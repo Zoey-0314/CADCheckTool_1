@@ -1,12 +1,19 @@
-﻿using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-
+using Autodesk.AutoCAD.Runtime;
+using Correct_test1.Batch;
+using Correct_test1.Checks;
+using Correct_test1.Core;
+using Correct_test1.Export;
+using Correct_test1.Models;
+using Correct_test1.Readers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using WinForms = System.Windows.Forms;
+using static Autodesk.AutoCAD.LayerManager.LayerFilter;
 
 
 namespace Correct_test1
@@ -14,7 +21,113 @@ namespace Correct_test1
     public class Class1
     {
 
+        [CommandMethod("CHECKFOLDER")]
+        public void CheckFolder()
+        {
 
+
+            Document doc =
+                Autodesk.AutoCAD.ApplicationServices.Application
+                .DocumentManager
+                .MdiActiveDocument;
+
+
+            Editor ed =
+                doc.Editor;
+
+
+
+            //选择文件夹
+            WinForms.FolderBrowserDialog dialog =
+                new WinForms.FolderBrowserDialog();
+
+
+            if (dialog.ShowDialog() != WinForms.DialogResult.OK)
+                return;
+
+
+
+            string folder =
+                dialog.SelectedPath;
+
+
+
+            PromptStringOptions options =
+                new PromptStringOptions(
+                    "\n请输入正确项目号:"
+                );
+
+
+
+            PromptResult input =
+                ed.GetString(options);
+
+
+
+            if (input.Status != PromptStatus.OK)
+                return;
+
+
+
+            string expected =
+                input.StringResult;
+
+
+
+            BatchChecker checker =
+                new BatchChecker();
+
+
+
+            List<CheckResult> results =
+                checker.CheckFolder(
+                    folder,
+                    expected,
+                    ed
+                );
+
+
+
+            string path =
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.Desktop)
+                +
+                "\\CAD批量项目号检查报告.csv";
+
+
+
+            CsvExporter exporter =
+                new CsvExporter();
+
+
+            exporter.Export(
+                results,
+                path
+            );
+            string errorPath =
+    Environment.GetFolderPath(
+        Environment.SpecialFolder.Desktop)
+    +
+    "\\CAD错误报告.csv";
+
+
+            exporter.ExportError(
+                results,
+                errorPath
+            );
+
+
+
+
+            Autodesk.AutoCAD.ApplicationServices.Application
+            .ShowAlertDialog(
+                "批量检查完成!\n报告:"
+                +
+                path
+            );
+
+
+        }
         [CommandMethod("CHECKALL")]
         public void CheckAll()
         {
@@ -516,5 +629,219 @@ namespace Correct_test1
         }
 
 
+
+        [CommandMethod("TESTPROJECT")]
+        public void TestProject()
+        {
+            {
+
+                ProjectChecker checker =
+                    new ProjectChecker();
+
+
+                var result =
+                    checker.CheckProject(
+                        "N2607US004-L0",
+                        "N2607US004-L0"
+                    );
+
+
+                Application.ShowAlertDialog(
+                    result.Message
+                );
+
+            }
+
+
+        }
+
+        [CommandMethod("CHECKPROJECT")]
+        public void CheckProject()
+        {
+
+
+            Document doc =
+                Autodesk.AutoCAD.ApplicationServices.Application
+                .DocumentManager
+                .MdiActiveDocument;
+
+
+
+            Editor ed = doc.Editor;
+
+
+
+            Database db = doc.Database;
+
+
+
+            ProjectReader reader =
+                new ProjectReader();
+
+
+
+            List<string> projects =
+                reader.ReadProjects(
+                    db,
+                    ed
+                );
+
+
+
+            //让用户输入项目号
+
+            PromptStringOptions options =
+                new PromptStringOptions(
+                    "\n请输入正确项目号:"
+                );
+
+
+            options.AllowSpaces = false;
+
+
+            PromptResult input =
+                ed.GetString(options);
+
+
+
+            if (input.Status != PromptStatus.OK)
+            {
+                return;
+            }
+
+
+            string expected =
+                input.StringResult;
+
+
+
+            ProjectChecker checker =
+                new ProjectChecker();
+
+
+
+            foreach (string p in projects)
+            {
+
+
+                CheckResult result =
+                    checker.CheckProject(
+                        p,
+                        expected
+                    );
+
+
+
+                if (!result.IsError)
+                {
+
+                    Autodesk.AutoCAD.ApplicationServices.Application
+                    .ShowAlertDialog(
+                        result.Message
+                    );
+
+
+                    return;
+
+                }
+
+
+            }
+
+
+
+            Autodesk.AutoCAD.ApplicationServices.Application
+            .ShowAlertDialog(
+                "未找到正确项目号"
+            );
+
+
+        }
+        [CommandMethod("CHECKDRAWING")]
+        public void CheckDrawing()
+        {
+
+
+            Document doc =
+                Autodesk.AutoCAD.ApplicationServices.Application
+                .DocumentManager
+                .MdiActiveDocument;
+
+
+            Editor ed = doc.Editor;
+
+
+            Database db = doc.Database;
+
+
+
+            //输入项目号
+
+            PromptStringOptions options =
+                new PromptStringOptions(
+                    "\n请输入正确项目号:"
+                );
+
+
+            PromptResult input =
+                ed.GetString(options);
+
+
+
+            if (input.Status != PromptStatus.OK)
+                return;
+
+
+
+            string expected =
+                input.StringResult;
+
+
+
+            //调用检查中心
+
+            DrawingCheckManager manager =
+                new DrawingCheckManager();
+
+
+
+            List<CheckResult> results =
+                manager.CheckDrawing(
+                    db,
+                    ed,
+                    expected
+                );
+
+
+
+            //输出CSV
+
+            string path =
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.Desktop)
+                +
+                "\\CAD项目号检查报告.csv";
+
+
+
+            CsvExporter exporter =
+                new CsvExporter();
+
+
+            exporter.Export(
+                results,
+                path
+            );
+
+
+
+            Autodesk.AutoCAD.ApplicationServices.Application
+            .ShowAlertDialog(
+                "检查完成!\n报告位置:\n"
+                + path
+            );
+
+
+        }
     }
 }
