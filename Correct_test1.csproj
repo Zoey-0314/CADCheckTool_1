@@ -7,8 +7,8 @@
     <ProjectGuid>{DE764F27-CF1C-420B-918A-D2F5DC66807C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Correcet_test1</RootNamespace>
-    <AssemblyName>Correcet_test1</AssemblyName>
+    <RootNamespace>Correct_test1</RootNamespace>
+    <AssemblyName>Correct_test1</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -63,6 +63,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -72,15 +73,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandEntry.cs" />
+    <Compile Include="Export\TitleCsvExporter.cs" />
+    <Compile Include="Markers\ErrorMarker.cs" />
+    <Compile Include="Models\DrawingInfo.cs" />
+    <Compile Include="Models\FrameInfo.cs" />
+    <Compile Include="Models\HorizontalTitleBlockTemplate.cs" />
+    <Compile Include="Models\LayoutInfo.cs" />
+    <Compile Include="Models\RevisionInfo.cs" />
+    <Compile Include="Models\RevisionTableTemplate.cs" />
+    <Compile Include="Models\TitleBlockData.cs" />
+    <Compile Include="Models\TitleText.cs" />
+    <Compile Include="Models\VerticalTitleBlockTemplate.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Batch\BatchChecker.cs" />
     <Compile Include="Checks\ProjectChecker.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="Core\DrawingCheckManager.cs" />
     <Compile Include="Export\CsvExporter.cs" />
     <Compile Include="Models\CheckResult.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Readers\FileNameProjectReader.cs" />
+    <Compile Include="Readers\FrameReader.cs" />
+    <Compile Include="Readers\LayoutReader.cs" />
     <Compile Include="Readers\ProjectReader.cs" />
+    <Compile Include="CheckForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CheckForm.Designer.cs">
+      <DependentUpon>CheckForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Readers\RevisionTableReader.cs" />
+    <Compile Include="Readers\TitleBlockParser.cs" />
+    <Compile Include="Readers\TitleBlockReader.cs" />
+    <Compile Include="TitleTestCommand.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="CheckForm.resx">
+      <DependentUpon>CheckForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

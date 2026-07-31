@@ -4,10 +4,13 @@ using Autodesk.AutoCAD.EditorInput;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+
 namespace Correct_test1.Readers
 {
+
     public class ProjectReader
     {
+
 
 
         public List<string> ReadProjects(
@@ -42,6 +45,7 @@ namespace Correct_test1.Readers
 
 
 
+
                 foreach (ObjectId spaceId in spaces)
                 {
 
@@ -51,6 +55,7 @@ namespace Correct_test1.Readers
                             spaceId,
                             OpenMode.ForRead)
                         as BlockTableRecord;
+
 
 
 
@@ -66,6 +71,13 @@ namespace Correct_test1.Readers
 
 
 
+                        if (ent == null)
+                            continue;
+
+
+
+                        //读取块
+
                         if (ent is BlockReference block)
                         {
 
@@ -79,9 +91,43 @@ namespace Correct_test1.Readers
                         }
 
 
+
+                        //读取普通文字
+
+                        else if (ent is DBText text)
+                        {
+
+                            AddProject(
+                                text.TextString,
+                                projects,
+                                ed
+                            );
+
+                        }
+
+
+
+                        //读取普通多行文字
+
+                        else if (ent is MText mtext)
+                        {
+
+                            AddProject(
+                                mtext.Text,
+                                projects,
+                                ed
+                            );
+
+                        }
+
+
+
                     }
 
+
+
                 }
+
 
 
                 trans.Commit();
@@ -92,21 +138,49 @@ namespace Correct_test1.Readers
 
             return projects;
 
+
         }
 
 
-        private bool IsProjectNumber(string text)
+
+
+
+
+
+        /*
+         
+         判断是否为项目号
+
+         支持：
+
+         N2607US004
+
+         N2607US004-L0
+
+         N2412CN001-CM1
+
+        */
+
+
+        private bool IsProjectNumber(
+            string text)
         {
+
 
             if (string.IsNullOrEmpty(text))
                 return false;
 
 
-            text = text.Trim();
+
+            text =
+                text.Trim()
+                .ToUpper();
+
 
 
             string pattern =
-                @"^N\d{4}US\d{3}-L\d+$";
+                @"N\d{4}[A-Z]{2}\d{3}(-[A-Z0-9]+)?";
+
 
 
             return Regex.IsMatch(
@@ -114,7 +188,125 @@ namespace Correct_test1.Readers
                 pattern
             );
 
+
         }
+
+
+
+
+
+
+
+
+        /*
+         
+         提取项目主体
+
+         N2607US004-L0
+
+         ↓
+
+         N2607US004
+
+        */
+
+
+        private string GetProjectNumber(
+            string text)
+        {
+
+
+            Match match =
+                Regex.Match(
+                    text.ToUpper(),
+                    @"N\d{4}[A-Z]{2}\d{3}"
+                );
+
+
+
+            if (match.Success)
+            {
+
+                return match.Value;
+
+            }
+
+
+            return null;
+
+
+        }
+
+
+
+
+
+
+
+
+
+        private void AddProject(
+            string text,
+            List<string> projects,
+            Editor ed)
+        {
+
+
+            if (string.IsNullOrEmpty(text))
+                return;
+
+
+
+            //去除MText换行
+
+            text =
+                text.Replace(
+                    "\\P",
+                    ""
+                )
+                .Trim();
+
+
+
+            if (IsProjectNumber(text))
+            {
+
+
+                string projectNumber =
+                    GetProjectNumber(text);
+
+
+
+                if (!string.IsNullOrEmpty(projectNumber))
+                {
+
+
+                    projects.Add(
+                        projectNumber
+                    );
+
+
+                    ed.WriteMessage(
+                        "\n发现项目号:"
+                        + projectNumber
+                    );
+
+
+                }
+
+
+            }
+
+
+
+        }
+
+
+
+
+
+
+
 
 
         private void ReadBlock(
@@ -123,6 +315,7 @@ namespace Correct_test1.Readers
             List<string> projects,
             Editor ed)
         {
+
 
 
             BlockTableRecord btr =
@@ -136,6 +329,7 @@ namespace Correct_test1.Readers
             foreach (ObjectId id in btr)
             {
 
+
                 Entity ent =
                     trans.GetObject(
                         id,
@@ -144,25 +338,21 @@ namespace Correct_test1.Readers
 
 
 
+                if (ent == null)
+                    continue;
+
+
+
                 if (ent is DBText text)
                 {
 
-                    string value =
-                        text.TextString;
 
+                    AddProject(
+                        text.TextString,
+                        projects,
+                        ed
+                    );
 
-                    if (IsProjectNumber(value))
-                    {
-
-                        projects.Add(value);
-
-
-                        ed.WriteMessage(
-                            "\n发现项目号:"
-                            + value
-                        );
-
-                    }
 
                 }
 
@@ -172,23 +362,12 @@ namespace Correct_test1.Readers
                 {
 
 
-                    string value =
-                        mtext.Text.Trim();
+                    AddProject(
+                        mtext.Text,
+                        projects,
+                        ed
+                    );
 
-
-
-                    if (IsProjectNumber(value))
-                    {
-
-                        projects.Add(value);
-
-
-                        ed.WriteMessage(
-                            "\n发现项目号:"
-                            + value
-                        );
-
-                    }
 
                 }
 
@@ -199,5 +378,7 @@ namespace Correct_test1.Readers
         }
 
 
+
     }
+
 }
