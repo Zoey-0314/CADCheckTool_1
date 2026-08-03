@@ -21,8 +21,9 @@ namespace Correct_test1
 {
 
 
-    public class RevisionTestCommand
+    public class TitleTestCommand
     {
+
 
 
         [CommandMethod("TESTREVISION")]
@@ -52,15 +53,16 @@ namespace Correct_test1
 
 
 
+
             try
             {
-
 
 
                 //读取布局
 
                 LayoutReader layoutReader =
                     new LayoutReader();
+
 
 
 
@@ -73,8 +75,10 @@ namespace Correct_test1
 
 
 
+
                 RevisionTableReader reader =
                     new RevisionTableReader();
+
 
 
 
@@ -98,7 +102,7 @@ namespace Correct_test1
 
 
                     sw.WriteLine(
-                        "布局,标记,更改内容,更改日期,签名,变更号"
+                        "布局,类型,标记,更改内容,更改日期,签名,变更号,右标记,右更改内容,右日期,右签名,右变更号"
                     );
 
 
@@ -108,7 +112,6 @@ namespace Correct_test1
 
                     foreach (LayoutInfo layout in layouts)
                     {
-
 
 
                         //跳过模型空间
@@ -121,10 +124,82 @@ namespace Correct_test1
 
 
 
+                        // 根据修改记录表中的“标记”数量判断方向
+
+                        List<TitleText> layoutTexts =
+                            reader.ReadAllTexts(
+                                db,
+                                layout.BlockTableRecordId
+                            );
+
+
+                        int markCount =
+                            0;
+
+
+                        foreach (TitleText text in layoutTexts)
+                        {
+
+                            if (text.Text.Trim() == "标记")
+                            {
+                                markCount++;
+                            }
+
+                        }
+
+
+
+                        bool isHorizontal =
+                            markCount >= 2;
+
+
+
                         ed.WriteMessage(
-                            "\n读取布局:"
+                            "\n标记数量:"
+                            +
+                            markCount
+                        );
+
+
+
+
+
+
+                        ed.WriteMessage(
+                            "\n===================="
+                        );
+
+
+                        ed.WriteMessage(
+                            "\n布局:"
                             +
                             layout.LayoutName
+                        );
+
+
+                        ed.WriteMessage(
+                            "\n宽:"
+                            +
+                            layout.Width
+                            +
+                            " 高:"
+                            +
+                            layout.Height
+                        );
+
+
+
+
+                        ed.WriteMessage(
+                            "\n判断方向:"
+                            +
+                            (
+                            isHorizontal
+                            ?
+                            "横版"
+                            :
+                            "竖版"
+                            )
                         );
 
 
@@ -133,67 +208,198 @@ namespace Correct_test1
 
 
 
-                        List<RevisionInfo> revisions =
-                            reader.Read(
-    db,
-    layout.BlockTableRecordId,
-    layout.Width > layout.Height
-);
 
 
+                        //========================
+                        // 横版
+                        //========================
 
 
-
-
-
-
-                        foreach (RevisionInfo rev in revisions)
+                        if (isHorizontal)
                         {
 
 
-                            sw.WriteLine(
 
-                                layout.LayoutName
+                            List<HorizontalRevisionRow> rows =
+                                reader.ReadHorizontalRows(
+                                    db,
+                                    layout.BlockTableRecordId
+                                );
+
+
+
+
+
+
+                            ed.WriteMessage(
+                                "\n横版读取数量:"
                                 +
-                                ","
-
-                                +
-
-                                Escape(rev.Mark)
-
-                                +
-
-                                ","
-
-                                +
-
-                                Escape(rev.Description)
-
-                                +
-
-                                ","
-
-                                +
-
-                                Escape(rev.Date)
-
-                                +
-
-                                ","
-
-                                +
-
-                                Escape(rev.Signer)
-
-                                +
-
-                                ","
-
-                                +
-
-                                Escape(rev.RevisionNumber)
-
+                                rows.Count
                             );
+
+
+
+
+
+
+
+                            foreach (
+                                HorizontalRevisionRow row
+                                in rows)
+                            {
+
+
+
+                                sw.WriteLine(
+
+                                    layout.LayoutName
+                                    +
+                                    ",横版,"
+                                    +
+
+                                    Escape(row.Left.Mark)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Left.Description)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Left.Date)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Left.Signer)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Left.RevisionNumber)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Right.Mark)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Right.Description)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Right.Date)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Right.Signer)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(row.Right.RevisionNumber)
+
+                                );
+
+
+
+                            }
+
+
+
+
+                        }
+
+
+
+
+
+
+
+
+
+                        //========================
+                        // 竖版
+                        //========================
+
+                        else
+                        {
+
+
+
+                            List<RevisionInfo> revisions =
+                                reader.ReadVertical(
+                                    db,
+                                    layout.BlockTableRecordId
+                                );
+
+
+
+
+
+
+                            ed.WriteMessage(
+                                "\n竖版读取数量:"
+                                +
+                                revisions.Count
+                            );
+
+
+
+
+
+
+
+
+                            foreach (
+                                RevisionInfo rev
+                                in revisions)
+                            {
+
+
+
+                                sw.WriteLine(
+
+                                    layout.LayoutName
+                                    +
+                                    ",竖版,"
+                                    +
+
+                                    Escape(rev.Mark)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(rev.Description)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(rev.Date)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(rev.Signer)
+                                    +
+                                    ","
+                                    +
+
+                                    Escape(rev.RevisionNumber)
+                                    +
+                                    ",,,,,"
+
+                                );
+
+
+
+                            }
+
 
 
                         }
@@ -215,6 +421,8 @@ namespace Correct_test1
 
 
 
+
+
                 WinForms.MessageBox.Show(
                     "完成\nCSV文件:\n"
                     +
@@ -225,8 +433,10 @@ namespace Correct_test1
 
 
 
-
             }
+
+
+
             catch (System.Exception ex)
             {
 
@@ -241,7 +451,6 @@ namespace Correct_test1
 
 
 
-
         }
 
 
@@ -249,9 +458,13 @@ namespace Correct_test1
 
 
 
+
+
+
         /// <summary>
-        /// 防止CSV逗号导致错列
+        /// CSV转义
         /// </summary>
+
         private string Escape(
             string value)
         {
@@ -262,14 +475,20 @@ namespace Correct_test1
 
 
 
+
+
             if (value.Contains(","))
             {
 
                 return "\""
-                    + value
-                    + "\"";
+                    +
+                    value
+                    +
+                    "\"";
 
             }
+
+
 
 
 
@@ -281,6 +500,7 @@ namespace Correct_test1
 
 
     }
+
 
 
 }

@@ -1,121 +1,67 @@
 ﻿namespace Correct_test1.Models
 {
 
-
-    /// <summary>
-    /// 横版修改记录模板
-    /// </summary>
-    public class HorizontalRevisionTemplate
+    public class HorizontalTitleBlockTemplate
     {
 
 
-        /*
-         
-         横版修改记录区域
-
-         根据你提供的横板图纸数据
-
-         */
-
-
-        /// <summary>
-        /// 左边界
-        /// </summary>
-        public double MinX
+        public double RevisionMinX
         {
-            get;
-            set;
+            get { return 45.2828; }
+        }
+
+
+        public double RevisionMaxX
+        {
+            get { return 329.8438; }
         }
 
 
 
-        /// <summary>
-        /// 右边界
-        /// </summary>
-        public double MaxX
+        public double RevisionTopY
         {
-            get;
-            set;
+            get { return 77.145; }
         }
 
 
-
-        /// <summary>
-        /// 下边界
-        /// </summary>
-        public double MinY
+        public double RevisionBottomY
         {
-            get;
-            set;
-        }
-
-
-
-        /// <summary>
-        /// 上边界
-        /// </summary>
-        public double MaxY
-        {
-            get;
-            set;
+            get { return 37.145; }
         }
 
 
 
 
-
-        public HorizontalRevisionTemplate()
-        {
-
-
-            /*
-             
-             横版修改记录大区域
-
-             根据横板：
-
-             更改记录标题
-             标记
-             更改内容
-             日期
-             签名
-             变更号
-
-             */
-
-
-            MinX = 14.0;
-
-
-            MaxX = 330.0;
-
-
-
-            MinY = 37.0;
-
-
-            MaxY = 77.5;
-
-
-
-        }
-
-
-
-
-
-
-        //列分割
-
-
-        /// <summary>
-        /// 标记右边
-        /// </summary>
-        public double MarkEndX
+        // 十列边界
+        public double[] XLines
         {
             get
             {
-                return 53.0;
+                return new double[]
+                {
+
+                    // 左五列
+
+                    45.2828,
+                    55.2828,
+                    130.2828,
+                    150.2828,
+                    170.2828,
+
+
+                    // 中间分割线
+
+                    187.5633,
+
+
+                    // 右五列
+
+                    197.5633,
+                    272.5633,
+                    292.5633,
+                    312.5633,
+                    329.8438
+                };
             }
         }
 
@@ -123,51 +69,35 @@
 
 
 
-        /// <summary>
-        /// 内容右边
-        /// </summary>
-        public double DescriptionEndX
+        // 行边界
+
+        public double[] YLines
         {
             get
             {
-                return 220.0;
-            }
-        }
+                return new double[]
+                {
+
+                    // 标题下面
+
+                    77.145,
 
 
+                    // 数据行
 
+                    67.145,
+                    61.145,
+                    55.145,
+                    49.145,
+                    43.145,
+                    37.145
 
-
-
-        /// <summary>
-        /// 日期右边
-        /// </summary>
-        public double DateEndX
-        {
-            get
-            {
-                return 260.0;
-            }
-        }
-
-
-
-
-
-        /// <summary>
-        /// 签名右边
-        /// </summary>
-        public double SignerEndX
-        {
-            get
-            {
-                return 300.0;
+                };
             }
         }
 
 
 
     }
-
 
 }
