@@ -73,7 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandEntry.cs" />
+    <Compile Include="Command\TitleTestCommand.cs" />
     <Compile Include="Export\TitleCsvExporter.cs" />
     <Compile Include="Markers\ErrorMarker.cs" />
     <Compile Include="Models\DrawingInfo.cs" />
@@ -104,15 +104,11 @@
     <Compile Include="Readers\RevisionTableReader.cs" />
     <Compile Include="Readers\TitleBlockParser.cs" />
     <Compile Include="Readers\TitleBlockReader.cs" />
-    <Compile Include="TitleTestCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CheckForm.resx">
       <DependentUpon>CheckForm.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="file1.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
