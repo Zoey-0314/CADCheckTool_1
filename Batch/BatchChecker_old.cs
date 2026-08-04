@@ -12,7 +12,7 @@ using Correct_test1.Models;
 namespace Correct_test1.Batch
 {
 
-    public class BatchChecker
+    public class BatchChecker_old
     {
 
 

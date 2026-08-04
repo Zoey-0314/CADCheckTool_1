@@ -23,20 +23,14 @@ namespace Correct_test1
                 Application.DocumentManager
                 .MdiActiveDocument;
 
-
             if (doc == null)
                 return;
-
-
 
             Database db =
                 doc.Database;
 
-
             Editor ed =
                 doc.Editor;
-
-
 
             try
             {
@@ -44,30 +38,20 @@ namespace Correct_test1
                 LayoutReader layoutReader =
                     new LayoutReader();
 
-
-
                 List<LayoutInfo> layouts =
                     layoutReader.ReadLayouts(
                         db,
                         ed
                     );
 
-
-
                 RevisionTableReader reader =
                     new RevisionTableReader();
-
-
 
                 RevisionChecker checker =
                     new RevisionChecker();
 
-
-
                 string path =
                     @"D:\Revision_Check_Error.csv";
-
-
 
                 using (StreamWriter sw =
                     new StreamWriter(
@@ -76,27 +60,17 @@ namespace Correct_test1
                         Encoding.UTF8))
                 {
 
-
                     sw.WriteLine(
                         "布局,标记,缺少字段,说明"
                     );
 
-
-
-
                     foreach (LayoutInfo layout in layouts)
                     {
-
 
                         if (layout.IsModelSpace)
                             continue;
 
-
-
-
                         bool isHorizontal;
-
-
 
                         //==========================
                         // 使用已有标记数量判断横竖
@@ -108,11 +82,7 @@ namespace Correct_test1
                                 layout.BlockTableRecordId
                             );
 
-
-
                         int markCount = 0;
-
-
 
                         foreach (TitleText t in texts)
                         {
@@ -125,21 +95,14 @@ namespace Correct_test1
 
                         }
 
-
-
                         isHorizontal =
                             markCount >= 2;
-
-
 
                         List<RevisionInfo> revisions =
                             new List<RevisionInfo>();
 
-
-
                         if (isHorizontal)
                         {
-
 
                             revisions =
                                 reader.ReadHorizontal(
@@ -147,11 +110,9 @@ namespace Correct_test1
                                     layout.BlockTableRecordId
                                 );
 
-
                         }
                         else
                         {
-
 
                             revisions =
                                 reader.ReadVertical(
@@ -161,18 +122,11 @@ namespace Correct_test1
 
                         }
 
-
-
-
                         List<RevisionCheckIssue> issues =
                             checker.Check(
                                 layout.LayoutName,
                                 revisions
                             );
-
-
-
-
 
                         foreach (
                             RevisionCheckIssue issue
@@ -214,15 +168,9 @@ namespace Correct_test1
 
                         }
 
-
-
                     }
 
-
-
                 }
-
-
 
                 System.Windows.Forms.MessageBox.Show(
                     "检查完成\n"

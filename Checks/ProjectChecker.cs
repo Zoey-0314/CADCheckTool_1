@@ -1,36 +1,27 @@
 ﻿using Correct_test1.Models;
 
-
 namespace Correct_test1.Checks
 {
     public class ProjectChecker
     {
-
 
         public CheckResult CheckProject(
             string currentProject,
             string expectedProject)
         {
 
-
             CheckResult result =
                 new CheckResult();
 
-
             result.Type = "项目号检查";
 
-
             result.ObjectName = "项目号";
-
 
             result.CurrentValue =
                 currentProject;
 
-
             result.ExpectedValue =
                 expectedProject;
-
-
 
             if (currentProject == expectedProject)
             {
@@ -51,11 +42,9 @@ namespace Correct_test1.Checks
 
             }
 
-
             return result;
 
         }
-
 
     }
 }

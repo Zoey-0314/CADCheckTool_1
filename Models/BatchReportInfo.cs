@@ -8,18 +8,9 @@
     /// </summary>
     public static class BatchReportInfo
     {
-
-
         /// <summary>
         /// 最近一次生成的CSV报告路径
         /// </summary>
-        public static string LastReportPath
-        {
-            get;
-            set;
-        } = "";
-
-
-
+        public static string LastReportPath { get; set; } = "";
     }
 }

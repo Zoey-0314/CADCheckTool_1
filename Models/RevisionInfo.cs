@@ -1,7 +1,5 @@
 ﻿namespace Correct_test1.Models
 {
-
-
     /// <summary>
     /// 图纸修改记录信息
     /// 对应标题栏中的：
@@ -13,8 +11,6 @@
     /// </summary>
     public class RevisionInfo
     {
-
-
         /// <summary>
         /// 修改标记
         /// 例如:
@@ -22,85 +18,35 @@
         /// 2
         /// A
         /// </summary>
-        public string Mark
-        {
-            get;
-            set;
-        }
-
-
-
-
+        public string Mark { get; set; }
 
         /// <summary>
         /// 修改内容
         /// </summary>
-        public string Description
-        {
-            get;
-            set;
-        }
-
-
-
-
+        public string Description { get; set; }
 
         /// <summary>
         /// 修改日期
         /// </summary>
-        public string Date
-        {
-            get;
-            set;
-        }
-
-
-
-
+        public string Date { get; set; }
 
         /// <summary>
         /// 修改人员签名
         /// </summary>
-        public string Signer
-        {
-            get;
-            set;
-        }
-
-
-
-
+        public string Signer { get; set; }
 
         /// <summary>
         /// 变更号
         /// </summary>
-        public string RevisionNumber
-        {
-            get;
-            set;
-        }
-
-
-
-
+        public string RevisionNumber { get; set; }
 
         public RevisionInfo()
         {
-
             Mark = "";
-
             Description = "";
-
             Date = "";
-
             Signer = "";
-
             RevisionNumber = "";
-
         }
-
-
-
     }
-
 }

@@ -9,7 +9,6 @@ namespace Correct_test1.Checks
     public class RevisionIssueMapper
     {
 
-
         public List<RevisionMarkPoint> Map(
             List<RevisionCheckIssue> issues,
             List<RevisionLocation> locations)
@@ -17,7 +16,6 @@ namespace Correct_test1.Checks
 
             List<RevisionMarkPoint> result =
                 new List<RevisionMarkPoint>();
-
 
             foreach (var issue in issues)
             {
@@ -28,34 +26,23 @@ namespace Correct_test1.Checks
                         issue.Mark
                     );
 
-
                 if (loc == null)
                     continue;
-
-
 
                 RevisionMarkPoint point =
                     new RevisionMarkPoint();
 
-
-
                 point.LayoutName =
                     issue.LayoutName;
-
 
                 point.Mark =
                     issue.Mark;
 
-
                 point.MissingField =
                     issue.MissingField;
 
-
                 point.Message =
                     issue.Message;
-
-
-
 
                 if (issue.MissingField == "更改日期")
                 {
@@ -68,7 +55,6 @@ namespace Correct_test1.Checks
 
                 }
 
-
                 else if (issue.MissingField == "签名")
                 {
 
@@ -80,19 +66,13 @@ namespace Correct_test1.Checks
 
                 }
 
-
                 result.Add(point);
 
             }
 
-
             return result;
 
         }
-
-
-
-
 
         private RevisionLocation FindLocation(
             List<RevisionLocation> locations,
@@ -107,11 +87,9 @@ namespace Correct_test1.Checks
 
             }
 
-
             return null;
 
         }
-
 
     }
 

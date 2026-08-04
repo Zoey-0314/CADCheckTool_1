@@ -18,17 +18,10 @@ namespace Correct_test1
     public partial class BatchCheckForm : Form
     {
 
-
         public BatchCheckForm()
         {
             InitializeComponent();
         }
-
-
-
-
-
-
 
         /// <summary>
         /// 执行批量检查
@@ -41,16 +34,11 @@ namespace Correct_test1
             try
             {
 
-
                 FolderBrowserDialog dialog =
                     new FolderBrowserDialog();
 
-
-
                 dialog.Description =
                     "请选择需要批量检查的DWG文件夹";
-
-
 
                 if (dialog.ShowDialog()
                     != DialogResult.OK)
@@ -58,46 +46,23 @@ namespace Correct_test1
                     return;
                 }
 
-
-
                 string folderPath =
                     dialog.SelectedPath;
-
-
-
-
-
-
 
                 //打开进度窗口
 
                 BatchProgressForm progressForm =
                     new BatchProgressForm();
 
-
-
                 progressForm.Show();
-
-
-
-
-
-
 
                 BatchCheckerManager manager =
                     new BatchCheckerManager();
-
-
-
-
-
-
 
                 List<CheckResult> results =
                     manager.CheckFolder(
 
                         folderPath,
-
 
                         (percent, total, name) =>
                         {
@@ -107,35 +72,18 @@ namespace Correct_test1
                                 name
                             );
 
-
                         }
 
                     );
-
-
-
-
-
-
-
 
                 //关闭进度窗口
 
                 progressForm.Close();
 
-
-
-
-
-
-
                 //生成报告
 
                 BatchCsvExporter exporter =
                     new BatchCsvExporter();
-
-
-
 
                 string csvPath =
                     exporter.Export(
@@ -143,18 +91,8 @@ namespace Correct_test1
                         folderPath
                     );
 
-
-
-
-
                 BatchReportInfo.LastReportPath =
                     csvPath;
-
-
-
-
-
-
 
                 DialogResult dr =
                     MessageBox.Show(
@@ -167,21 +105,13 @@ namespace Correct_test1
                         +
                         "\n\n是否打开检查报告？",
 
-
                         "批量检查",
 
-
                         MessageBoxButtons.YesNo,
-
 
                         MessageBoxIcon.Information
 
                     );
-
-
-
-
-
 
                 if (dr == DialogResult.Yes)
                 {
@@ -192,12 +122,9 @@ namespace Correct_test1
 
                 }
 
-
-
             }
             catch (Exception ex)
             {
-
 
                 MessageBox.Show(
 
@@ -207,19 +134,9 @@ namespace Correct_test1
 
                 );
 
-
             }
 
-
         }
-
-
-
-
-
-
-
-
 
         /// <summary>
         /// 打开最近报告
@@ -232,11 +149,8 @@ namespace Correct_test1
             try
             {
 
-
                 string path =
                     BatchReportInfo.LastReportPath;
-
-
 
                 if (!string.IsNullOrEmpty(path)
                     &&
@@ -258,7 +172,6 @@ namespace Correct_test1
 
                 }
 
-
             }
             catch (Exception ex)
             {
@@ -270,16 +183,7 @@ namespace Correct_test1
 
             }
 
-
         }
-
-
-
-
-
-
-
-
 
         /// <summary>
         /// 清除当前打开图纸修改注释
@@ -292,17 +196,13 @@ namespace Correct_test1
             try
             {
 
-
                 Document doc =
                     Autodesk.AutoCAD.ApplicationServices.Application
                     .DocumentManager
                     .MdiActiveDocument;
 
-
-
                 if (doc == null)
                 {
-
                     MessageBox.Show(
                         "当前没有打开CAD图纸"
                     );
@@ -310,10 +210,6 @@ namespace Correct_test1
                     return;
 
                 }
-
-
-
-
 
                 using (DocumentLock lockDoc =
                     doc.LockDocument())
@@ -329,14 +225,9 @@ namespace Correct_test1
 
                 }
 
-
-
-
-
                 MessageBox.Show(
                     "当前图纸修改注释已清除"
                 );
-
 
             }
             catch (Exception ex)
@@ -349,16 +240,7 @@ namespace Correct_test1
 
             }
 
-
         }
-
-
-
-
-
-
-
-
 
         /// <summary>
         /// 清除文件夹所有修改注释
@@ -371,16 +253,11 @@ namespace Correct_test1
             try
             {
 
-
                 FolderBrowserDialog dialog =
                     new FolderBrowserDialog();
 
-
-
                 dialog.Description =
                     "请选择需要清除修改注释的DWG文件夹";
-
-
 
                 if (dialog.ShowDialog()
                     != DialogResult.OK)
@@ -388,25 +265,13 @@ namespace Correct_test1
                     return;
                 }
 
-
-
-
-
                 BatchMarkerCleaner cleaner =
                     new BatchMarkerCleaner();
-
-
-
-
 
                 List<string> result =
                     cleaner.ClearFolderMarkers(
                         dialog.SelectedPath
                     );
-
-
-
-
 
                 MessageBox.Show(
 
@@ -421,8 +286,6 @@ namespace Correct_test1
 
                 );
 
-
-
             }
             catch (Exception ex)
             {
@@ -434,16 +297,7 @@ namespace Correct_test1
 
             }
 
-
         }
-
-
-
-
-
-
-
-
 
         /// <summary>
         /// 关闭窗口
@@ -456,8 +310,6 @@ namespace Correct_test1
             Close();
 
         }
-
-
 
     }
 

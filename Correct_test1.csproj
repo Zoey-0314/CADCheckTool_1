@@ -73,25 +73,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BatchCheckForm.cs">
+    <Compile Include="Forms\BatchCheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BatchCheckForm.Designer.cs">
+    <Compile Include="Forms\BatchCheckForm.Designer.cs">
       <DependentUpon>BatchCheckForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="BatchProgressForm.cs">
+    <Compile Include="Forms\BatchProgressForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BatchProgressForm.Designer.cs">
+    <Compile Include="Forms\BatchProgressForm.Designer.cs">
       <DependentUpon>BatchProgressForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Batch\BatchCheckerManager.cs" />
     <Compile Include="Batch\BatchMarkerCleaner.cs" />
     <Compile Include="Batch\DrawingWeightCalculator.cs" />
-    <Compile Include="CheckSelectForm.cs">
+    <Compile Include="Forms\CheckSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CheckSelectForm.Designer.cs">
+    <Compile Include="Forms\CheckSelectForm.Designer.cs">
       <DependentUpon>CheckSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Checks\RevisionChecker.cs" />
@@ -117,39 +117,42 @@
     <Compile Include="Models\TitleText.cs" />
     <Compile Include="Models\VerticalTitleBlockTemplate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Batch\BatchChecker.cs" />
+    <Compile Include="Batch\BatchChecker_old.cs" />
     <Compile Include="Checks\ProjectChecker.cs" />
     <Compile Include="Core\DrawingCheckManager.cs" />
-    <Compile Include="Export\CsvExporter.cs" />
+    <Compile Include="Export\CsvExporter_old.cs" />
     <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Readers\FileNameProjectReader.cs" />
     <Compile Include="Readers\FrameReader.cs" />
     <Compile Include="Readers\LayoutReader.cs" />
     <Compile Include="Readers\ProjectReader.cs" />
-    <Compile Include="CheckForm.cs">
+    <Compile Include="Forms\CheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CheckForm.Designer.cs">
+    <Compile Include="Forms\CheckForm.Designer.cs">
       <DependentUpon>CheckForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Readers\RevisionLocationReader.cs" />
     <Compile Include="Readers\RevisionTableReader.cs" />
     <Compile Include="Readers\TitleBlockParser.cs" />
     <Compile Include="Readers\TitleBlockReader.cs" />
-    <Compile Include="SingleCheckForm.cs">
+    <Compile Include="Forms\SingleCheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SingleCheckForm.Designer.cs">
+    <Compile Include="Forms\SingleCheckForm.Designer.cs">
       <DependentUpon>SingleCheckForm.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BatchProgressForm.resx">
+    <EmbeddedResource Include="Forms\BatchProgressForm.resx">
       <DependentUpon>BatchProgressForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CheckForm.resx">
+    <EmbeddedResource Include="Forms\CheckForm.resx">
       <DependentUpon>CheckForm.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

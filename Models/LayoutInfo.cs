@@ -1,5 +1,4 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-
 using System.Collections.Generic;
 
 
@@ -17,47 +16,28 @@ namespace Correct_test1.Models
         /// <summary>
         /// 布局名称
         /// </summary>
-        public string LayoutName
-        {
-            get;
-            set;
-        }
+        public string LayoutName { get; set; }
 
 
 
         /// <summary>
         /// 对应空间ID
         /// </summary>
-        public ObjectId BlockTableRecordId
-        {
-            get;
-            set;
-        }
-
+        public ObjectId BlockTableRecordId { get; set; }
 
 
 
         /// <summary>
         /// 是否模型空间
         /// </summary>
-        public bool IsModelSpace
-        {
-            get;
-            set;
-        }
-
+        public bool IsModelSpace { get; set; }
 
 
 
         /// <summary>
         /// 是否有效图纸
         /// </summary>
-        public bool IsValidDrawing
-        {
-            get;
-            set;
-        }
-
+        public bool IsValidDrawing { get; set; }
 
 
 
@@ -66,44 +46,19 @@ namespace Correct_test1.Models
         //==============================
 
 
-        public double MinX
-        {
-            get;
-            set;
-        }
+        public double MinX { get; set; }
 
 
 
-        public double MinY
-        {
-            get;
-            set;
-        }
+        public double MinY { get; set; }
 
 
 
-        public double Width
-        {
-            get;
-            set;
-        }
+        public double Width { get; set; }
 
 
 
-        public double Height
-        {
-            get;
-            set;
-        }
-
-
-
-
-        //==============================
-        // 标题栏区域
-        //==============================
-
-
+        public double Height { get; set; }
 
 
 
@@ -112,29 +67,16 @@ namespace Correct_test1.Models
         //==============================
 
 
-        public List<TitleText> TitleTexts
-        {
-            get;
-            set;
-        }
-
-
+        public List<TitleText> TitleTexts { get; set; }
 
 
 
         public LayoutInfo()
         {
 
-
-
-
-
-            TitleTexts =
-                new List<TitleText>();
+            TitleTexts = new List<TitleText>();
 
         }
-
-
 
     }
 

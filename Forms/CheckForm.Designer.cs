@@ -1,4 +1,4 @@
-﻿namespace Correcet_test1
+﻿namespace Correct_test1
 {
     partial class CheckForm
     {

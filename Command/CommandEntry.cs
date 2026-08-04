@@ -1,16 +1,10 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+using System;
 using Autodesk.AutoCAD.Runtime;
-using Correcet_test1;
-using Correct_test1.Checks;
-using Correct_test1.Models;
-using Correct_test1.Readers;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using Autodesk.AutoCAD.ApplicationServices;
+using Correct_test1;
 
-namespace Correcet_test1
+namespace Correct_test1
 {
     public class CommandEntry
     {

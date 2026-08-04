@@ -7,13 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-
 namespace Correct_test1.Batch
 {
 
     public class BatchCheckerManager
     {
-
 
         /// <summary>
         /// 原版本
@@ -22,19 +20,11 @@ namespace Correct_test1.Batch
         public List<CheckResult> CheckFolder(
             string folderPath)
         {
-
             return CheckFolder(
                 folderPath,
                 null
             );
-
         }
-
-
-
-
-
-
 
         /// <summary>
         /// 带真实进度回调的批量检查
@@ -49,17 +39,11 @@ namespace Correct_test1.Batch
             Action<int, int, string> progress)
         {
 
-
             List<CheckResult> results =
                 new List<CheckResult>();
 
-
-
             if (!Directory.Exists(folderPath))
                 return results;
-
-
-
 
             string[] files =
                 Directory.GetFiles(
@@ -68,34 +52,20 @@ namespace Correct_test1.Batch
                     SearchOption.AllDirectories
                 );
 
-
-
-
             if (files.Length == 0)
                 return results;
-
-
-
-
 
             //--------------------------------
             // 第一步：计算所有DWG权重
             //--------------------------------
 
-
             DrawingWeightCalculator calculator =
                 new DrawingWeightCalculator();
-
-
 
             Dictionary<string, double> weights =
                 new Dictionary<string, double>();
 
-
-
             double totalWeight = 0;
-
-
 
             foreach (string file in files)
             {
@@ -105,65 +75,38 @@ namespace Correct_test1.Batch
                         file
                     );
 
-
-
                 weights.Add(
                     file,
                     weight
                 );
-
-
 
                 totalWeight +=
                     weight;
 
             }
 
-
-
-
-
             if (totalWeight <= 0)
                 totalWeight = 1;
 
-
-
-
-
-
             double finishedWeight = 0;
-
-
-
-
-
-
 
             //--------------------------------
             // 第二步：正式检查
             //--------------------------------
 
-
             foreach (string file in files)
             {
 
-
                 Database db = null;
-
-
 
                 try
                 {
-
 
                     db =
                         new Database(
                             false,
                             true
                         );
-
-
-
 
                     db.ReadDwgFile(
                         file,
@@ -172,22 +115,10 @@ namespace Correct_test1.Batch
                         ""
                     );
 
-
-
-
                     db.CloseInput(true);
-
-
-
-
-
 
                     DrawingCheckManager manager =
                         new DrawingCheckManager();
-
-
-
-
 
                     List<CheckResult> oneResults =
                         manager.CheckDrawing(
@@ -196,18 +127,9 @@ namespace Correct_test1.Batch
                             true
                         );
 
-
-
-
                     results.AddRange(
                         oneResults
                     );
-
-
-
-
-
-
 
                     //--------------------------------
                     // 保存绿色标记
@@ -218,12 +140,9 @@ namespace Correct_test1.Batch
                         DwgVersion.Current
                     );
 
-
-
                 }
                 catch (Exception ex)
                 {
-
 
                     results.Add(
                         new CheckResult
@@ -232,21 +151,14 @@ namespace Correct_test1.Batch
                             FilePath =
                                 file,
 
-
                             FileName =
                                 Path.GetFileName(file),
-
-
 
                             Type =
                                 "文件处理错误",
 
-
-
                             ObjectName =
                                 "DWG",
-
-
 
                             Message =
                                 ex.Message
@@ -255,14 +167,11 @@ namespace Correct_test1.Batch
                                 +
                                 ex.StackTrace,
 
-
-
                             IsError =
                                 true
 
                         }
                     );
-
 
                 }
                 finally
@@ -275,19 +184,12 @@ namespace Correct_test1.Batch
 
                 }
 
-
-
-
-
                 //--------------------------------
                 // 更新真实进度
                 //--------------------------------
 
-
                 finishedWeight +=
                     weights[file];
-
-
 
                 int percent =
                     (int)(
@@ -298,27 +200,17 @@ namespace Correct_test1.Batch
                         100
                     );
 
-
-
                 progress?.Invoke(
                     percent,
                     files.Length,
                     Path.GetFileName(file)
                 );
 
-
-
             }
-
-
-
-
 
             return results;
 
-
         }
-
 
     }
 

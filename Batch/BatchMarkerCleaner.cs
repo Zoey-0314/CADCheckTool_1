@@ -13,7 +13,6 @@ namespace Correct_test1.Batch
     public class BatchMarkerCleaner
     {
 
-
         /// <summary>
         /// 清除指定文件夹内所有DWG的检查标记
         /// 
@@ -23,21 +22,16 @@ namespace Correct_test1.Batch
         /// 保留：
         /// 原图其他内容
         /// </summary>
+        
         public List<string> ClearFolderMarkers(
             string folderPath)
         {
 
-
             List<string> results =
                 new List<string>();
 
-
-
             if (!Directory.Exists(folderPath))
                 return results;
-
-
-
 
             string[] files =
                 Directory.GetFiles(
@@ -46,31 +40,19 @@ namespace Correct_test1.Batch
                     SearchOption.AllDirectories
                 );
 
-
-
-
-
             foreach (string file in files)
             {
 
-
                 Database db = null;
-
-
 
                 try
                 {
-
 
                     db =
                         new Database(
                             false,
                             true
                         );
-
-
-
-
 
                     db.ReadDwgFile(
                         file,
@@ -79,29 +61,14 @@ namespace Correct_test1.Batch
                         ""
                     );
 
-
-
                     db.CloseInput(true);
-
-
-
-
-
 
                     RevisionMarker marker =
                         new RevisionMarker();
 
-
-
-
                     marker.ClearMarkers(
                         db
                     );
-
-
-
-
-
 
                     // 保存清除后的DWG
 
@@ -110,14 +77,9 @@ namespace Correct_test1.Batch
                         DwgVersion.Current
                     );
 
-
-
-
                     results.Add(
                         file
                     );
-
-
 
                 }
                 catch (Exception)
@@ -140,18 +102,11 @@ namespace Correct_test1.Batch
 
                 }
 
-
-
             }
-
-
 
             return results;
 
-
         }
-
-
 
     }
 

@@ -10,7 +10,6 @@ namespace Correct_test1.Checks
     public class RevisionChecker
     {
 
-
         /// <summary>
         /// 修改记录完整性检查
         ///
@@ -32,25 +31,17 @@ namespace Correct_test1.Checks
             List<RevisionInfo> revisions)
         {
 
-
             List<RevisionCheckIssue> issues =
                 new List<RevisionCheckIssue>();
-
-
 
             if (revisions == null)
                 return issues;
 
-
-
             foreach (RevisionInfo rev in revisions)
             {
 
-
                 if (rev == null)
                     continue;
-
-
 
                 // 没有标记，不检查
                 if (
@@ -60,8 +51,6 @@ namespace Correct_test1.Checks
                     continue;
                 }
 
-
-
                 // 没有更改内容，不认为是一条记录
                 if (
                     string.IsNullOrWhiteSpace(
@@ -69,9 +58,6 @@ namespace Correct_test1.Checks
                 {
                     continue;
                 }
-
-
-
 
                 //=========================
                 // 检查日期
@@ -93,9 +79,6 @@ namespace Correct_test1.Checks
 
                 }
 
-
-
-
                 //=========================
                 // 检查签名
                 //=========================
@@ -116,19 +99,11 @@ namespace Correct_test1.Checks
 
                 }
 
-
-
             }
-
-
 
             return issues;
 
         }
-
-
-
-
 
         private RevisionCheckIssue CreateIssue(
             string layoutName,
@@ -137,47 +112,36 @@ namespace Correct_test1.Checks
             string message)
         {
 
-
             return new RevisionCheckIssue()
             {
 
                 LayoutName =
                     layoutName,
 
-
                 Orientation =
                     "",
-
 
                 RowNumber =
                     0,
 
-
                 Mark =
                     rev.Mark,
-
 
                 MissingField =
                     field,
 
-
                 X =
                     0,
 
-
                 Y =
                     0,
-
 
                 Message =
                     message
 
             };
 
-
         }
-
-
 
     }
 

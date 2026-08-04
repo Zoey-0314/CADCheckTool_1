@@ -21,23 +21,17 @@ namespace Correct_test1.Command
             FolderBrowserDialog dialog =
                 new FolderBrowserDialog();
 
-
             if (dialog.ShowDialog()
                 != DialogResult.OK)
                 return;
 
-
-
             BatchMarkerCleaner cleaner =
                 new BatchMarkerCleaner();
-
-
 
             List<string> result =
                 cleaner.ClearFolderMarkers(
                     dialog.SelectedPath
                 );
-
 
             Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog(
                 "清除完成\n数量:"
@@ -51,28 +45,19 @@ namespace Correct_test1.Command
         public void TestBatch()
         {
 
-
             Document doc =
                 Autodesk.AutoCAD.ApplicationServices.Application
                 .DocumentManager
                 .MdiActiveDocument;
 
-
-
             if (doc == null)
                 return;
-
-
 
             FolderBrowserDialog dialog =
                 new FolderBrowserDialog();
 
-
-
             dialog.Description =
                 "请选择需要批量检查的DWG文件夹";
-
-
 
             if (dialog.ShowDialog()
                 != DialogResult.OK)
@@ -80,12 +65,8 @@ namespace Correct_test1.Command
                 return;
             }
 
-
-
             string folder =
                 dialog.SelectedPath;
-
-
 
             doc.Editor.WriteMessage(
                 "\n选择文件夹:"
@@ -93,37 +74,27 @@ namespace Correct_test1.Command
                 folder
             );
 
-
-
             BatchCheckerManager manager =
                 new BatchCheckerManager();
-
-
 
             List<CheckResult> results =
                 manager.CheckFolder(
                     folder
                 );
 
-
-
             doc.Editor.WriteMessage(
                 "\n================"
             );
 
-
             doc.Editor.WriteMessage(
                 "\n批量检查完成"
             );
-
 
             doc.Editor.WriteMessage(
                 "\n问题数量:"
                 +
                 results.Count
             );
-
-
 
             foreach (CheckResult r in results)
             {
@@ -144,14 +115,11 @@ namespace Correct_test1.Command
 
             }
 
-
             doc.Editor.WriteMessage(
                 "\n================"
             );
 
-
         }
-
 
     }
 

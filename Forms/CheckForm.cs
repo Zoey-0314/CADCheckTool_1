@@ -13,7 +13,7 @@ using System.IO;
 using Correct_test1.Export;
 
 
-namespace Correcet_test1
+namespace Correct_test1
 {
 
     public partial class CheckForm : Form

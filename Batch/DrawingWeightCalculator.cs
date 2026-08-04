@@ -9,14 +9,11 @@ namespace Correct_test1.Batch
     public class DrawingWeightCalculator
     {
 
-
         public double Calculate(
             string file)
         {
 
             double weight = 0;
-
-
 
             try
             {
@@ -24,20 +21,14 @@ namespace Correct_test1.Batch
                 FileInfo info =
                     new FileInfo(file);
 
-
-
                 // 文件大小权重
                 weight += info.Length / 1024.0 / 1024.0;
-
-
 
                 Database db =
                     new Database(
                         false,
                         true
                     );
-
-
 
                 db.ReadDwgFile(
                     file,
@@ -46,12 +37,9 @@ namespace Correct_test1.Batch
                     ""
                 );
 
-
-
                 using (Transaction tr =
                     db.TransactionManager.StartTransaction())
                 {
-
 
                     //布局数量
 
@@ -62,18 +50,11 @@ namespace Correct_test1.Batch
                         )
                         as DBDictionary;
 
-
-
                     int layoutCount =
                         layouts.Count;
 
-
-
                     weight +=
                         layoutCount * 5;
-
-
-
 
                     //实体数量
 
@@ -83,8 +64,6 @@ namespace Correct_test1.Batch
                             OpenMode.ForRead
                         )
                         as BlockTable;
-
-
 
                     foreach (ObjectId id in bt)
                     {
@@ -96,18 +75,15 @@ namespace Correct_test1.Batch
                             )
                             as BlockTableRecord;
 
-
                         if (btr != null)
                         {
 
                             int entityCount = 0;
 
-
                             foreach (ObjectId entId in btr)
                             {
                                 entityCount++;
                             }
-
 
                             weight +=
                                 entityCount * 0.01;
@@ -116,15 +92,11 @@ namespace Correct_test1.Batch
 
                     }
 
-
                     tr.Commit();
 
                 }
 
-
-
                 db.Dispose();
-
 
             }
             catch
@@ -136,20 +108,14 @@ namespace Correct_test1.Batch
 
             }
 
-
-
             //防止权重为0
 
             if (weight <= 0)
                 weight = 1;
 
-
-
             return weight;
 
-
         }
-
 
     }
 
