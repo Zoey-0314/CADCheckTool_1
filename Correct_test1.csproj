@@ -73,14 +73,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Checks\RevisionChecker.cs" />
+    <Compile Include="Checks\RevisionIssueMapper.cs" />
+    <Compile Include="Command\CommandEntry.cs" />
     <Compile Include="Command\TitleTestCommand.cs" />
     <Compile Include="Export\TitleCsvExporter.cs" />
     <Compile Include="Markers\ErrorMarker.cs" />
+    <Compile Include="Markers\RevisionMarker.cs" />
     <Compile Include="Models\DrawingInfo.cs" />
     <Compile Include="Models\FrameInfo.cs" />
     <Compile Include="Models\HorizontalTitleBlockTemplate.cs" />
     <Compile Include="Models\LayoutInfo.cs" />
+    <Compile Include="Models\RevisionCheckIssue.cs" />
     <Compile Include="Models\RevisionInfo.cs" />
+    <Compile Include="Models\RevisionLocation.cs" />
+    <Compile Include="Models\RevisionMarkPoint.cs" />
     <Compile Include="Models\RevisionTableTemplate.cs" />
     <Compile Include="Models\TitleBlockData.cs" />
     <Compile Include="Models\TitleText.cs" />
@@ -101,6 +108,7 @@
     <Compile Include="CheckForm.Designer.cs">
       <DependentUpon>CheckForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Readers\RevisionLocationReader.cs" />
     <Compile Include="Readers\RevisionTableReader.cs" />
     <Compile Include="Readers\TitleBlockParser.cs" />
     <Compile Include="Readers\TitleBlockReader.cs" />
