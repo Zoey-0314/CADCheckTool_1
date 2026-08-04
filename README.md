@@ -23,7 +23,7 @@ CAD检查助手是一款基于 AutoCAD .NET API 开发的 CAD 图纸自动检查
 
 # 一、当前版本功能
 
-## v0.6 Batch Check Stable
+## v1.1 Batch Check Stable
 
 当前已完成：
 
@@ -803,7 +803,7 @@ Markers
 当前建议版本：
 
 
-v0.6-batch-check-stable
+v1.1-batch-check-stable
 
 
 
