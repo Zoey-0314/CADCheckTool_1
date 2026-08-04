@@ -19,8 +19,9 @@ namespace Correcet_test1
         {
             try
             {
-                CheckForm form =
-                    new CheckForm();
+                // Open the new selection form as the plugin entry
+                Correct_test1.CheckSelectForm form =
+                    new Correct_test1.CheckSelectForm();
 
                 Autodesk.AutoCAD.ApplicationServices.Application
                     .ShowModelessDialog(form);

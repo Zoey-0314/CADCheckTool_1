@@ -12,8 +12,44 @@ namespace Correct_test1.Readers
     {
 
 
+        //========================================
+        // 原接口 保留
+        //========================================
 
         public List<string> ReadProjects(
+            Database db,
+            Editor ed)
+        {
+
+            return ReadProjectsInternal(
+                db,
+                ed
+            );
+
+        }
+
+
+
+        //========================================
+        // 新接口 给批量使用
+        //========================================
+
+        public List<string> ReadProjects(
+            Database db)
+        {
+
+            return ReadProjectsInternal(
+                db,
+                null
+            );
+
+        }
+
+
+
+
+
+        private List<string> ReadProjectsInternal(
             Database db,
             Editor ed)
         {
@@ -49,7 +85,6 @@ namespace Correct_test1.Readers
                 foreach (ObjectId spaceId in spaces)
                 {
 
-
                     BlockTableRecord btr =
                         trans.GetObject(
                             spaceId,
@@ -58,10 +93,8 @@ namespace Correct_test1.Readers
 
 
 
-
                     foreach (ObjectId id in btr)
                     {
-
 
                         Entity ent =
                             trans.GetObject(
@@ -76,8 +109,6 @@ namespace Correct_test1.Readers
 
 
 
-                        //读取块
-
                         if (ent is BlockReference block)
                         {
 
@@ -91,9 +122,6 @@ namespace Correct_test1.Readers
                         }
 
 
-
-                        //读取普通文字
-
                         else if (ent is DBText text)
                         {
 
@@ -105,9 +133,6 @@ namespace Correct_test1.Readers
 
                         }
 
-
-
-                        //读取普通多行文字
 
                         else if (ent is MText mtext)
                         {
@@ -121,13 +146,10 @@ namespace Correct_test1.Readers
                         }
 
 
-
                     }
 
 
-
                 }
-
 
 
                 trans.Commit();
@@ -146,20 +168,6 @@ namespace Correct_test1.Readers
 
 
 
-
-        /*
-         
-         判断是否为项目号
-
-         支持：
-
-         N2607US004
-
-         N2607US004-L0
-
-         N2412CN001-CM1
-
-        */
 
 
         private bool IsProjectNumber(
@@ -188,27 +196,12 @@ namespace Correct_test1.Readers
                 pattern
             );
 
-
         }
 
 
 
 
 
-
-
-
-        /*
-         
-         提取项目主体
-
-         N2607US004-L0
-
-         ↓
-
-         N2607US004
-
-        */
 
 
         private string GetProjectNumber(
@@ -225,19 +218,14 @@ namespace Correct_test1.Readers
 
 
             if (match.Success)
-            {
-
                 return match.Value;
 
-            }
 
 
             return null;
 
 
         }
-
-
 
 
 
@@ -256,8 +244,6 @@ namespace Correct_test1.Readers
                 return;
 
 
-
-            //去除MText换行
 
             text =
                 text.Replace(
@@ -286,10 +272,18 @@ namespace Correct_test1.Readers
                     );
 
 
-                    ed.WriteMessage(
-                        "\n发现项目号:"
-                        + projectNumber
-                    );
+
+                    // 防止批量空引用
+                    if (ed != null)
+                    {
+
+                        ed.WriteMessage(
+                            "\n发现项目号:"
+                            +
+                            projectNumber
+                        );
+
+                    }
 
 
                 }
@@ -298,9 +292,7 @@ namespace Correct_test1.Readers
             }
 
 
-
         }
-
 
 
 
@@ -376,7 +368,6 @@ namespace Correct_test1.Readers
 
 
         }
-
 
 
     }

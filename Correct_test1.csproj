@@ -73,13 +73,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BatchCheckForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BatchCheckForm.Designer.cs">
+      <DependentUpon>BatchCheckForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BatchProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BatchProgressForm.Designer.cs">
+      <DependentUpon>BatchProgressForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Batch\BatchCheckerManager.cs" />
+    <Compile Include="Batch\BatchMarkerCleaner.cs" />
+    <Compile Include="Batch\DrawingWeightCalculator.cs" />
+    <Compile Include="CheckSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CheckSelectForm.Designer.cs">
+      <DependentUpon>CheckSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Checks\RevisionChecker.cs" />
     <Compile Include="Checks\RevisionIssueMapper.cs" />
+    <Compile Include="Command\BatchTestCommand.cs" />
     <Compile Include="Command\CommandEntry.cs" />
     <Compile Include="Command\TitleTestCommand.cs" />
+    <Compile Include="Export\BatchCsvExporter.cs" />
     <Compile Include="Export\TitleCsvExporter.cs" />
     <Compile Include="Markers\ErrorMarker.cs" />
     <Compile Include="Markers\RevisionMarker.cs" />
+    <Compile Include="Models\BatchReportInfo.cs" />
     <Compile Include="Models\DrawingInfo.cs" />
     <Compile Include="Models\FrameInfo.cs" />
     <Compile Include="Models\HorizontalTitleBlockTemplate.cs" />
@@ -112,8 +136,17 @@
     <Compile Include="Readers\RevisionTableReader.cs" />
     <Compile Include="Readers\TitleBlockParser.cs" />
     <Compile Include="Readers\TitleBlockReader.cs" />
+    <Compile Include="SingleCheckForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SingleCheckForm.Designer.cs">
+      <DependentUpon>SingleCheckForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BatchProgressForm.resx">
+      <DependentUpon>BatchProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CheckForm.resx">
       <DependentUpon>CheckForm.cs</DependentUpon>
     </EmbeddedResource>

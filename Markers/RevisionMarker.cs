@@ -17,9 +17,15 @@ namespace Correct_test1.Markers
         private const string LayerName =
             "REVISION_CHECK";
 
+
+
+        /// <summary>
+        /// 清除当前Database中的检查框
+        /// </summary>
         public void ClearMarkers(
-    Database db)
+            Database db)
         {
+
 
             using (Transaction tr =
                 db.TransactionManager.StartTransaction())
@@ -37,6 +43,7 @@ namespace Correct_test1.Markers
                 foreach (ObjectId id in bt)
                 {
 
+
                     BlockTableRecord btr =
                         tr.GetObject(
                             id,
@@ -53,6 +60,7 @@ namespace Correct_test1.Markers
                     foreach (ObjectId entId in btr)
                     {
 
+
                         Entity ent =
                             tr.GetObject(
                                 entId,
@@ -60,18 +68,24 @@ namespace Correct_test1.Markers
                             as Entity;
 
 
+
                         if (ent != null &&
-                           ent.Layer == "REVISION_CHECK")
+                           ent.Layer == LayerName)
                         {
+
                             remove.Add(entId);
+
                         }
+
 
                     }
 
 
 
+
                     foreach (ObjectId rid in remove)
                     {
+
 
                         Entity ent =
                             tr.GetObject(
@@ -80,22 +94,40 @@ namespace Correct_test1.Markers
                             as Entity;
 
 
-                        ent.Erase();
+
+                        if (ent != null)
+                        {
+
+                            ent.Erase();
+
+                        }
+
 
                     }
 
 
+
                 }
+
 
 
                 tr.Commit();
 
             }
 
+
         }
 
+
+
+
+
+
         /// <summary>
-        /// 在指定布局空间绘制检查框
+        /// 绘制检查绿色框
+        /// 支持：
+        /// 1. 当前CAD文档
+        /// 2. 后台Database批量检查
         /// </summary>
         public void DrawMarkers(
             Database db,
@@ -110,15 +142,21 @@ namespace Correct_test1.Markers
 
 
 
+
             using (Transaction tr =
                 db.TransactionManager.StartTransaction())
             {
 
 
-                CreateLayer(
-                    db,
-                    tr
-                );
+
+                // 确保图层存在
+                ObjectId layerId =
+                    EnsureLayer(
+                        db,
+                        tr
+                    );
+
+
 
 
 
@@ -130,8 +168,11 @@ namespace Correct_test1.Markers
 
 
 
+
                 if (btr == null)
                     return;
+
+
 
 
 
@@ -140,7 +181,7 @@ namespace Correct_test1.Markers
                 {
 
 
-                    // 防止异常坐标
+                    // 无有效坐标跳过
 
                     if (point.X == 0 &&
                        point.Y == 0)
@@ -156,12 +197,17 @@ namespace Correct_test1.Markers
                         );
 
 
-                    rect.Layer =
-                        LayerName;
+
+                    // 再次确认图层存在
+
+                    rect.LayerId =
+                        layerId;
+
 
 
 
                     btr.AppendEntity(rect);
+
 
 
                     tr.AddNewlyCreatedDBObject(
@@ -170,13 +216,18 @@ namespace Correct_test1.Markers
                     );
 
 
+
                 }
+
+
 
 
 
                 tr.Commit();
 
+
             }
+
 
 
         }
@@ -185,15 +236,18 @@ namespace Correct_test1.Markers
 
 
 
+
+
+
         /// <summary>
-        /// 创建绿色图层
+        /// 确保检查图层存在
+        /// 批量Database环境使用
         /// </summary>
 
-        private void CreateLayer(
-            Database db,
-            Transaction tr)
+        private ObjectId EnsureLayer(
+     Database db,
+     Transaction tr)
         {
-
 
             LayerTable lt =
                 tr.GetObject(
@@ -204,7 +258,9 @@ namespace Correct_test1.Markers
 
 
             if (lt.Has(LayerName))
-                return;
+            {
+                return lt[LayerName];
+            }
 
 
 
@@ -216,12 +272,11 @@ namespace Correct_test1.Markers
                 new LayerTableRecord();
 
 
+
             layer.Name =
                 LayerName;
 
 
-
-            // AutoCAD绿色
 
             layer.Color =
                 Color.FromColorIndex(
@@ -231,7 +286,8 @@ namespace Correct_test1.Markers
 
 
 
-            lt.Add(layer);
+            ObjectId layerId =
+                lt.Add(layer);
 
 
 
@@ -241,6 +297,9 @@ namespace Correct_test1.Markers
             );
 
 
+
+            return layerId;
+
         }
 
 
@@ -248,8 +307,10 @@ namespace Correct_test1.Markers
 
 
 
+
+
         /// <summary>
-        /// 根据中心点生成矩形
+        /// 创建矩形框
         /// </summary>
 
         private Polyline CreateRectangle(
@@ -258,17 +319,16 @@ namespace Correct_test1.Markers
         {
 
 
-            // 暂定框大小
-            // 后续可根据表格尺寸调整
-
             double width = 18;
 
             double height = 5;
 
 
 
+
             Polyline pl =
                 new Polyline();
+
 
 
 
@@ -280,6 +340,7 @@ namespace Correct_test1.Markers
                 0,
                 0,
                 0);
+
 
 
 
@@ -294,6 +355,7 @@ namespace Correct_test1.Markers
 
 
 
+
             pl.AddVertexAt(
                 2,
                 new Point2d(
@@ -302,6 +364,7 @@ namespace Correct_test1.Markers
                 0,
                 0,
                 0);
+
 
 
 
@@ -316,6 +379,7 @@ namespace Correct_test1.Markers
 
 
 
+
             pl.Closed = true;
 
 
@@ -324,6 +388,7 @@ namespace Correct_test1.Markers
 
 
         }
+
 
 
     }
