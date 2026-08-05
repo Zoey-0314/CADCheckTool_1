@@ -1,20 +1,629 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
+
 <head>
-<title>Correct_test1</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Correct_test1 | AutoCAD Drawing Quality Inspection Tool</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    margin:0;
+
+    font-family:
+    "Inter",
+    "Microsoft YaHei",
+    sans-serif;
+
+    background:
+    radial-gradient(
+        circle at top right,
+        rgba(180,255,0,.15),
+        transparent 30%
+    ),
+    #05070c;
+
+    color:#f5f5f5;
+
+}
+
+
+.container{
+
+    width:1200px;
+    max-width:90%;
+    margin:auto;
+
+}
+
+
+
+header{
+
+    padding:80px 0 50px;
+
+}
+
+
+.tag{
+
+    color:#caff00;
+    letter-spacing:3px;
+    font-size:14px;
+
+}
+
+
+h1{
+
+    font-size:64px;
+
+    margin:20px 0;
+
+    line-height:1.1;
+
+}
+
+
+h1 span{
+
+    color:#caff00;
+
+}
+
+
+.subtitle{
+
+    font-size:22px;
+    color:#aaa;
+
+}
+
+
+
+.card{
+
+    background:
+    rgba(255,255,255,.04);
+
+    border:
+
+    1px solid
+
+    rgba(255,255,255,.12);
+
+    border-radius:24px;
+
+    padding:35px;
+
+    backdrop-filter:blur(20px);
+
+}
+
+
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(3,1fr);
+
+    gap:25px;
+
+}
+
+
+
+.card h2{
+
+    font-size:28px;
+
+}
+
+
+.card p{
+
+    color:#bbb;
+
+    line-height:1.8;
+
+}
+
+
+
+.icon{
+
+    font-size:35px;
+
+    color:#caff00;
+
+}
+
+
+
+
+.section{
+
+    margin:70px 0;
+
+}
+
+
+
+.big-card{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:40px;
+
+}
+
+
+
+.screen{
+
+    height:260px;
+
+    border-radius:20px;
+
+    background:
+
+    linear-gradient(
+    135deg,
+    #151b29,
+    #070a12
+    );
+
+    border:
+
+    1px solid
+    rgba(255,255,255,.1);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#caff00;
+
+    font-size:40px;
+
+}
+
+
+
+ul{
+
+    color:#bbb;
+
+    line-height:2;
+
+}
+
+
+
+footer{
+
+    padding:60px 0;
+
+    text-align:center;
+
+    color:#777;
+
+}
+
+
+.button{
+
+    display:inline-block;
+
+    margin-top:30px;
+
+    padding:14px 30px;
+
+    background:#caff00;
+
+    color:#000;
+
+    border-radius:30px;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+}
+
+
+
+@media(max-width:900px){
+
+.grid,
+.big-card{
+
+grid-template-columns:1fr;
+
+}
+
+h1{
+
+font-size:40px;
+
+}
+
+}
+
+
+
+</style>
+
 </head>
+
 
 <body>
 
-<h1>Correct_test1</h1>
 
-<p>
+<div class="container">
+
+
+<header>
+
+<div class="tag">
+PRODUCT / ENGINEERING TOOL
+</div>
+
+
+<h1>
+Correct_test1
+<br>
+<span>
 AutoCAD Drawing Quality Inspection Tool
+</span>
+</h1>
+
+
+<p class="subtitle">
+
+基于 C# + AutoCAD .NET API 的工程图纸智能检查平台
+
 </p>
 
+
+<a class="button"
+href="https://github.com/Zoey-0314/CADCheckTool_1">
+
+View GitHub
+
+</a>
+
+
+</header>
+
+
+
+<section class="section">
+
+
+<div class="grid">
+
+
+<div class="card">
+
+<div class="icon">
+01
+</div>
+
+<h2>
+Title Block Analysis
+</h2>
+
 <p>
-C# + AutoCAD .NET API
+
+自动读取标题栏信息，
+检查图号、字段完整性以及工程标准。
+
 </p>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="icon">
+02
+</div>
+
+
+<h2>
+Revision Inspection
+</h2>
+
+
+<p>
+
+自动分析修改记录表，
+检查修改标记、日期以及签字信息。
+
+</p>
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<div class="icon">
+03
+</div>
+
+
+<h2>
+Batch Processing
+</h2>
+
+
+<p>
+
+支持批量 DWG 检查，
+自动生成检查报告。
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section class="section">
+
+
+<div class="card big-card">
+
+
+<div>
+
+<h2>
+
+Engineering Quality Control
+
+</h2>
+
+
+<p>
+
+Correct_test1 将传统人工 CAD 审核流程数字化。
+
+通过：
+
+</p>
+
+
+<ul>
+
+<li>
+DWG 信息读取
+</li>
+
+<li>
+规则自动检查
+</li>
+
+<li>
+CAD 图内错误标记
+</li>
+
+<li>
+CSV 检查报告
+</li>
+
+
+</ul>
+
+
+</div>
+
+
+
+<div class="screen">
+
+CAD
+CHECK
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+System Architecture
+</h2>
+
+
+<div class="card">
+
+
+<pre>
+
+Correct_test1
+
+Command
+    |
+Readers
+    |
+Parsers
+    |
+Checks
+    |
+Markers
+    |
+Batch
+    |
+Export
+
+</pre>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<section class="section">
+
+
+<div class="grid">
+
+
+<div class="card">
+
+<h2>
+v1.2.0
+</h2>
+
+<p>
+
+Title Block Validation Release
+
+</p>
+
+
+<ul>
+
+<li>
+Drawing Number Check
+</li>
+
+<li>
+CAD Green Marker
+</li>
+
+<li>
+Batch Inspection
+</li>
+
+</ul>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+<h2>
+Roadmap
+</h2>
+
+
+<ul>
+
+<li>
+BOM Extraction
+</li>
+
+<li>
+Part / Assembly Recognition
+</li>
+
+<li>
+Advanced CAD Standards
+</li>
+
+</ul>
+
+
+</div>
+
+
+
+<div class="card">
+
+
+<h2>
+Technology
+</h2>
+
+
+<ul>
+
+<li>
+C#
+</li>
+
+<li>
+AutoCAD .NET API
+</li>
+
+<li>
+DWG Automation
+</li>
+
+</ul>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+<footer>
+
+Correct_test1 © 2026
+
+<br>
+
+AutoCAD Engineering Automation Project
+
+</footer>
+
+
+
+</div>
+
 
 </body>
+
+
 </html>
