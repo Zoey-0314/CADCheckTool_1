@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Colors;
 using System.Collections.Generic;
 using System.IO;
+using Correct_test1.Core;
 
 
 namespace Correct_test1.Markers
@@ -49,16 +50,7 @@ namespace Correct_test1.Markers
         {
 
 
-            File.AppendAllText(
-                @"D:\title_debug.txt",
-                "\n进入DrawMarker"
-                + "\n布局:"
-                + layoutName
-                + "\n正确图号:"
-                + correctNumber
-                + "\n横竖:"
-                + isHorizontal
-            );
+            AppLogger.Info("进入DrawMarker" + " 布局:" + layoutName + " 正确图号:" + correctNumber + " 横竖:" + isHorizontal, "TitleBlockDrawingNumberMarker");
 
 
 
@@ -85,11 +77,7 @@ namespace Correct_test1.Markers
                     if (!layoutDict.Contains(layoutName))
                     {
 
-                        File.AppendAllText(
-                            @"D:\title_debug.txt",
-                            "\n不存在布局:"
-                            + layoutName
-                        );
+                        AppLogger.Info("不存在布局:" + layoutName, "TitleBlockDrawingNumberMarker");
 
 
                         return;
@@ -112,10 +100,7 @@ namespace Correct_test1.Markers
                     if (layout == null)
                     {
 
-                        File.AppendAllText(
-                            @"D:\title_debug.txt",
-                            "\nLayout为空"
-                        );
+                        AppLogger.Info("Layout为空", "TitleBlockDrawingNumberMarker");
 
 
                         return;
@@ -138,10 +123,7 @@ namespace Correct_test1.Markers
                     if (btr == null)
                     {
 
-                        File.AppendAllText(
-                            @"D:\title_debug.txt",
-                            "\nBTR为空"
-                        );
+                        AppLogger.Info("BTR为空", "TitleBlockDrawingNumberMarker");
 
 
                         return;
@@ -150,11 +132,7 @@ namespace Correct_test1.Markers
 
 
 
-                    File.AppendAllText(
-                        @"D:\title_debug.txt",
-                        "\n真实BTR:"
-                        + btr.Name
-                    );
+                    AppLogger.Info("真实BTR:" + btr.Name, "TitleBlockDrawingNumberMarker");
 
 
 
@@ -209,17 +187,7 @@ namespace Correct_test1.Markers
 
 
 
-                    File.AppendAllText(
-                        @"D:\title_debug.txt",
-                        "\n坐标:"
-                        + x1
-                        + ","
-                        + y1
-                        + " -> "
-                        + x2
-                        + ","
-                        + y2
-                    );
+                    AppLogger.Info("坐标:" + x1 + "," + y1 + " -> " + x2 + "," + y2, "TitleBlockDrawingNumberMarker");
 
 
 
@@ -291,12 +259,7 @@ namespace Correct_test1.Markers
                         true
                     );
 
-                    File.AppendAllText(
-                        @"D:\title_debug.txt",
-                        "\n矩形加入成功"
-                        + "\n矩形创建标志:" + (rect.ObjectId != ObjectId.Null)
-                        + "\n矩形ObjectId:" + rect.ObjectId.ToString()
-                    );
+                    AppLogger.Info("矩形加入成功 矩形创建标志:" + (rect.ObjectId != ObjectId.Null) + " 矩形ObjectId:" + rect.ObjectId.ToString(), "TitleBlockDrawingNumberMarker");
 
 
                     //--------------------------------
@@ -343,28 +306,19 @@ namespace Correct_test1.Markers
                         true
                     );
 
-                    File.AppendAllText(
-                        @"D:\title_debug.txt",
-                        "\n文字加入成功:"
-                        + text.TextString
-                        + "\n文字创建标志:" + (text.ObjectId != ObjectId.Null)
-                        + "\n文字ObjectId:" + text.ObjectId.ToString()
-                    );
+                    AppLogger.Info("文字加入成功:" + text.TextString + " 文本创建标志:" + (text.ObjectId != ObjectId.Null) + " 文本ObjectId:" + text.ObjectId.ToString(), "TitleBlockDrawingNumberMarker");
 
 
                     tr.Commit();
 
 
-                    File.AppendAllText(
-                        @"D:\title_debug.txt",
-                        "\nCommit成功"
-                    );
+                    AppLogger.Info("Commit成功", "TitleBlockDrawingNumberMarker");
 
                 }
             }
             catch (System.Exception ex)
             {
-                File.AppendAllText(@"D:\title_debug.txt", ex.ToString());
+                AppLogger.Exception(ex, "TitleBlockDrawingNumberMarker");
                 throw;
             }
 

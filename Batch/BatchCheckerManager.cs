@@ -144,6 +144,8 @@ namespace Correct_test1.Batch
                 catch (Exception ex)
                 {
 
+                    Correct_test1.Core.AppLogger.Error(ex, "BatchCheckerManager.CheckFolder", file);
+
                     results.Add(
                         new CheckResult
                         {

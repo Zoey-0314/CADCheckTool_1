@@ -4,6 +4,7 @@ using Correct_test1.Models;
 using Correct_test1.Readers;
 using Correct_test1.Markers;
 using System.IO;
+using Correct_test1.Core;
 namespace Correct_test1.Checks
 {
 
@@ -242,11 +243,7 @@ namespace Correct_test1.Checks
             }
             catch (System.Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    "标题栏图号检查异常:"
-                    +
-                    ex.Message
-                );
+                AppLogger.Error(ex, "TitleBlockCheckManager");
             }
 
 
