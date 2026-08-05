@@ -215,11 +215,21 @@ namespace Correct_test1
                     doc.LockDocument())
                 {
 
-                    RevisionMarker marker =
+                    RevisionMarker revisionMarker =
                         new RevisionMarker();
 
 
-                    marker.ClearMarkers(
+                    revisionMarker.ClearMarkers(
+                        doc.Database
+                    );
+
+
+
+                    TitleBlockDrawingNumberMarker titleBlockMarker =
+                        new TitleBlockDrawingNumberMarker();
+
+
+                    titleBlockMarker.ClearMarkers(
                         doc.Database
                     );
 

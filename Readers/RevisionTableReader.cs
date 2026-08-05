@@ -88,12 +88,18 @@ namespace Correct_test1.Readers
                     db,
                     blockId
                 );
-            Editor ed =
-    Autodesk.AutoCAD.ApplicationServices.Application
-    .DocumentManager
-    .MdiActiveDocument
-    .Editor;
+            Editor ed = null;
 
+            Document doc =
+                Autodesk.AutoCAD.ApplicationServices.Application
+                .DocumentManager
+                .MdiActiveDocument;
+
+
+            if (doc != null)
+            {
+                ed = doc.Editor;
+            }
 
             foreach (TitleText t in texts)
             {
@@ -104,8 +110,9 @@ namespace Correct_test1.Readers
                     t.X < 330
                 )
                 {
-
-                    ed.WriteMessage(
+                    if (ed != null)
+                    {
+                        ed.WriteMessage(
                         "\n文字:"
                         + t.Text
                         +
@@ -117,6 +124,7 @@ namespace Correct_test1.Readers
                         +
                         t.Y
                     );
+                    }
 
                 }
             }
@@ -154,21 +162,56 @@ namespace Correct_test1.Readers
             // ---------- 新增调试输出：逐行显示 HorizontalRevisionRow 内容 ----------
             try
             {
-                foreach (HorizontalRevisionRow row in result)
+                if (ed != null)
                 {
-                    ed.WriteMessage("\nROW:");
-                    ed.WriteMessage("\nLeft.Mark=" + (row.Left?.Mark ?? ""));
-                    ed.WriteMessage("\nLeft.Description=" + (row.Left?.Description ?? ""));
-                    ed.WriteMessage("\nLeft.Date=" + (row.Left?.Date ?? ""));
-                    ed.WriteMessage("\nLeft.Signer=" + (row.Left?.Signer ?? ""));
-                    ed.WriteMessage("\nRight.Mark=" + (row.Right?.Mark ?? ""));
-                    ed.WriteMessage("\nRight.Description=" + (row.Right?.Description ?? ""));
+                    foreach (HorizontalRevisionRow row in result)
+                    {
+                        ed.WriteMessage("\nROW:");
+                        ed.WriteMessage(
+                            "\nLeft.Mark="
+                            +
+                            (row.Left?.Mark ?? "")
+                        );
+
+                        ed.WriteMessage(
+                            "\nLeft.Description="
+                            +
+                            (row.Left?.Description ?? "")
+                        );
+
+                        ed.WriteMessage(
+                            "\nLeft.Date="
+                            +
+                            (row.Left?.Date ?? "")
+                        );
+
+                        ed.WriteMessage(
+                            "\nLeft.Signer="
+                            +
+                            (row.Left?.Signer ?? "")
+                        );
+
+                        ed.WriteMessage(
+                            "\nRight.Mark="
+                            +
+                            (row.Right?.Mark ?? "")
+                        );
+
+                        ed.WriteMessage(
+                            "\nRight.Description="
+                            +
+                            (row.Right?.Description ?? "")
+                        );
+                    }
                 }
             }
             catch (Exception ex)
             {
-                // 仅记录调试信息，不影响主流程
-                System.Diagnostics.Debug.WriteLine("Debug ROW output failed: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine(
+                    "Debug ROW output failed: "
+                    +
+                    ex.Message
+                );
             }
             // --------------------------------------------------------------------
 
@@ -207,21 +250,42 @@ namespace Correct_test1.Readers
     List<RevisionInfo> result =
         new List<RevisionInfo>();
 
-    // 调试用 Editor
-    var ed = Autodesk.AutoCAD.ApplicationServices.Application
-        .DocumentManager
-        .MdiActiveDocument
-        .Editor;
+            // 调试用 Editor
+            Editor ed = null;
 
-    foreach (HorizontalRevisionRow row in rows)
+            Document doc =
+                Autodesk.AutoCAD.ApplicationServices.Application
+                .DocumentManager
+                .MdiActiveDocument;
+
+
+            if (doc != null)
+            {
+                ed = doc.Editor;
+            }
+
+            foreach (HorizontalRevisionRow row in rows)
     {
         // 新增调试输出：观察 ParseHorizontalTable 产生的每一行及其 IsValid 判断结果（左侧）
         try
         {
-            ed.WriteMessage("\nDEBUG ROW LEFT: Mark=" + (row.Left?.Mark ?? "")
-                + " Description=" + (row.Left?.Description ?? "")
-                + " IsValid=" + IsValid(row.Left));
-        }
+                    if (ed != null)
+                    {
+                        ed.WriteMessage(
+                            "\nDEBUG ROW LEFT: Mark="
+                            +
+                            (row.Left?.Mark ?? "")
+                            +
+                            " Description="
+                            +
+                            (row.Left?.Description ?? "")
+                            +
+                            " IsValid="
+                            +
+                            IsValid(row.Left)
+                        );
+                    }
+                }
         catch
         {
             // 忽略调试输出异常，不影响主流程
@@ -414,22 +478,38 @@ namespace Correct_test1.Readers
             // --- 新增调试输出：列出 potentialMarks 中的候选标记 ---
     try
     {
-        var ed = Autodesk.AutoCAD.ApplicationServices.Application
-            .DocumentManager
-            .MdiActiveDocument
-            .Editor;
+                Editor ed = null;
 
-        foreach (var t in potentialMarks)
+                Document doc =
+                    Autodesk.AutoCAD.ApplicationServices.Application
+                    .DocumentManager
+                    .MdiActiveDocument;
+
+
+                if (doc != null)
+                {
+                    ed = doc.Editor;
+                }
+
+                foreach (var t in potentialMarks)
         {
-            ed.WriteMessage(
-                "\n候选标记:"
-                + t.Text
-                + " X="
-                + t.X
-                + " Y="
-                + t.Y
-            );
-        }
+                    if (ed != null)
+                    {
+                        ed.WriteMessage(
+                            "\n候选标记:"
+                            +
+                            t.Text
+                            +
+                            " X="
+                            +
+                            t.X
+                            +
+                            " Y="
+                            +
+                            t.Y
+                        );
+                    }
+                }
     }
     catch
     {

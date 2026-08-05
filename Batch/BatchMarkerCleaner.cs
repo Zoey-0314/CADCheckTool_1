@@ -69,6 +69,14 @@ namespace Correct_test1.Batch
                     marker.ClearMarkers(
                         db
                     );
+                    TitleBlockDrawingNumberMarker titleBlockMarker =
+    new TitleBlockDrawingNumberMarker();
+
+
+                    titleBlockMarker.ClearMarkers(
+                        db
+                    );
+
 
                     // 保存清除后的DWG
 

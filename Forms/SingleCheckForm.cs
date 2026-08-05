@@ -78,8 +78,25 @@ namespace Correct_test1
 
                 using (DocumentLock lockDoc = doc.LockDocument())
                 {
-                    RevisionMarker marker = new RevisionMarker();
-                    marker.ClearMarkers(doc.Database);
+
+                    RevisionMarker revisionMarker =
+                        new RevisionMarker();
+
+
+                    revisionMarker.ClearMarkers(
+                        doc.Database
+                    );
+
+
+
+                    TitleBlockDrawingNumberMarker titleBlockMarker =
+                        new TitleBlockDrawingNumberMarker();
+
+
+                    titleBlockMarker.ClearMarkers(
+                        doc.Database
+                    );
+
                 }
 
                 MessageBox.Show("检查标记已清除", "CAD检查助手");

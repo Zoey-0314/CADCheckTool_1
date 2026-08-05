@@ -1,915 +1,413 @@
-﻿# CAD检查助手
+﻿# Correct_test1 - AutoCAD Drawing Quality Inspection Tool
 
-## 项目介绍
+# Correct_test1 - AutoCAD 图纸质量检查工具
 
-CAD检查助手是一款基于 AutoCAD .NET API 开发的 CAD 图纸自动检查工具。
 
-主要用于机械设计图纸检查，通过读取 DWG 文件中的：
+![AutoCAD](https://img.shields.io/badge/AutoCAD-.NET%20API-blue)
+![C#](https://img.shields.io/badge/C%23-.NET-purple)
+![Version](https://img.shields.io/badge/version-v1.2.0-green)
 
-- 标题栏信息
-- 项目号信息
-- 修改记录表
-- 图纸布局结构
-
-自动检测图纸规范问题，并提供：
-
-- 自动检查结果输出
-- CAD绿色框错误定位
-- 批量DWG检查
-- CSV检查报告
-- 批量清除检查标记
 
 ---
 
-# 一、当前版本功能
+# 中文介绍 | Introduction (Chinese)
 
-## v1.1 Batch Check Stable
+## 项目简介
 
-当前已完成：
+Correct_test1 是一个基于 **AutoCAD .NET API** 开发的 CAD 图纸自动检查插件。
 
-### 1. 单张图纸检查
+该项目旨在帮助工程设计人员自动检查 DWG 图纸中的标准化问题，
+减少人工检查工作量，提高图纸审核效率。
 
-支持：
+当前版本主要实现：
 
-- 项目号检查
-- 修改记录检查
-- 缺失字段检测
+- 修改记录自动检查
+- 标题栏信息读取与检查
+- 图号一致性检查
+- 自动生成 CAD 内绿色错误标记
+- 批量 DWG 检查
+- CSV 检查报告导出
 
 
-检查结果：
+---
+
+# English Introduction
+
+## Project Overview
+
+Correct_test1 is an AutoCAD plugin developed with **AutoCAD .NET API**.
+
+The purpose of this project is to automatically inspect engineering drawings,
+reduce manual checking workload, and improve CAD drawing quality control efficiency.
+
+Current features include:
+
+- Revision table inspection
+- Title block extraction and validation
+- Drawing number consistency checking
+- Automatic CAD error marking
+- Batch DWG inspection
+- CSV report exporting
+
+
+---
+
+# 技术栈 | Technology Stack
+
+## Development Environment
+
+| 项目 | 技术 |
+|---|---|
+| Language | C# |
+| Platform | AutoCAD .NET API |
+| Framework | .NET Framework |
+| CAD Format | DWG |
+| IDE | Visual Studio |
+| Version Control | Git |
+
+
+---
+
+# 项目结构 | Project Structure
+
+
+Correct_test1
+│
+├── Commands
+│ └── AutoCAD Commands Entry
+│
+├── Models
+│ ├── DrawingInfo
+│ ├── LayoutInfo
+│ ├── CheckResult
+│ └── RevisionInfo
+│
+├── Readers
+│ ├── LayoutReader
+│ ├── TitleBlockReader
+│ ├── RevisionTableReader
+│ └── FileNameDrawingNumberReader
+│
+├── Parsers
+│ └── TitleBlockRegionParser
+│
+├── Checks
+│ ├── TitleBlockCheckManager
+│ ├── TitleBlockChecker
+│ ├── RevisionChecker
+│ └── DrawingCheckManager
+│
+├── Markers
+│ ├── RevisionMarker
+│ └── TitleBlockDrawingNumberMarker
+│
+├── Batch
+│ ├── BatchCheckerManager
+│ └── BatchMarkerCleaner
+│
+└── Export
+└── BatchCsvExporter
+
+
+---
+
+# 已实现功能 | Features
+
+
+## 1. 修改记录检查
+## Revision Table Inspection
+
+支持自动读取 CAD 修改记录表：
+
+- 标记
+- 修改内容
+- 日期
+- 签名
+
+
+自动判断：
+
+- 缺少日期
+- 缺少修改内容
+- 缺少签名
+
+
+并生成：
+
+- CheckResult
+- CAD绿色标记
+
+
+---
+
+## 2. 标题栏解析
+## Title Block Extraction
+
+支持读取标题栏信息：
+
+### 基础信息
+
+- 图号 Drawing Number
+- 图纸名称 Drawing Name
+- 公司 Company
+- 材料 Material
+- 规格 Specification
+- 表面处理 Surface Treatment
+
+
+### 签字信息
+
+- 制图 Designer
+- 校对 Checker
+- 标审 Reviewer
+- 批准 Approver
+- 日期 Date
+
+
+---
+
+## 3. 横版 / 竖版自动识别
+## Landscape / Portrait Detection
+
+
+通过标题栏布局内部文字特征判断：
+
+
+标记数量 >= 2
+|
+↓
+Horizontal
+
+标记数量 < 2
+|
+↓
+Vertical
+
+
+
+判断以 Layout 为单位，
+避免多个布局之间相互影响。
+
+
+---
+
+## 4. 图号一致性检查
+## Drawing Number Validation
+
+
+自动比较：
+
+
+DWG文件名图号
+
+    VS
+
+标题栏图号
+
+
 
 例如：
 
-类型：
-修改记录检查
-
-对象：
-标记12
-
-问题：
-缺少签名
+文件：
 
 
----
-
-### 2. CAD绿色标记
-
-检查发现问题后：
-
-自动在对应位置生成：
-REVISION_CHECK
+NS135H xxxx.dwg
 
 
-图层。
 
-使用绿色矩形框标记：
+标题栏：
 
-- 缺少签名
-- 缺少日期
-- 缺少修改内容
+
+NS136H
+
+
+
+系统自动识别错误。
 
 
 ---
 
-### 3. 批量DWG检查
+## 5. CAD自动错误标记
+## Automatic CAD Marking
+
+
+错误位置自动生成：
+
+### 图层
+
+
+TITLEBLOCK_CHECK
+
+
+
+生成：
+
+- 绿色矩形框
+- 修改提示文字
+
+
+例如：
+
+
+应改为:NS135H
+
+
+
+---
+
+## 6. 批量检查
+## Batch Inspection
+
 
 支持：
 
-选择文件夹：
+
 文件夹
 |
-├── A.dwg
-├── B.dwg
-└── C.dwg
+├── Drawing1.dwg
+├── Drawing2.dwg
+└── Drawing3.dwg
 
+    ↓
 
-自动执行：
+自动检查
 
+    ↓
 
-读取DWG
-↓
-项目号检查
-↓
-修改记录检查
-↓
-生成绿色标记
-↓
-保存DWG
-↓
-生成报告
+CSV报告
 
 
 
 ---
 
-### 4. 批量检查报告
+## 7. CSV报告导出
+## CSV Report Export
+
 
 生成：
 
 
-CAD检查报告_xxxxxx.csv
+批量检查结果_xxxxxx.csv
+
 
 
 包含：
 
 |字段|说明|
 |-|-|
-|文件路径|DWG完整路径|
-|文件名|图纸名称|
-|检查类型|项目号/修改记录|
-|检查对象|错误位置|
-|当前值|读取内容|
-|标准值|要求内容|
-|结果|失败/通过|
-|错误说明|具体问题|
-
----
-
-### 5. 批量清除标记
-
-支持：
-
-当前图纸清除：
-
-
-清除当前图纸修改注释
-
-
-批量清除：
-
-
-清除所有图纸修改注释
-
-
-删除：
-
-
-REVISION_CHECK
-
-
-图层中的检查框。
-
----
-
-# 二、项目架构
-
-
-整体结构：
-
-
-Forms
-↓
-Batch/Core
-↓
-Checks
-↓
-Readers
-↓
-Models
-
+|文件名|DWG文件|
+|打开图纸|快捷链接|
+|布局|Layout|
+|检查类型|Issue Type|
+|缺失项|Missing Field|
+|问题描述|Description|
 
 
 ---
 
-# 三、目录说明
+# 版本记录 | Version History
 
 
-## Batch
+## v1.2.0
 
-批量处理模块。
-
-
-### BatchCheckerManager.cs
-
-批量检查核心。
-
-负责：
-
-- 搜索DWG文件
-- 调用检查核心
-- 保存修改
-- 返回检查结果
-
-
-调用：
-
-
-BatchCheckForm
-|
-↓
-BatchCheckerManager
-
-
-
-
----
-
-### BatchMarkerCleaner.cs
-
-批量清除绿色检查框。
-
-
-流程：
-
-
-选择文件夹
-
-↓
-
-打开DWG数据库
-
-↓
-
-删除REVISION_CHECK对象
-
-
-
----
-
-### DrawingWeightCalculator.cs
-
-批量检查进度计算。
-
-
-作用：
-
-根据：
-
-- 文件大小
-- Layout数量
-- CAD对象数量
-
-估算图纸处理权重。
-
-
-用于：
-
-真实进度显示。
-
-
----
-
-# Checks
-
-
-检查规则模块。
-
-
-## ProjectChecker.cs
-
-项目号检查。
-
-负责：
-
-判断：
-
-文件名项目号
-
-是否与：
-
-图纸内部项目号
-
-一致。
-
-
-
----
-
-## RevisionChecker.cs
-
-修改记录检查核心。
-
-
-负责：
-
-检查：
-
-- 更改内容
-- 更改日期
-- 签名
-
-
----
-
-## RevisionIssueMapper.cs
-
-问题坐标映射。
-
-
-作用：
-
-将：
-
-检查结果
-
-转换为：
-
-CAD中的标记位置。
-
-
----
-
-# Command
-
-
-AutoCAD命令入口。
-
-
-## CommandEntry.cs
-
-插件加载入口。
-
-
-负责：
-
-启动窗口。
-
-
----
-
-## BatchTestCommand.cs
-
-批量功能测试命令。
-
-
-开发阶段使用。
-
-
----
-
-## TitleTestCommand.cs
-
-标题栏读取测试命令。
-
-
-开发阶段使用。
-
-
----
-
-# Core
-
-
-核心业务逻辑。
-
-
-## DrawingCheckManager.cs
-
-
-整个检查系统核心。
-
-
-执行：
-
-
-项目号读取
-
-↓
-
-项目号检查
-
-↓
-
-布局读取
-
-↓
-
-修改记录读取
-
-↓
-
-错误定位
-
-↓
-
-生成标记
-
-
-
-单张和批量检查最终都会调用这里。
-
-
----
-
-# Export
-
-
-输出模块。
-
-
-## BatchCsvExporter.cs
-
-批量检查报告生成。
-
-
-输入：
-
-
-List<CheckResult>
-
-
-输出：
-
-
-CSV文件
-
-
-
----
-
-## TitleCsvExporter.cs
-
-标题栏信息导出。
-
-
-用于后续：
-
-- 数据统计
-- 批量信息整理
-
-
----
-
-## CsvExporter.cs
-
-旧版CSV导出类。
-
-
-当前正式流程未使用。
-
-
-保留原因：
-
-历史代码参考。
-
-
-后续可删除。
-
-
----
-
-# Markers
-
-
-CAD标记模块。
-
-
-## RevisionMarker.cs
-
-绿色框生成与清除核心。
-
-
-负责：
-
-创建：
-
-
-REVISION_CHECK
-
-
-图层。
-
-
-绘制：
-
-Polyline矩形框。
-
-
-关联：
-
-
-DrawingCheckManager
-
-BatchMarkerCleaner
-
-CheckForm
-
-BatchCheckForm
-
-
-
----
-
-## ErrorMarker.cs
-
-旧版错误标记。
-
-
-当前主要使用：
-
-
-RevisionMarker
-
-
-暂未删除。
-
-
----
-
-# Models
-
-
-数据模型。
-
-
-用于模块之间传递数据。
-
-
-主要：
-
-## CheckResult.cs
-
-检查结果。
-
-
-包含：
-
-- 文件路径
-- 文件名
-- 检查类型
-- 错误信息
-
-
----
-
-## RevisionInfo.cs
-
-修改记录信息。
-
-
----
-
-## RevisionLocation.cs
-
-修改记录坐标。
-
-
-用于：
-
-绿色框定位。
-
-
----
-
-## RevisionMarkPoint.cs
-
-绿色框绘制点。
-
-
----
-
-## LayoutInfo.cs
-
-布局信息。
-
-
----
-
-## BatchReportInfo.cs
-
-保存最近一次批量报告路径。
-
-
-用于：
-
-打开最近报告。
-
-
----
-
-# Readers
-
-
-数据读取模块。
-
-
-负责：
-
-从DWG中读取信息。
-
-
----
-
-## ProjectReader.cs
-
-读取项目号。
-
-
-支持：
-
-- DBText
-- MText
-- Block内部文字
-
-
----
-
-## LayoutReader.cs
-
-读取：
-
-- Layout
-- BlockTableRecord
-- 图纸范围
-
-
----
-
-## RevisionTableReader.cs
-
-读取修改记录表。
-
-
-支持：
-
-- 横版修改记录
-- 竖版修改记录
-
-
----
-
-## RevisionLocationReader.cs
-
-读取修改记录坐标。
-
-
----
-
-## TitleBlockReader.cs
-
-标题栏读取。
-
-
----
-
-# Forms
-
-
-界面模块。
-
-
-## CheckSelectForm
-
-检查入口选择窗口。
-
-
-用于：
-
-选择：
-
-- 单张检查
-- 批量检查
-
-
----
-
-## SingleCheckForm
-
-单张检查窗口。
-
-
----
-
-## BatchCheckForm
-
-批量检查窗口。
-
-
-功能：
-
-- 执行批量检查
-- 打开报告
-- 清除标记
-
-
----
-
-## BatchProgressForm
-
-批量检查进度窗口。
-
-
-显示：
-
-- 当前DWG
-- 完成百分比
-
-
----
-
-# 四、开发规范
-
-
-## 1. 新增检查规则
-
-不要直接修改窗体。
-
-
-正确流程：
-
-
-Readers
-↓
-Checks
-↓
-Core
-↓
-Forms
-
-
-
-例如：
-
-增加新检查：
+### Title Block Validation Release
 
 新增：
 
-
-Checks/NewChecker.cs
-
-
-
-然后在：
-
-
-DrawingCheckManager.cs
-
-
-调用。
+- 标题栏自动读取
+- 标题栏字段检查
+- 文件名图号检查
+- 图号错误绿色标记
+- 批量模式 Marker 支持
 
 
 ---
 
-## 2. 不要在Reader里面写检查逻辑
+## v1.1.1
 
-Reader：
+### Code Maintenance Release
 
-只负责读取。
-
-
-例如：
-
-正确：
+- Code formatting improvement
+- Structure optimization
+- No functional changes
 
 
-ProjectReader
-↓
-读取项目号
+---
+
+# 开发计划 | Roadmap
+
+
+## v1.3.0
+
+计划：
+
+- BOM表读取
+- 零件 / 组件自动识别
+- 装配图检查
+
+
+---
+
+## v1.4.0
+
+计划：
+
+- 更复杂材料规格规则
+- 页码自动检查
+- 更多企业标准支持
+
+
+---
+
+# 使用流程 | Workflow
 
 
 
-错误：
+打开AutoCAD
 
+    ↓
 
-ProjectReader
-↓
-判断项目号是否正确
+加载插件 DLL
 
+    ↓
 
+选择DWG文件
 
-判断应该放：
+    ↓
 
+读取布局
 
-ProjectChecker
+    ↓
+
+解析标题栏
+
+    ↓
+
+执行检查
+
+    ↓
+
+生成错误标记
+
+    ↓
+
+导出检查报告
 
 
 
 ---
 
-## 3. 不要在Form里面写CAD逻辑
+# License
 
-Form只负责：
+This project is currently for learning and engineering automation research.
 
-- 用户操作
-- 调用功能
-- 显示结果
-
-
-CAD处理应该放：
-
-
-Core
-Batch
-Readers
-Markers
-
+本项目目前用于 CAD 自动化学习与工程应用研究。
 
 
 ---
 
-# 五、Git版本记录
+# Author
 
+Developed with C# and AutoCAD .NET API.
 
-当前建议版本：
-
-
-v1.1-batch-check-stable
-
-
-
-已完成：
-
-- 单张检查
-- 批量检查
-- 绿色标记
-- 批量清除
-- CSV报告
-- 批量进度框架
-
-
----
-
-# 六、后续开发计划
-
-
-## 短期
-
-- CSV文件路径超链接
-- 优化检查报告格式
-- 优化窗口布局
-- 增加日志
-
-
----
-
-## 中期
-
-增加检查：
-
-- 标题栏完整性
-- 图框比例检查
-- 图层规范检查
-- 尺寸标注检查
-
-
----
-
-## 长期
-
-建立：
-
-图纸质量检查平台。
-
-
-支持：
-
-- 批量数据库
-- Web管理
-- 检查历史记录
-- 自动统计
-
-
----
-
-# 七、维护说明
-
-
-接手开发时：
-
-推荐阅读顺序：
-
-1. README.md
-
-↓
-
-2. CommandEntry.cs
-
-↓
-
-3. CheckSelectForm.cs
-
-↓
-
-4. DrawingCheckManager.cs
-
-↓
-
-5. Readers
-
-↓
-
-6. Checks
-
-↓
-
-7. Markers
-
-
-不要直接修改UI代码。
-
-
-先理解：
-
-
-读取
-↓
-检查
-↓
-结果
-↓
-标记
-↓
-输出
-
-
-整个流程。
+基于 C# 与 AutoCAD .NET API 开发。

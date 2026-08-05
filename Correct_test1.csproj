@@ -73,6 +73,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Checks\TitleBlockChecker.cs" />
+    <Compile Include="Checks\TitleBlockCheckManager.cs" />
+    <Compile Include="Checks\TitleInfoChecker.cs" />
+    <Compile Include="Command\TitleRegionTestCommand.cs" />
+    <Compile Include="Configs\TitleBlockHorizontalConfig.cs" />
+    <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
     <Compile Include="Forms\BatchCheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -100,9 +106,9 @@
     <Compile Include="Command\CommandEntry.cs" />
     <Compile Include="Command\TitleTestCommand.cs" />
     <Compile Include="Export\BatchCsvExporter.cs" />
-    <Compile Include="Export\TitleCsvExporter.cs" />
-    <Compile Include="Markers\ErrorMarker.cs" />
     <Compile Include="Markers\RevisionMarker.cs" />
+    <Compile Include="Markers\TitleBlockDrawingNumberMarker.cs" />
+    <Compile Include="Markers\TitleBlockMarkerMapper.cs" />
     <Compile Include="Models\BatchReportInfo.cs" />
     <Compile Include="Models\DrawingInfo.cs" />
     <Compile Include="Models\FrameInfo.cs" />
@@ -114,6 +120,7 @@
     <Compile Include="Models\RevisionMarkPoint.cs" />
     <Compile Include="Models\RevisionTableTemplate.cs" />
     <Compile Include="Models\TitleBlockData.cs" />
+    <Compile Include="Models\TitleFieldRegion.cs" />
     <Compile Include="Models\TitleText.cs" />
     <Compile Include="Models\VerticalTitleBlockTemplate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -122,6 +129,7 @@
     <Compile Include="Core\DrawingCheckManager.cs" />
     <Compile Include="Export\CsvExporter_old.cs" />
     <Compile Include="Models\CheckResult.cs" />
+    <Compile Include="Readers\FileNameDrawingNumberReader.cs" />
     <Compile Include="Readers\FileNameProjectReader.cs" />
     <Compile Include="Readers\FrameReader.cs" />
     <Compile Include="Readers\LayoutReader.cs" />
@@ -142,6 +150,7 @@
     <Compile Include="Forms\SingleCheckForm.Designer.cs">
       <DependentUpon>SingleCheckForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Readers\TitleBlockRegionParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\BatchProgressForm.resx">

@@ -78,7 +78,27 @@ namespace Correct_test1.Core
             {
                 if (layout.IsModelSpace)
                     continue;
+                //--------------------------------------
+                // 标题栏检查
+                //--------------------------------------
 
+                TitleBlockCheckManager titleManager =
+                    new TitleBlockCheckManager();
+
+
+                List<CheckResult> titleResults =
+                    titleManager.Check(
+                        db,
+                        layout,
+                        filePath,
+                        fileName,
+                        drawMarker
+                    );
+
+
+                results.AddRange(
+                    titleResults
+                );
                 // 读取文字
                 List<TitleText> texts = revisionReader.ReadAllTexts(db, layout.BlockTableRecordId);
                 if (texts.Count == 0)
