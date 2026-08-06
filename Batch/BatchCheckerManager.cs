@@ -135,10 +135,13 @@ namespace Correct_test1.Batch
                     // 保存绿色标记
                     //--------------------------------
 
-                    db.SaveAs(
-                        file,
-                        DwgVersion.Current
+
+
+                    Correct_test1.Core.SafeDwgSaver.Save(
+                        db,
+                        file
                     );
+
 
                 }
                 catch (Exception ex)
