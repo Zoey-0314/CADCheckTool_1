@@ -1,9 +1,10 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.Colors;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Colors;
-using System.Collections.Generic;
+using Correct_test1.Configs;
 using Correct_test1.Core;
-
+using Correct_test1.Models;
+using System.Collections.Generic;
 
 namespace Correct_test1.Markers
 {
@@ -24,9 +25,22 @@ namespace Correct_test1.Markers
     {
 
         private const string LayerName =
-            "TITLEBLOCK_CHECK";
+            MarkerConfig.TitleBlockLayerName;
 
-
+        private TitleFieldRegion GetDrawingNumberRegion(
+    bool isHorizontal)
+        {
+            if (isHorizontal)
+            {
+                return TitleBlockHorizontalConfig.Regions
+                    .Find(x => x.FieldName == "DrawingNumber");
+            }
+            else
+            {
+                return TitleBlockVerticalConfig.Regions
+                    .Find(x => x.FieldName == "DrawingNumber");
+            }
+        }
 
         /// <summary>
         /// 绘制标题栏图号错误标记
@@ -137,11 +151,25 @@ namespace Correct_test1.Markers
                     ObjectId layerId = EnsureLayer(db, tr, LayerName, Color.FromRgb(0, 255, 0));
 
 
+                    TitleFieldRegion region =
+                        GetDrawingNumberRegion(isHorizontal);
 
-                    double x1;
-                    double x2;
-                    double y1;
-                    double y2;
+
+                    if (region == null)
+                    {
+                        AppLogger.Warn(
+                            "未找到DrawingNumber区域配置",
+                            "TitleBlockDrawingNumberMarker");
+
+                        return;
+                    }
+
+
+                    double x1 = region.MinX;
+                    double x2 = region.MaxX;
+
+                    double y1 = region.MinY;
+                    double y2 = region.MaxY;
 
 
 
@@ -149,34 +177,10 @@ namespace Correct_test1.Markers
                     // 图号区域坐标
                     //--------------------------------
 
-                    if (isHorizontal)
-                    {
-
-                        // 横版
-
-                        x1 = 389.8816;
-                        x2 = 449.8816;
-
-                        y1 = 69.3206;
-                        y2 = 77.3206;
-
-                    }
-                    else
-                    {
-
-                        // 竖版
-
-                        x1 = 232.7611;
-                        x2 = 282.7611;
-
-                        y1 = 97.4386;
-                        y2 = 105.4386;
-
-                    }
 
 
 
-                    AppLogger.Info("坐标:" + x1 + "," + y1 + " -> " + x2 + "," + y2, "TitleBlockDrawingNumberMarker");
+
 
 
 
@@ -273,7 +277,7 @@ namespace Correct_test1.Markers
 
 
                     text.Height =
-                        3;
+                        MarkerConfig.TextHeight;
 
 
                     text.LayerId = layerId;
