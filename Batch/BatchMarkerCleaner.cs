@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
 using Correct_test1.Markers;
+using Correct_test1.Core;
 
 using System;
 using System.Collections.Generic;
@@ -80,9 +81,11 @@ namespace Correct_test1.Batch
 
                     // 保存清除后的DWG
 
-                    db.SaveAs(
-                        file,
-                        DwgVersion.Current
+                    // 安全保存清除后的DWG
+
+                    SafeDwgSaver.Save(
+                        db,
+                        file
                     );
 
                     results.Add(
@@ -90,10 +93,15 @@ namespace Correct_test1.Batch
                     );
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    // 单个文件失败不影响其他文件
+                    Correct_test1.Core.AppLogger.Error(
+                        ex,
+                        "BatchMarkerCleaner",
+                        file
+                    );
+
 
                     continue;
 

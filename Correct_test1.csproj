@@ -79,6 +79,8 @@
     <Compile Include="Command\TitleRegionTestCommand.cs" />
     <Compile Include="Configs\TitleBlockHorizontalConfig.cs" />
     <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
+    <Compile Include="Core\AppLogger.cs" />
+    <Compile Include="Core\SafeDwgSaver.cs" />
     <Compile Include="Forms\BatchCheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,6 +108,7 @@
     <Compile Include="Command\CommandEntry.cs" />
     <Compile Include="Command\TitleTestCommand.cs" />
     <Compile Include="Export\BatchCsvExporter.cs" />
+    <Compile Include="Markers\MarkerBase.cs" />
     <Compile Include="Markers\RevisionMarker.cs" />
     <Compile Include="Markers\TitleBlockDrawingNumberMarker.cs" />
     <Compile Include="Markers\TitleBlockMarkerMapper.cs" />
@@ -161,6 +164,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DEVELOPMENT_WORKFLOW.md" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

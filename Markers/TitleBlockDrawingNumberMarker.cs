@@ -2,7 +2,6 @@
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Colors;
 using System.Collections.Generic;
-using System.IO;
 using Correct_test1.Core;
 
 
@@ -21,7 +20,7 @@ namespace Correct_test1.Markers
     /// 不负责:
     /// 图号判断
     /// </summary>
-    public class TitleBlockDrawingNumberMarker
+    public class TitleBlockDrawingNumberMarker : MarkerBase
     {
 
         private const string LayerName =
@@ -130,22 +129,12 @@ namespace Correct_test1.Markers
 
                     }
 
-
-
-                    AppLogger.Info("真实BTR:" + btr.Name, "TitleBlockDrawingNumberMarker");
-
-
-
-
                     //--------------------------------
                     // 创建图层
                     //--------------------------------
 
                     // Ensure layer exists and get its id (compatible with batch mode)
-                    ObjectId layerId = CreateLayer(
-                        db,
-                        tr
-                    );
+                    ObjectId layerId = EnsureLayer(db, tr, LayerName, Color.FromRgb(0, 255, 0));
 
 
 
@@ -259,8 +248,6 @@ namespace Correct_test1.Markers
                         true
                     );
 
-                    AppLogger.Info("矩形加入成功 矩形创建标志:" + (rect.ObjectId != ObjectId.Null) + " 矩形ObjectId:" + rect.ObjectId.ToString(), "TitleBlockDrawingNumberMarker");
-
 
                     //--------------------------------
                     // 创建提示文字
@@ -306,13 +293,7 @@ namespace Correct_test1.Markers
                         true
                     );
 
-                    AppLogger.Info("文字加入成功:" + text.TextString + " 文本创建标志:" + (text.ObjectId != ObjectId.Null) + " 文本ObjectId:" + text.ObjectId.ToString(), "TitleBlockDrawingNumberMarker");
-
-
                     tr.Commit();
-
-
-                    AppLogger.Info("Commit成功", "TitleBlockDrawingNumberMarker");
 
                 }
             }
@@ -323,57 +304,7 @@ namespace Correct_test1.Markers
             }
 
         }
-        //--------------------------------
-        // 创建检查图层
-        //--------------------------------
-
-        private ObjectId CreateLayer(
-            Database db,
-            Transaction tr)
-        {
-
-            LayerTable lt =
-                tr.GetObject(
-                    db.LayerTableId,
-                    OpenMode.ForRead
-                )
-                as LayerTable;
-
-
-            if (lt.Has(LayerName))
-            {
-                return lt[LayerName];
-            }
-
-
-            lt.UpgradeOpen();
-
-
-            LayerTableRecord layer =
-                new LayerTableRecord();
-
-
-            layer.Name =
-                LayerName;
-
-
-            layer.Color =
-                Color.FromRgb(
-                    0,
-                    255,
-                    0
-                );
-
-            ObjectId layerId = lt.Add(layer);
-
-            tr.AddNewlyCreatedDBObject(
-                layer,
-                true
-            );
-
-            return layerId;
-
-        }
+        // 图层由 MarkerBase.EnsureLayer 管理
 
 
 
@@ -387,7 +318,6 @@ namespace Correct_test1.Markers
         public void ClearMarkers(
             Database db)
         {
-
 
             using (Transaction tr =
                 db.TransactionManager.StartTransaction())
@@ -434,14 +364,19 @@ namespace Correct_test1.Markers
                                 OpenMode.ForRead
                             )
                             as Entity;
-
+                        if (ent != null)
+                        {
+                            Correct_test1.Core.AppLogger.Debug(
+                                $"检查实体 ObjectId:{ent.ObjectId} 类型:{ent.GetType().Name} Layer:{ent.Layer}",
+                                "TitleBlockDrawingNumberMarker"
+                            );
+                        }
 
                         if (ent != null &&
-                           ent.Layer == LayerName)
+                            ent.Layer == LayerName)
                         {
 
                             remove.Add(entId);
-
                         }
 
                     }
