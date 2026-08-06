@@ -6,7 +6,7 @@ using Correct_test1.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Correct_test1.Core;
 
 
 namespace Correct_test1.Readers
@@ -139,7 +139,7 @@ namespace Correct_test1.Readers
                     t.X < 330
                 )
                 {
-                    System.Diagnostics.Debug.WriteLine(
+                    AppLogger.Debug(
                         t.Text
                         +
                         "   X="
@@ -207,7 +207,7 @@ namespace Correct_test1.Readers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
+                AppLogger.Debug(
                     "Debug ROW output failed: "
                     +
                     ex.Message
@@ -627,7 +627,7 @@ namespace Correct_test1.Readers
                     GetHorizontalColumn(
                         text.X
                     );
-                System.Diagnostics.Debug.WriteLine(
+                AppLogger.Debug(
     "Parse:"
     + text.Text
     + " X="
@@ -1236,7 +1236,7 @@ namespace Correct_test1.Readers
                     // 块参照：先读取属性属性引用（AttributeReference），再递归读取块定义内实体（含嵌套块）
                     else if (ent is BlockReference br)
                     {
-                        System.Diagnostics.Debug.WriteLine(
+                        AppLogger.Debug(
     "发现块:"
     + br.Name
 );
@@ -1295,7 +1295,7 @@ namespace Correct_test1.Readers
                     tr.GetObject(br.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
                 if (blockDef != null)
                 {
-                    System.Diagnostics.Debug.WriteLine(
+                    AppLogger.Debug(
                         "读取块定义:"
                         + blockDef.Name
                     );
@@ -1312,7 +1312,9 @@ namespace Correct_test1.Readers
             }
             catch (System.Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"ReadBlockTexts failed for BlockReference: {ex.Message}");
+                AppLogger.Error(
+    ex,
+    "RevisionTableReader.ReadBlockTexts"); ;
             }
         }
 
@@ -1329,7 +1331,7 @@ namespace Correct_test1.Readers
             // 调试：输出块信息
             try
             {
-                System.Diagnostics.Debug.WriteLine($"Processing blockDef: {blockDef.Name}, Transform present.");
+                AppLogger.Debug($"Processing blockDef: {blockDef.Name}, Transform present.");
             }
             catch { }
 
@@ -1341,7 +1343,7 @@ namespace Correct_test1.Readers
                 if (innerEnt == null)
                     continue;
 
-                System.Diagnostics.Debug.WriteLine($"  InnerEntType: {innerEnt.GetType().Name}");
+                AppLogger.Debug($"  InnerEntType: {innerEnt.GetType().Name}");
 
                 // DBText：把定义坐标通过 transformToWorld 转换为世界坐标
                 if (innerEnt is DBText innerText)
@@ -1396,7 +1398,9 @@ namespace Correct_test1.Readers
                     }
                     catch (System.Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Nested block read failed: {ex.Message}");
+                        AppLogger.Error(
+    ex,
+    "RevisionTableReader.ReadBlockTexts"); ;
                     }
                 }
                 // 其余类型暂不处理（保留扩展点）

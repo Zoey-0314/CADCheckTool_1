@@ -4,12 +4,14 @@ using Autodesk.AutoCAD.Colors;
 using Correct_test1.Models;
 using Correct_test1.Core;
 using System.Collections.Generic;
+using Correct_test1.Configs;
 
 namespace Correct_test1.Markers
 {
     public class RevisionMarker : MarkerBase
     {
-        private const string LayerName = "REVISION_CHECK";
+        private string LayerName =>
+            MarkerConfig.RevisionLayerName;
 
 
         /// <summary>
@@ -216,8 +218,11 @@ namespace Correct_test1.Markers
             double y)
         {
 
-            double width = 18;
-            double height = 5;
+            double width =
+                MarkerConfig.RevisionBoxWidth;
+
+            double height =
+                MarkerConfig.RevisionBoxHeight;
 
 
             Polyline pl =
