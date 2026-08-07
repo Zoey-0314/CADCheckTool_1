@@ -58,6 +58,40 @@ namespace Correct_test1.Core
                     IsError = true
                 });
             }
+            else
+            {
+                FileNameProjectReader fileProjectReader =
+                    new FileNameProjectReader();
+                FileNameProjectReader.ProjectInfo expectedProject =
+                    fileProjectReader.ReadProjectNumber(filePath);
+
+                if (expectedProject != null &&
+                    !string.Equals(
+                        projects[0],
+                        expectedProject.ProjectNumber,
+                        System.StringComparison.OrdinalIgnoreCase))
+                {
+                    results.Add(new CheckResult
+                    {
+                        FilePath = filePath,
+                        FileName = fileName,
+                        Type = "项目号检查",
+                        ObjectName = "项目号",
+                        CurrentValue = projects[0],
+                        ExpectedValue = expectedProject.ProjectNumber,
+                        Message = "当前项目号与要求项目号不一致",
+                        IsError = true
+                    });
+
+                    if (drawMarker)
+                    {
+                        new MarkerManager().CreateProjectMarkers(
+                            db,
+                            projects[0],
+                            expectedProject.ProjectNumber);
+                    }
+                }
+            }
 
             //--------------------------------------
             // 2. 修改记录检查

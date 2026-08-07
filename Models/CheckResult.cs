@@ -26,6 +26,14 @@
         // 参考值
         public string ExpectedValue { get; set; }
 
+        public string DrawingNumber { get; set; }
+
+        public string PartNumber { get; set; }
+
+        public string PartName { get; set; }
+
+        public string CorrectValue { get; set; }
+
         // 提示信息
         public string Message { get; set; }
 
@@ -42,6 +50,10 @@
             ObjectName = "";
             CurrentValue = "";
             ExpectedValue = "";
+            DrawingNumber = "";
+            PartNumber = "";
+            PartName = "";
+            CorrectValue = "";
             Message = "";
             IsError = false;
         }

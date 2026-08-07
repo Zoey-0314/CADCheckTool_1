@@ -278,10 +278,22 @@ namespace Correct_test1
                 BatchMarkerCleaner cleaner =
                     new BatchMarkerCleaner();
 
+                BatchProgressForm progressForm =
+                    new BatchProgressForm();
+                progressForm.Show();
+
                 List<string> result =
                     cleaner.ClearFolderMarkers(
-                        dialog.SelectedPath
+                        dialog.SelectedPath,
+                        (percent, total, name) =>
+                        {
+                            progressForm.UpdateProgress(
+                                percent,
+                                name);
+                        }
                     );
+
+                progressForm.Close();
 
                 MessageBox.Show(
 

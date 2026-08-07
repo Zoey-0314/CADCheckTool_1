@@ -144,16 +144,61 @@ namespace Correct_test1.Batch
                         db,
                         report.Results);
 
+                    foreach (StandardPartCheckResult standardResult in report.Results)
+                    {
+                        if (standardResult.Status == StandardPartCheckStatus.Correct)
+                        {
+                            continue;
+                        }
+
+                        results.Add(new CheckResult
+                        {
+                            FilePath = file,
+                            FileName = Path.GetFileName(file),
+                            DrawingNumber = standardResult.DrawingNumber,
+                            PartNumber = standardResult.BomItem == null
+                                ? ""
+                                : standardResult.BomItem.PartNumber,
+                            PartName = standardResult.BomItem == null
+                                ? ""
+                                : standardResult.BomItem.Name,
+                            CorrectValue = standardResult.Status == StandardPartCheckStatus.NameError
+                                ? standardResult.CorrectName
+                                : standardResult.CorrectPartNumber,
+                            Type = "标准件检查",
+                            ObjectName = "标准件",
+                            CurrentValue = standardResult.BomItem == null
+                                ? ""
+                                : standardResult.BomItem.PartNumber,
+                            ExpectedValue = standardResult.CorrectPartNumber,
+                            Message = standardResult.Message,
+                            IsError = true
+                        });
+                    }
+
                     //--------------------------------
                     // 保存绿色标记
                     //--------------------------------
 
 
 
-                    Correct_test1.Core.SafeDwgSaver.Save(
+                    bool saved = Correct_test1.Core.SafeDwgSaver.Save(
                         db,
                         file
                     );
+
+                    if (!saved)
+                    {
+                        results.Add(new CheckResult
+                        {
+                            FilePath = file,
+                            FileName = Path.GetFileName(file),
+                            Type = "文件保存错误",
+                            ObjectName = "DWG",
+                            Message = "SafeDwgSaver 保存失败，详见日志",
+                            IsError = true
+                        });
+                    }
 
 
                 }

@@ -27,6 +27,13 @@ namespace Correct_test1.Batch
         public List<string> ClearFolderMarkers(
             string folderPath)
         {
+            return ClearFolderMarkers(folderPath, null);
+        }
+
+        public List<string> ClearFolderMarkers(
+            string folderPath,
+            Action<int, int, string> progress)
+        {
 
             List<string> results =
                 new List<string>();
@@ -41,6 +48,7 @@ namespace Correct_test1.Batch
                     SearchOption.AllDirectories
                 );
 
+            int completed = 0;
             foreach (string file in files)
             {
 
@@ -87,14 +95,15 @@ namespace Correct_test1.Batch
 
                     // 安全保存清除后的DWG
 
-                    SafeDwgSaver.Save(
+                    bool saved = SafeDwgSaver.Save(
                         db,
                         file
                     );
 
-                    results.Add(
-                        file
-                    );
+                    if (saved)
+                    {
+                        results.Add(file);
+                    }
 
                 }
                 catch (Exception ex)
@@ -119,6 +128,12 @@ namespace Correct_test1.Batch
                         db.Dispose();
 
                     }
+
+                completed++;
+                progress?.Invoke(
+                    completed * 100 / files.Length,
+                    files.Length,
+                    Path.GetFileName(file));
 
                 }
 

@@ -21,7 +21,7 @@ namespace Correct_test1.Export
 
 
             // CSV标题
-            sb.AppendLine("文件名,打开图纸,布局,标记,检查类型,缺失项,问题");
+            sb.AppendLine("文件名,打开图纸,所属图号,当前图号,零件名称,正确内容,布局,标记,检查类型,缺失项,问题");
 
 
 
@@ -34,6 +34,10 @@ namespace Correct_test1.Export
                 sb.AppendLine(
                     Escape(result.FileName) + "," +
                     Escape(link) + "," +
+                    Escape(result.DrawingNumber) + "," +
+                    Escape(result.PartNumber) + "," +
+                    Escape(result.PartName) + "," +
+                    Escape(result.CorrectValue) + "," +
                     Escape(result.LayoutName) + "," +
                     Escape(result.Mark) + "," +
                     Escape(result.Type) + "," +

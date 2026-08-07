@@ -27,7 +27,7 @@ namespace Correct_test1.Core
         /// </summary>
         /// <param name="db">当前Database</param>
         /// <param name="originalFile">原文件路径</param>
-        public static void Save(
+        public static bool Save(
             Database db,
             string originalFile
         )
@@ -71,10 +71,25 @@ namespace Correct_test1.Core
                     "SafeDwgSaver"
                 );
 
+                AppLogger.Info(
+                    "SaveAs前: DatabaseDisposed=" + db.IsDisposed +
+                    ", ActiveTransactions=" +
+                    db.TransactionManager.NumberOfActiveTransactions +
+                    ", OriginalExists=" + File.Exists(originalFile),
+                    "SafeDwgSaver"
+                );
+
 
                 db.SaveAs(
                     tempFile,
                     DwgVersion.Current
+                );
+
+                FileInfo savedInfo = new FileInfo(tempFile);
+                AppLogger.Info(
+                    "SaveAs后: TempExists=" + File.Exists(tempFile) +
+                    ", TempLength=" + savedInfo.Length,
+                    "SafeDwgSaver"
                 );
 
 
@@ -160,6 +175,8 @@ namespace Correct_test1.Core
                     "SafeDwgSaver"
                 );
 
+                return true;
+
 
             }
             catch (Exception ex)
@@ -167,8 +184,11 @@ namespace Correct_test1.Core
 
 
                 AppLogger.Error(
-                    ex,
-                    "SafeDwgSaver保存失败"
+                    new Exception(
+                        "SafeDwgSaver保存失败: " + ex.Message +
+                        Environment.NewLine + ex.StackTrace,
+                        ex),
+                    "SafeDwgSaver"
                 );
 
 
@@ -191,7 +211,7 @@ namespace Correct_test1.Core
 
 
 
-                throw;
+                return false;
 
             }
 

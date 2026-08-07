@@ -158,6 +158,7 @@
     <Compile Include="Export\BatchCsvExporter.cs" />
     <Compile Include="Markers\MarkerBase.cs" />
     <Compile Include="Markers\MarkerManager.cs" />
+    <Compile Include="Markers\ProjectNumberMarker.cs" />
     <Compile Include="Markers\RevisionMarker.cs" />
     <Compile Include="Markers\StandardPartMarker.cs" />
     <Compile Include="Markers\TitleBlockDrawingNumberMarker.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="Models\LayoutInfo.cs" />
     <Compile Include="Models\MarkerInfo.cs" />
     <Compile Include="Models\PartNumberType.cs" />
+    <Compile Include="Models\ProjectNumberLocation.cs" />
     <Compile Include="Models\RevisionCheckIssue.cs" />
     <Compile Include="Models\RevisionInfo.cs" />
     <Compile Include="Models\RevisionLocation.cs" />
