@@ -1,12 +1,15 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using System;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Correct_test1;
+using Correct_test1.Core;
+using System;
 
 namespace Correct_test1
 {
     public class CommandEntry
     {
+
         [CommandMethod("CHECKDRAWING")]
         public void OpenCheckForm()
         {
