@@ -4,118 +4,130 @@
 
 CADCheckTool_1 uses a layered architecture.
 
-Design principle:
+## Design Principle
 
-Read Data → Analyze Data → Generate Result → Modify CAD
+    Read Data → Analyze Data → Generate Result → Modify CAD
 
-# Project Layers
+## Project Structure
 
     Correct_test1
 
+    ├── Command
     ├── Readers
-
     ├── Checks
-
     ├── Markers
-
     ├── Batch
-
-    ├── Configs
-
     ├── Core
-
     ├── Models
-
+    ├── Configs
     └── Export
 
-# Readers
+## Module Responsibilities
 
-Responsibility:
+### Readers
 
-Read information from DWG files.
+Responsible for:
 
-Examples:
+-   DWG data reading
+-   BOM reading
+-   Title block reading
+-   Revision reading
 
--   Layout information
--   Title block text
--   Revision table content
+### Checks
 
-Readers should not modify CAD entities.
-
-# Checks
-
-Responsibility:
-
-Implement business validation rules.
-
-Examples:
+Responsible for:
 
 -   Drawing number checking
 -   Revision checking
+-   Project number checking
+-   BOM validation
+-   Standard part verification
 
-Checks should not directly create CAD graphics.
+### Markers
 
-# Markers
+Responsible for:
 
-Responsibility:
+-   CAD error visualization
+-   Marker lifecycle management
+-   XData association
+-   Safe removal
 
-Create CAD annotations.
+### Core
 
-Examples:
+Responsible for:
 
--   Error rectangles
--   Text labels
+-   Logging
+-   Safe saving
+-   Common services
 
-Marker classes should inherit from:
+## Architecture Rules
 
-    MarkerBase
+Forbidden:
 
-# Configs
+-   Readers modifying CAD
+-   Checks creating CAD entities directly
+-   Markers executing business rules
+---
+## 设计原则
 
-Responsibility:
+    读取数据 → 分析数据 → 生成结果 → 修改CAD
 
-Store configurable parameters.
+## 项目结构
 
-Purpose:
+    Correct_test1
 
-Avoid hard-coded engineering rules.
+    ├── Command
+    ├── Readers
+    ├── Checks
+    ├── Markers
+    ├── Batch
+    ├── Core
+    ├── Models
+    ├── Configs
+    └── Export
 
-Bad:
+## 模块职责
 
-``` csharp
-double width = 18;
-```
+### Readers
 
-Good:
+负责：
 
-``` csharp
-MarkerConfig.RevisionBoxWidth;
-```
+-   DWG数据读取
+-   BOM读取
+-   标题栏读取
+-   修改记录读取
 
-# Core
+### Checks
 
-Common infrastructure.
+负责：
 
-Current components:
+-   图号检查
+-   修改记录检查
+-   项目号检查
+-   BOM检查
+-   标准件检查
 
--   AppLogger
--   SafeDwgSaver
+### Markers
 
-Future components:
+负责：
 
--   ExceptionHelper
--   TransactionHelper
+-   CAD错误显示
+-   标记生命周期管理
+-   XData绑定
+-   安全清除
 
-# Design Rules
+### Core
 
-1.  Readers only read data.
+负责：
 
-2.  Checks only analyze data.
+-   日志系统
+-   安全保存
+-   公共服务
 
-3.  Markers only modify CAD.
+## 架构规则
 
-4.  Company-specific rules belong in Configs.
+禁止：
 
-5.  Avoid magic numbers.
-
-6.  Keep CAD transaction operations controlled.
+-   Reader修改CAD
+-   Check直接创建CAD实体
+-   Marker执行业务判断

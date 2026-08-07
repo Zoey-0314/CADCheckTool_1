@@ -5,113 +5,166 @@ AutoCAD engineering drawing automatic inspection plugin.
 
 ![AutoCAD](https://img.shields.io/badge/AutoCAD-.NET%20API-blue)
 ![CSharp](https://img.shields.io/badge/C%23-.NET-purple)
-![Version](https://img.shields.io/badge/version-v1.2.0-green)
+![Version](https://img.shields.io/badge/version-v1.5.0-green)
+## Project Introduction
 
-## Overview
+CADCheckTool_1 is a mechanical engineering drawing inspection plugin
+developed based on the AutoCAD .NET API.
 
-CADCheckTool_1 is a C# based AutoCAD automation tool used for
-engineering drawing inspection.
+The goal is to automatically read drawing information, execute
+engineering rules, and provide traceable CAD visual feedback.
 
-Main functions:
+Core workflow:
+
+    Read Data → Analyze Rules → Generate Results → CAD Visualization
+
+## Current Version
+
+v1.5.0 Development
+
+## Implemented Features
+
+### Drawing Inspection
+
+Supports:
 
 -   Drawing number consistency checking
 -   Title block inspection
--   Revision table inspection
--   Automatic CAD error marking
--   Batch DWG processing
--   Safe DWG saving
+-   Revision inspection
+-   Basic project number checking
 
-Current version:
+### BOM Inspection
 
-v1.3.1
+Supports:
 
-# Features
-
-## Drawing Number Validation
-
-The system compares drawing information from different sources:
-
--   DWG file name
--   Title block drawing number
-
-When inconsistent information is detected:
-
-1.  A check result is generated.
-2.  A marker is created in the drawing.
-3.  The issue is recorded in the log system.
-
-## Revision Table Inspection
-
-The system reads revision table information and checks:
-
--   Revision number
--   Revision description
--   Revision location
-
-## Batch Processing
-
-The system supports processing multiple DWG files.
+-   CAD BOM table reading
+-   BOM data parsing
+-   Part information extraction
 
 Workflow:
 
-DWG Folder → Read Drawing → Run Checks → Generate Markers → Save Result
+    DWG
+     ↓
+    CadTableReader
+     ↓
+    BomTableRecognizer
+     ↓
+    BomData
 
-Each drawing is processed independently.
+### Standard Part Inspection
 
-# Project Structure
+Supports:
 
-    Correct_test1
+-   StandardParts.xlsx database
+-   Standard part cache
+-   Part number indexing
+-   Loose part number matching
+-   Strict format validation
+-   Name validation
+-   Missing standard detection
+-   Multiple match detection
+-   NS non-standard filtering
 
-    ├── Batch
-    │   Batch processing logic
+### Marker System
 
-    ├── Checks
-    │   Business checking rules
+Supports:
 
-    ├── Configs
-    │   Configurable engineering parameters
+-   Error location markers
+-   Dedicated marker layer
+-   XData association
+-   Safe marker removal
 
-    ├── Core
-    │   Common infrastructure
+## Version Roadmap
 
-    ├── Markers
-    │   CAD annotation generation
+v1.4.0
 
-    ├── Models
-    │   Data models
+BOM Extraction and Recognition System
 
-    ├── Readers
-    │   DWG information extraction
+v1.5.0
 
-    └── Export
-        Result output
+Standard Part Checking System
 
-# Important Customization Notice
+v1.6.0
 
-This software contains engineering standard related rules.
+Intelligent Correction and Knowledge Base
+## 项目简介
 
-Different companies may have different CAD standards.
+CADCheckTool_1 是基于 AutoCAD .NET API 开发的机械工程图智能审核插件。
 
-Before deployment, review:
+目标：
 
--   Drawing number rules
--   Project number rules
--   Title block position
--   Revision table format
--   Marker appearance
+自动读取工程图数据，执行工程规则检查，并在 CAD 中生成可追踪的错误标记。
 
-Detailed configuration information:
+核心流程：
 
-See:
+    读取数据 → 分析规则 → 生成结果 → CAD可视化反馈
 
-CONFIGURATION_GUIDE.md
+## 当前版本
 
-# Development Documentation
+v1.5.0 Development
 
-Architecture:
+## 已实现功能
 
-ARCHITECTURE.md
+### 工程图检查
 
-Development workflow:
+支持：
 
-DEVELOPMENT_WORKFLOW.md
+-   图号一致性检查
+-   标题栏检查
+-   修改记录检查
+-   项目号检查基础逻辑
+
+### BOM检查
+
+支持：
+
+-   CAD BOM表读取
+-   BOM数据解析
+-   零件信息提取
+
+流程：
+
+    DWG
+     ↓
+    CadTableReader
+     ↓
+    BomTableRecognizer
+     ↓
+    BomData
+
+### 标准件检查
+
+支持：
+
+-   StandardParts.xlsx标准件库
+-   标准件缓存
+-   图号索引
+-   图号宽松匹配
+-   严格格式检查
+-   名称检查
+-   未收录检测
+-   多匹配检测
+-   NS非标件过滤
+
+### Marker系统
+
+支持：
+
+-   错误位置标记
+-   专用Marker图层
+-   XData关联
+-   安全清除
+
+## 版本规划
+
+v1.4.0
+
+BOM Extraction and Recognition System
+
+v1.5.0
+
+Standard Part Checking System
+
+v1.6.0
+
+Intelligent Correction and Knowledge Base
