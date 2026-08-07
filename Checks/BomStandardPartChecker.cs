@@ -31,6 +31,7 @@ namespace Correct_test1.Checks
                 StandardPartCheckResult result =
                     new StandardPartCheckResult();
                 result.BomItem = item;
+                result.DrawingNumber = bom.DrawingNumber;
 
                 if (matches.Count == 0)
                 {

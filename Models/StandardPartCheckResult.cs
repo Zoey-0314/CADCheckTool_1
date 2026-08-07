@@ -39,6 +39,12 @@
             set;
         }
 
+        public string DrawingNumber
+        {
+            get;
+            set;
+        }
+
 
 
         /// <summary>
