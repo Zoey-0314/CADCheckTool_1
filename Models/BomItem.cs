@@ -1,5 +1,6 @@
 ﻿namespace Correct_test1.Models
 {
+    using Autodesk.AutoCAD.Geometry;
 
     /// <summary>
     /// BOM单行数据
@@ -32,6 +33,20 @@
         /// 数量
         /// </summary>
         public string Quantity { get; set; }
+
+        public int BomRow { get; set; }
+
+        public int NoColumn { get; set; }
+
+        public int PartNumberColumn { get; set; }
+
+        public int NameColumn { get; set; }
+
+        public Point3d NoCellPosition { get; set; }
+
+        public Point3d PartNumberCellPosition { get; set; }
+
+        public Point3d NameCellPosition { get; set; }
 
     }
 

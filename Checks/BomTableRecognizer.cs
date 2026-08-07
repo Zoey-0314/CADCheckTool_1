@@ -137,6 +137,20 @@ namespace Correct_test1.Checks
                         r,
                         mapping.QuantityColumn);
 
+                item.BomRow = r;
+                item.NoColumn = mapping.NoColumn;
+                item.PartNumberColumn = mapping.PartNumberColumn;
+                item.NameColumn = mapping.NameColumn;
+                item.NoCellPosition = table.GetCellPosition(
+                    r,
+                    mapping.NoColumn);
+                item.PartNumberCellPosition = table.GetCellPosition(
+                    r,
+                    mapping.PartNumberColumn);
+                item.NameCellPosition = table.GetCellPosition(
+                    r,
+                    mapping.NameColumn);
+
 
 
                 // 空行跳过

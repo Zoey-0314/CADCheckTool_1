@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Correct_test1.Checks;
 using Correct_test1.Core;
 using Correct_test1.Markers;
 using Correct_test1.Models;
@@ -40,6 +41,17 @@ namespace Correct_test1
                         doc.Name,
                         true
                     );
+
+                    CheckService checkService =
+                        new CheckService();
+                    CheckReport report =
+                        checkService.Check(doc.Database);
+
+                    MarkerManager markerManager =
+                        new MarkerManager();
+                    markerManager.CreateMarkers(
+                        doc.Database,
+                        report.Results);
                 }
 
                 if (results == null || results.Count == 0)
@@ -96,6 +108,10 @@ namespace Correct_test1
                     titleBlockMarker.ClearMarkers(
                         doc.Database
                     );
+
+                    MarkerManager markerManager =
+                        new MarkerManager();
+                    markerManager.ClearMarkers(doc.Database);
 
                 }
 

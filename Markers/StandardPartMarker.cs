@@ -1,4 +1,5 @@
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Models;
 
 namespace Correct_test1.Markers
@@ -17,10 +18,10 @@ namespace Correct_test1.Markers
                     spaceId,
                     OpenMode.ForWrite) as BlockTableRecord;
 
-            DBText text = new DBText();
-            text.Position = info.Position;
-            text.Height = 2.5;
-            text.TextString = info.Text;
+            MText text = new MText();
+            text.Location = info.Position + Vector3d.XAxis * 5.0;
+            text.TextHeight = 3.0;
+            text.Contents = info.Text;
             text.LayerId = layerId;
 
             space.AppendEntity(text);

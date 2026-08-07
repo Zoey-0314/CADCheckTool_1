@@ -275,6 +275,47 @@ namespace Correct_test1.Readers
 
                     row.Add(value);
 
+                    try
+                    {
+                        Point3dCollection cellPoints =
+                            new Point3dCollection();
+                        table.GetCellExtents(
+                            r,
+                            c,
+                            false,
+                            cellPoints);
+
+                        double minX = double.MaxValue;
+                        double minY = double.MaxValue;
+                        double minZ = double.MaxValue;
+                        double maxX = double.MinValue;
+                        double maxY = double.MinValue;
+                        double maxZ = double.MinValue;
+
+                        foreach (Point3d point in cellPoints)
+                        {
+                            minX = Math.Min(minX, point.X);
+                            minY = Math.Min(minY, point.Y);
+                            minZ = Math.Min(minZ, point.Z);
+                            maxX = Math.Max(maxX, point.X);
+                            maxY = Math.Max(maxY, point.Y);
+                            maxZ = Math.Max(maxZ, point.Z);
+                        }
+
+                        data.CellPositions.Add(
+                            r + ":" + c,
+                            new Point3d(
+                                (minX + maxX) / 2,
+                                (minY + maxY) / 2,
+                                (minZ + maxZ) / 2));
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLogger.Error(
+                            ex,
+                            "CadTableReader.ReadCellPosition");
+                    }
+
                 }
 
 

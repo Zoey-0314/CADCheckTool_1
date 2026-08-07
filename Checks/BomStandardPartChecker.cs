@@ -71,6 +71,18 @@ namespace Correct_test1.Checks
                     }
                 }
 
+                result.BomRow = item.BomRow;
+                if (result.Status == StandardPartCheckStatus.NameError)
+                {
+                    result.BomColumn = item.NameColumn;
+                    result.CellPosition = item.NameCellPosition;
+                }
+                else
+                {
+                    result.BomColumn = item.PartNumberColumn;
+                    result.CellPosition = item.PartNumberCellPosition;
+                }
+
                 results.Add(result);
             }
 

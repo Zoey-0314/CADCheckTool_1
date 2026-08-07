@@ -167,6 +167,7 @@
     <Compile Include="Models\BomData.cs" />
     <Compile Include="Models\BomItem.cs" />
     <Compile Include="Models\CadTableData.cs" />
+    <Compile Include="Models\CheckReport.cs" />
     <Compile Include="Models\DrawingInfo.cs" />
     <Compile Include="Models\FrameInfo.cs" />
     <Compile Include="Models\HorizontalTitleBlockTemplate.cs" />

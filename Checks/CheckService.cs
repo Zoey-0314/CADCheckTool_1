@@ -1,21 +1,26 @@
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Correct_test1.Models;
 using Correct_test1.Readers;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Correct_test1.Checks
 {
     public class CheckService
     {
-        public List<StandardPartCheckResult> Check(Database database)
+        public CheckReport Check(Database database)
         {
-            List<StandardPartCheckResult> results =
-                new List<StandardPartCheckResult>();
+            CheckReport report = new CheckReport();
+            report.CheckTime = DateTime.Now;
 
             if (database == null)
             {
-                return results;
+                return report;
             }
+
+            report.DrawingName = database.Filename;
 
             CadTableReader tableReader =
                 new CadTableReader();
@@ -35,10 +40,24 @@ namespace Correct_test1.Checks
                 }
 
                 BomData bom = recognizer.Parse(table);
-                results.AddRange(checker.Check(bom));
+                report.Results.AddRange(checker.Check(bom));
             }
 
-            return results;
+            report.TotalCount = report.Results.Count;
+            report.CorrectCount = report.Results.Count(
+                result => result.Status == StandardPartCheckStatus.Correct);
+            report.ErrorCount = report.TotalCount - report.CorrectCount;
+
+            foreach (StandardPartCheckResult result in report.Results)
+            {
+                if (string.IsNullOrEmpty(report.DrawingNumber) &&
+                    !string.IsNullOrEmpty(result.DrawingNumber))
+                {
+                    report.DrawingNumber = result.DrawingNumber;
+                }
+            }
+
+            return report;
         }
     }
 }

@@ -78,6 +78,10 @@ namespace Correct_test1.Batch
                         db
                     );
 
+                    MarkerManager markerManager =
+                        new MarkerManager();
+                    markerManager.ClearMarkers(db);
+
 
                     // 保存清除后的DWG
 

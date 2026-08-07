@@ -1,6 +1,8 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
+using Correct_test1.Checks;
 using Correct_test1.Core;
+using Correct_test1.Markers;
 using Correct_test1.Models;
 
 using System;
@@ -130,6 +132,17 @@ namespace Correct_test1.Batch
                     results.AddRange(
                         oneResults
                     );
+
+                    CheckService checkService =
+                        new CheckService();
+                    CheckReport report =
+                        checkService.Check(db);
+
+                    MarkerManager markerManager =
+                        new MarkerManager();
+                    markerManager.CreateMarkers(
+                        db,
+                        report.Results);
 
                     //--------------------------------
                     // 保存绿色标记
