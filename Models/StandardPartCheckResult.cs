@@ -11,6 +11,13 @@ namespace Correct_test1.Models
         MultipleMatch
     }
 
+    public enum StandardPartMatchSource
+    {
+        None,
+        ExportPartNumber,
+        NationalPartNumber
+    }
+
     public class StandardPartCheckResult
     {
         public StandardPartCheckStatus Status { get; set; }
@@ -26,6 +33,8 @@ namespace Correct_test1.Models
         public Point3d CellPosition { get; set; }
 
         public StandardPart StandardPart { get; set; }
+
+        public StandardPartMatchSource MatchSource { get; set; }
 
         public string CorrectPartNumber { get; set; }
 

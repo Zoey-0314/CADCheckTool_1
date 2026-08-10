@@ -50,16 +50,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>D:\Program Files\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>D:\Program Files\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>D:\Program Files\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
     </Reference>
     <Reference Include="EPPlus, Version=8.6.3.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>packages\EPPlus.8.6.3\lib\net462\EPPlus.dll</HintPath>

@@ -76,8 +76,14 @@ namespace Correct_test1.Checks
 
 
 
+            result.MatchSource =
+                GetMatchSource(item.PartNumber, standard);
+
             result.CorrectPartNumber =
-                standard.ExportPartNumber;
+                result.MatchSource
+                == StandardPartMatchSource.NationalPartNumber
+                ? standard.NationalPartNumber
+                : standard.ExportPartNumber;
 
 
 
@@ -90,7 +96,7 @@ namespace Correct_test1.Checks
                 PartNumberNormalizer
                 .StrictEquals(
                     item.PartNumber,
-                    standard.ExportPartNumber
+                    result.CorrectPartNumber
                 )
                 &&
                 item.Name.Trim()
@@ -145,6 +151,41 @@ namespace Correct_test1.Checks
             return result;
 
 
+        }
+
+        private static StandardPartMatchSource GetMatchSource(
+            string partNumber,
+            StandardPart standardPart)
+        {
+            if (PartNumberNormalizer.StrictEquals(
+                partNumber,
+                standardPart.ExportPartNumber))
+            {
+                return StandardPartMatchSource.ExportPartNumber;
+            }
+
+            if (PartNumberNormalizer.StrictEquals(
+                partNumber,
+                standardPart.NationalPartNumber))
+            {
+                return StandardPartMatchSource.NationalPartNumber;
+            }
+
+            if (PartNumberNormalizer.LooseEquals(
+                partNumber,
+                standardPart.ExportPartNumber))
+            {
+                return StandardPartMatchSource.ExportPartNumber;
+            }
+
+            if (PartNumberNormalizer.LooseEquals(
+                partNumber,
+                standardPart.NationalPartNumber))
+            {
+                return StandardPartMatchSource.NationalPartNumber;
+            }
+
+            return StandardPartMatchSource.None;
         }
 
     }

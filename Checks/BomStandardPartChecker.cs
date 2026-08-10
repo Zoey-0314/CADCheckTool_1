@@ -47,7 +47,11 @@ namespace Correct_test1.Checks
                 {
                     StandardPart standardPart = matches[0];
                     result.StandardPart = standardPart;
-                    result.CorrectPartNumber = standardPart.ExportPartNumber;
+                    result.MatchSource = GetMatchSource(item.PartNumber, standardPart);
+                    result.CorrectPartNumber = result.MatchSource
+                        == StandardPartMatchSource.NationalPartNumber
+                        ? standardPart.NationalPartNumber
+                        : standardPart.ExportPartNumber;
                     result.CorrectName = standardPart.Name;
 
                     if (!string.Equals(
@@ -60,7 +64,7 @@ namespace Correct_test1.Checks
                     }
                     else if (PartNumberNormalizer.StrictEquals(
                         item.PartNumber,
-                        standardPart.ExportPartNumber))
+                        result.CorrectPartNumber))
                     {
                         result.Status = StandardPartCheckStatus.Correct;
                     }
@@ -87,6 +91,41 @@ namespace Correct_test1.Checks
             }
 
             return results;
+        }
+
+        private static StandardPartMatchSource GetMatchSource(
+            string partNumber,
+            StandardPart standardPart)
+        {
+            if (PartNumberNormalizer.StrictEquals(
+                partNumber,
+                standardPart.ExportPartNumber))
+            {
+                return StandardPartMatchSource.ExportPartNumber;
+            }
+
+            if (PartNumberNormalizer.StrictEquals(
+                partNumber,
+                standardPart.NationalPartNumber))
+            {
+                return StandardPartMatchSource.NationalPartNumber;
+            }
+
+            if (PartNumberNormalizer.LooseEquals(
+                partNumber,
+                standardPart.ExportPartNumber))
+            {
+                return StandardPartMatchSource.ExportPartNumber;
+            }
+
+            if (PartNumberNormalizer.LooseEquals(
+                partNumber,
+                standardPart.NationalPartNumber))
+            {
+                return StandardPartMatchSource.NationalPartNumber;
+            }
+
+            return StandardPartMatchSource.None;
         }
     }
 }
