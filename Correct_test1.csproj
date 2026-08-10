@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Correct_test1</RootNamespace>
-    <AssemblyName>Correct_test1</AssemblyName>
+    <AssemblyName>CADCheckTool_1</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -114,11 +114,14 @@
     <Compile Include="Command\StandardPartTestCommand.cs" />
     <Compile Include="Command\TableDebug.cs" />
     <Compile Include="Command\TableTestCommand.cs" />
+    <Compile Include="Command\TestInstallerCommand.cs" />
     <Compile Include="Command\TitleRegionTestCommand.cs" />
     <Compile Include="Configs\MarkerConfig.cs" />
     <Compile Include="Configs\BomConfig.cs" />
     <Compile Include="Configs\TitleBlockHorizontalConfig.cs" />
     <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
+    <Compile Include="Installer\CADCheckToolInstaller.cs" />
+    <Compile Include="Installer\CADPluginRegistryManager.cs" />
     <Compile Include="Core\AppLogger.cs" />
     <Compile Include="Core\CadTextCleaner.cs" />
     <Compile Include="Core\PartNumberNormalizer.cs" />
@@ -226,6 +229,7 @@
     <None Include="ARCHITECTURE.md" />
     <None Include="CONFIGURATION_GUIDE.md" />
     <None Include="DEVELOPMENT_WORKFLOW.md" />
+    <None Include="Installer\INSTALLATION_GUIDE.md" />
     <None Include="packages.config" />
     <None Include="README.md" />
     <None Include="Resources\StandardParts.xlsx">
