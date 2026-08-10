@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.37516.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Correct_test1", "Correct_test1.csproj", "{DE764F27-CF1C-420B-918A-D2F5DC66807C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerLauncher", "..\InstallerLauncher\InstallerLauncher.csproj", "{19E3B816-AAF9-4D60-8C92-26E8BFC33224}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerLauncher", "InstallerLauncher\InstallerLauncher.csproj", "{19E3B816-AAF9-4D60-8C92-26E8BFC33224}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
