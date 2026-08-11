@@ -5,14 +5,17 @@ using Correct_test1.Core;
 
 namespace Correct_test1.Installer
 {
-    /// <summary>
-    /// 管理当前用户 AutoCAD Applications 注册表中的插件自动加载配置。
-    /// </summary>
     public sealed class CADPluginRegistryManager
     {
         private const string ApplicationName = "CADCheckTool_1";
         private const string Description = "CADCheckTool_1 AutoCAD Engineering Drawing Inspection Plugin";
         private const int LoadControls = 15;
+
+        private sealed class ApplicationKeyLocation
+        {
+            public RegistryView View { get; set; }
+            public string ApplicationsPath { get; set; }
+        }
 
         /// <summary>
         /// 为当前 Windows 用户已发现的所有 AutoCAD 产品配置注册插件。
@@ -22,32 +25,54 @@ namespace Correct_test1.Installer
             if (string.IsNullOrWhiteSpace(dllPath))
                 throw new ArgumentException("DLL 路径不能为空。", nameof(dllPath));
 
-            var applicationKeys = FindAutoCadApplicationKeys(true);
-            if (applicationKeys.Count == 0)
-                throw new InvalidOperationException("未找到当前用户的 AutoCAD 注册表项。请先至少启动一次 AutoCAD，再执行安装。");
-
             try
             {
-                using (RegistryKey currentUser = OpenCurrentUser64())
+                List<ApplicationKeyLocation> applicationKeys =
+                    FindAutoCadApplicationKeys(true);
+
+                if (applicationKeys.Count == 0)
                 {
-                    foreach (string applicationsPath in applicationKeys)
+                    throw new InvalidOperationException(
+                        "未找到当前用户的 AutoCAD Applications 注册表项。");
+                }
+
+                foreach (ApplicationKeyLocation location in applicationKeys)
+                {
+                    using (RegistryKey localMachine = OpenLocalMachine(location.View))
+                    using (RegistryKey applicationsKey =
+                        localMachine.CreateSubKey(location.ApplicationsPath))
+                    using (RegistryKey pluginKey =
+                        applicationsKey.CreateSubKey(ApplicationName))
                     {
-                        using (RegistryKey applicationsKey = currentUser.CreateSubKey(applicationsPath))
-                        using (RegistryKey pluginKey = applicationsKey.CreateSubKey(ApplicationName))
-                        {
-                            pluginKey.SetValue("DESCRIPTION", Description, RegistryValueKind.String);
-                            pluginKey.SetValue("LOADER", dllPath, RegistryValueKind.String);
-                            pluginKey.SetValue("LOADCTRLS", LoadControls, RegistryValueKind.DWord);
-                            pluginKey.SetValue("MANAGED", 1, RegistryValueKind.DWord);
-                        }
+                        if (pluginKey == null)
+                            throw new InvalidOperationException(
+                                "无法创建 AutoCAD 插件注册表项。");
+
+                        pluginKey.SetValue("DESCRIPTION", Description, RegistryValueKind.String);
+                        pluginKey.SetValue("LOADER", dllPath, RegistryValueKind.String);
+                        pluginKey.SetValue("LOADCTRLS", LoadControls, RegistryValueKind.DWord);
+                        pluginKey.SetValue("MANAGED", 1, RegistryValueKind.DWord);
                     }
                 }
 
-                AppLogger.Info("[Installer] Plugin registered successfully", "Installer");
+                AppLogger.Info(
+                    "[Installer] 插件注册成功",
+                    "Installer");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "Installer",
+                    message: "[Installer] 注册表权限被拒绝。请以管理员身份运行安装程序。");
+                throw;
             }
             catch (Exception ex)
             {
-                AppLogger.Error(ex, "Installer", message: "[Installer] Plugin registration failed");
+                AppLogger.Error(
+                    ex,
+                    "Installer",
+                    message: "[Installer] 插件注册失败");
                 throw;
             }
         }
@@ -59,23 +84,39 @@ namespace Correct_test1.Installer
         {
             try
             {
-                using (RegistryKey currentUser = OpenCurrentUser64())
+                foreach (ApplicationKeyLocation location in FindAutoCadApplicationKeys(false))
                 {
-                    foreach (string applicationsPath in FindAutoCadApplicationKeys(false))
+                    using (RegistryKey localMachine = OpenLocalMachine(location.View))
+                    using (RegistryKey applicationsKey =
+                        localMachine.OpenSubKey(location.ApplicationsPath, true))
                     {
-                        using (RegistryKey applicationsKey = currentUser.OpenSubKey(applicationsPath, true))
+                        if (applicationsKey != null)
                         {
-                            if (applicationsKey != null)
-                                applicationsKey.DeleteSubKeyTree(ApplicationName, false);
+                            applicationsKey.DeleteSubKeyTree(
+                                ApplicationName,
+                                false);
                         }
                     }
                 }
 
-                AppLogger.Info("[Installer] Plugin removed successfully", "Installer");
+                AppLogger.Info(
+                    "[Installer] 插件移除成功",
+                    "Installer");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "Installer",
+                    message: "[Installer] 注册表权限被拒绝。请以管理员身份运行安装程序。");
+                throw;
             }
             catch (Exception ex)
             {
-                AppLogger.Error(ex, "Installer", message: "[Installer] Plugin removal failed");
+                AppLogger.Error(
+                    ex,
+                    "Installer",
+                    message: "[Installer] 插件移除失败");
                 throw;
             }
         }
@@ -85,57 +126,137 @@ namespace Correct_test1.Installer
         /// </summary>
         public bool IsRegistered()
         {
-            List<string> applicationKeys = FindAutoCadApplicationKeys(false);
-            if (applicationKeys.Count == 0)
-                return false;
-
-            using (RegistryKey currentUser = OpenCurrentUser64())
+            try
             {
-                foreach (string applicationsPath in applicationKeys)
+                List<ApplicationKeyLocation> applicationKeys =
+                    FindAutoCadApplicationKeys(false);
+
+                if (applicationKeys.Count == 0)
+                    return false;
+
+                foreach (ApplicationKeyLocation location in applicationKeys)
                 {
-                    using (RegistryKey pluginKey = currentUser.OpenSubKey(applicationsPath + "\\" + ApplicationName, false))
+                    using (RegistryKey localMachine = OpenLocalMachine(location.View))
+                    using (RegistryKey pluginKey = localMachine.OpenSubKey(
+                        location.ApplicationsPath + "\\" + ApplicationName,
+                        false))
                     {
                         if (pluginKey == null || pluginKey.GetValue("LOADER") == null)
                             return false;
                     }
                 }
-            }
 
-            return true;
+                return true;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "Installer",
+                    message: "[Installer] 注册表权限被拒绝。请以管理员身份运行安装程序。");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error(ex, "Installer", message: "[Installer] 注册表检查失败");
+                return false;
+            }
         }
 
         // 递归寻找已有 Applications 节点，因此不会把 AutoCAD 版本、语言或产品编号写死在代码中。
-        private static List<string> FindAutoCadApplicationKeys(bool createMissingApplicationsKey)
+        private static List<ApplicationKeyLocation> FindAutoCadApplicationKeys(
+            bool createMissingApplicationsKey)
         {
-            var result = new List<string>();
-            const string autoCadRootPath = @"Software\Autodesk\AutoCAD";
+            List<ApplicationKeyLocation> result =
+                new List<ApplicationKeyLocation>();
 
-            using (RegistryKey currentUser = OpenCurrentUser64())
-            using (RegistryKey autoCadRoot = currentUser.OpenSubKey(autoCadRootPath, createMissingApplicationsKey))
-            {
-                if (autoCadRoot == null)
-                    return result;
+            FindAutoCadApplicationKeys(
+                RegistryView.Registry64,
+                @"Software\Autodesk\AutoCAD",
+                createMissingApplicationsKey,
+                result);
 
-                FindApplicationKeys(autoCadRoot, autoCadRootPath, result);
-            }
+            FindAutoCadApplicationKeys(
+                RegistryView.Registry64,
+                @"Software\WOW6432Node\Autodesk\AutoCAD",
+                createMissingApplicationsKey,
+                result);
+
+            FindAutoCadApplicationKeys(
+                RegistryView.Registry32,
+                @"Software\Autodesk\AutoCAD",
+                createMissingApplicationsKey,
+                result);
 
             return result;
         }
 
-        // 强制使用 64 位注册表视图，确保与 64 位 AutoCAD 读取的 HKCU 路径一致。
-        private static RegistryKey OpenCurrentUser64()
+        private static void FindAutoCadApplicationKeys(
+            RegistryView view,
+            string autoCadRootPath,
+            bool createMissingApplicationsKey,
+            List<ApplicationKeyLocation> result)
         {
-            return RegistryKey.OpenBaseKey(
-                RegistryHive.CurrentUser,
-                RegistryView.Registry64);
+            using (RegistryKey localMachine = OpenLocalMachine(view))
+            using (RegistryKey autoCadRoot = localMachine.OpenSubKey(
+                autoCadRootPath,
+                createMissingApplicationsKey))
+            {
+                if (autoCadRoot == null)
+                    return;
+
+                List<string> paths = new List<string>();
+                FindApplicationKeys(autoCadRoot, autoCadRootPath, paths);
+
+                foreach (string path in paths)
+                {
+                    bool exists = false;
+                    foreach (ApplicationKeyLocation item in result)
+                    {
+                        if (item.View == view &&
+                            string.Equals(
+                                item.ApplicationsPath,
+                                path,
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists)
+                    {
+                        result.Add(new ApplicationKeyLocation
+                        {
+                            View = view,
+                            ApplicationsPath = path
+                        });
+                    }
+                }
+            }
         }
 
-        private static void FindApplicationKeys(RegistryKey currentKey, string currentPath, List<string> result)
+        // 强制使用 64 位注册表视图，确保与 64 位 AutoCAD 读取的 HKLM 路径一致。
+        private static RegistryKey OpenLocalMachine(RegistryView view)
+        {
+            return RegistryKey.OpenBaseKey(
+                RegistryHive.LocalMachine,
+                view);
+        }
+
+        private static void FindApplicationKeys(
+            RegistryKey currentKey,
+            string currentPath,
+            List<string> result)
         {
             foreach (string subKeyName in currentKey.GetSubKeyNames())
             {
                 string subKeyPath = currentPath + "\\" + subKeyName;
-                if (string.Equals(subKeyName, "Applications", StringComparison.OrdinalIgnoreCase))
+
+                if (string.Equals(
+                    subKeyName,
+                    "Applications",
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     result.Add(subKeyPath);
                     continue;
@@ -144,7 +265,9 @@ namespace Correct_test1.Installer
                 using (RegistryKey subKey = currentKey.OpenSubKey(subKeyName, false))
                 {
                     if (subKey != null)
+                    {
                         FindApplicationKeys(subKey, subKeyPath, result);
+                    }
                 }
             }
         }
