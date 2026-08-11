@@ -119,6 +119,11 @@ namespace Correct_test1.Batch
 
                     db.CloseInput(true);
 
+                    CheckService checkService =
+                        new CheckService();
+                    CheckReport report =
+                        checkService.Check(db);
+
                     DrawingCheckManager manager =
                         new DrawingCheckManager();
 
@@ -126,17 +131,14 @@ namespace Correct_test1.Batch
                         manager.CheckDrawing(
                             db,
                             file,
-                            true
+                            true,
+                            report.DrawingNumber,
+                            report.DrawingNumberPosition
                         );
 
                     results.AddRange(
                         oneResults
                     );
-
-                    CheckService checkService =
-                        new CheckService();
-                    CheckReport report =
-                        checkService.Check(db);
 
                     MarkerManager markerManager =
                         new MarkerManager();

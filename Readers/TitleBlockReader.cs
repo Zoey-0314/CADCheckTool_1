@@ -37,6 +37,7 @@ namespace Correct_test1.Readers
                                 Text = Clean(text.TextString),
                                 X = text.Position.X,
                                 Y = text.Position.Y,
+                                Height = text.Height,
                                 LayoutName = layout.LayoutName
                             });
                         }
@@ -48,6 +49,7 @@ namespace Correct_test1.Readers
                                 Text = Clean(mtext.Text),
                                 X = mtext.Location.X,
                                 Y = mtext.Location.Y,
+                                Height = mtext.TextHeight,
                                 LayoutName = layout.LayoutName
                             });
                         }

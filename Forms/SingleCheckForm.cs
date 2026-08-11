@@ -33,17 +33,19 @@ namespace Correct_test1
 
                 using (DocumentLock lockDoc = doc.LockDocument())
                 {
-                    DrawingCheckManager manager = new DrawingCheckManager();
-                    manager.CheckDrawing(
-                        doc.Database,
-                        doc.Name,
-                        true
-                    );
-
                     CheckService checkService =
                         new CheckService();
                     CheckReport report =
                         checkService.Check(doc.Database);
+
+                    DrawingCheckManager manager = new DrawingCheckManager();
+                    manager.CheckDrawing(
+                        doc.Database,
+                        doc.Name,
+                        true,
+                        report.DrawingNumber,
+                        report.DrawingNumberPosition
+                    );
 
                     MarkerManager markerManager =
                         new MarkerManager();

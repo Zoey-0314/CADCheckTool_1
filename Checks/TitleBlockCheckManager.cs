@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 using Correct_test1.Models;
 using Correct_test1.Readers;
 using Correct_test1.Markers;
+using Correct_test1.Configs;
 using System.IO;
 using Correct_test1.Core;
 namespace Correct_test1.Checks
@@ -67,7 +70,9 @@ namespace Correct_test1.Checks
             string fileName,
             bool drawMarker,
             int expectedPage = 0,
-            int expectedPageCount = 0)
+            int expectedPageCount = 0,
+            string bomDrawingNumber = null,
+            Autodesk.AutoCAD.Geometry.Point3d bomDrawingNumberPosition = default(Autodesk.AutoCAD.Geometry.Point3d))
         {
 
 
@@ -153,6 +158,16 @@ namespace Correct_test1.Checks
 
             info.IsHorizontal =
                 isHorizontal;
+
+            List<TextHeightIssue> textHeightIssues =
+                CheckTextHeights(texts, isHorizontal);
+
+            if (drawMarker)
+            {
+                new MarkerManager().CreateTextHeightMarkers(
+                    db,
+                    textHeightIssues);
+            }
 
 
 
@@ -284,7 +299,7 @@ namespace Correct_test1.Checks
          IsError = true
      }
  );
-                    if (drawMarker)
+                     if (drawMarker)
                     {
                         drawingNumberMarker.DrawMarker(
                             db,
@@ -294,6 +309,85 @@ namespace Correct_test1.Checks
                         );
                     }
 
+                }
+
+                if (!string.IsNullOrWhiteSpace(bomDrawingNumber)
+                    && !string.IsNullOrWhiteSpace(titleDrawingNumber)
+                    && !bomDrawingNumber.Equals(
+                        titleDrawingNumber,
+                        System.StringComparison.Ordinal))
+                {
+                    results.Add(
+                        new CheckResult
+                        {
+                            FilePath = filePath,
+                            FileName = fileName,
+                            LayoutName = info.LayoutName,
+                            Mark = "",
+                            Type = "标题栏图号检查",
+                            ObjectName = "图号",
+                            CurrentValue = titleDrawingNumber,
+                            ExpectedValue = bomDrawingNumber,
+                            Message = "标题栏图号与BOM表上方图号不一致",
+                            IsError = true
+                        }
+                    );
+
+                     if (drawMarker &&
+                         string.IsNullOrWhiteSpace(fileDrawingNumber))
+                    {
+                        drawingNumberMarker.DrawMarker(
+                            db,
+                            layout.LayoutName,
+                            info.IsHorizontal,
+                            bomDrawingNumber,
+                            bomDrawingNumberPosition
+                        );
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(bomDrawingNumber)
+                    && ((!string.IsNullOrWhiteSpace(fileDrawingNumber)
+                            && !bomDrawingNumber.Equals(
+                                fileDrawingNumber,
+                                System.StringComparison.Ordinal))
+                        || (string.IsNullOrWhiteSpace(fileDrawingNumber)
+                            && !string.IsNullOrWhiteSpace(titleDrawingNumber)
+                            && !bomDrawingNumber.Equals(
+                                titleDrawingNumber,
+                                System.StringComparison.Ordinal))))
+                {
+                    string expectedDrawingNumber =
+                        !string.IsNullOrWhiteSpace(fileDrawingNumber)
+                            ? fileDrawingNumber
+                            : titleDrawingNumber;
+
+                    results.Add(
+                        new CheckResult
+                        {
+                            FilePath = filePath,
+                            FileName = fileName,
+                            LayoutName = info.LayoutName,
+                            Mark = "",
+                            Type = "标题栏图号检查",
+                            ObjectName = "图号",
+                            CurrentValue = bomDrawingNumber,
+                            ExpectedValue = expectedDrawingNumber,
+                            Message = "BOM表上方图号与文件名图号不一致",
+                            IsError = true
+                        }
+                    );
+
+                    if (drawMarker)
+                    {
+                        drawingNumberMarker.DrawMarker(
+                            db,
+                            layout.LayoutName,
+                            info.IsHorizontal,
+                            expectedDrawingNumber,
+                            bomDrawingNumberPosition
+                        );
+                    }
                 }
 
             }
@@ -341,6 +435,103 @@ namespace Correct_test1.Checks
             }
 
             return "";
+        }
+
+        private List<TextHeightIssue> CheckTextHeights(
+            List<TitleText> texts,
+            bool isHorizontal)
+        {
+            List<TextHeightIssue> issues = new List<TextHeightIssue>();
+            List<TitleFieldRegion> regions = isHorizontal
+                ? TitleBlockHorizontalConfig.Regions
+                : TitleBlockVerticalConfig.Regions;
+
+            AddRegionHeightIssues(
+                texts,
+                regions.Find(x => x.FieldName == "DrawingName"),
+                5.0,
+                "名称文字高度错误",
+                issues);
+
+            AddRegionHeightIssues(
+                texts,
+                regions.Find(x => x.FieldName == "DrawingNumber"),
+                3.5,
+                "图号文字高度错误",
+                issues);
+
+            TitleText technicalTitle = texts.Find(x =>
+                (x.Text ?? "").Contains("技术要求"));
+
+            if (technicalTitle != null)
+            {
+                AddHeightIssue(
+                    technicalTitle,
+                    5.0,
+                    "技术要求标题文字高度错误",
+                    issues);
+
+                List<TitleText> technicalTexts = texts
+                    .Where(x => x.Y < technicalTitle.Y &&
+                                Math.Abs(x.X - technicalTitle.X) < 100 &&
+                                Regex.IsMatch(
+                                    (x.Text ?? "").Trim(),
+                                    @"^\d+\s*[\.、．:：]"))
+                    .OrderByDescending(x => x.Y)
+                    .ToList();
+
+                foreach (TitleText technicalText in technicalTexts)
+                {
+                    AddHeightIssue(
+                        technicalText,
+                        3.5,
+                        "技术要求文字高度错误",
+                        issues);
+                }
+            }
+
+            return issues;
+        }
+
+        private void AddRegionHeightIssues(
+            List<TitleText> texts,
+            TitleFieldRegion region,
+            double expectedHeight,
+            string message,
+            List<TextHeightIssue> issues)
+        {
+            if (region == null)
+                return;
+
+            foreach (TitleText text in texts)
+            {
+                if (region.Contains(text.X, text.Y))
+                {
+                    AddHeightIssue(text, expectedHeight, message, issues);
+                }
+            }
+        }
+
+        private void AddHeightIssue(
+            TitleText text,
+            double expectedHeight,
+            string message,
+            List<TextHeightIssue> issues)
+        {
+            if (Math.Abs(text.Height - expectedHeight) >= 0.01)
+            {
+                issues.Add(new TextHeightIssue
+                {
+                    LayoutName = text.LayoutName,
+                    Position = new Autodesk.AutoCAD.Geometry.Point3d(
+                        text.X + 5,
+                        text.Y,
+                        0),
+                    Message = message +
+                        " 当前高度:" + text.Height.ToString("0.###") +
+                        " 正确高度:" + expectedHeight.ToString("0.0")
+                });
+            }
         }
 
 

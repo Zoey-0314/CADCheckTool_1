@@ -39,6 +39,14 @@ namespace Correct_test1.Checks
                 }
 
                 BomData bom = recognizer.Parse(table);
+
+                if (string.IsNullOrEmpty(report.DrawingNumber) &&
+                    !string.IsNullOrEmpty(bom.DrawingNumber))
+                {
+                    report.DrawingNumber = bom.DrawingNumber;
+                    report.DrawingNumberPosition = bom.DrawingNumberPosition;
+                }
+
                 report.Results.AddRange(checker.Check(bom));
             }
 

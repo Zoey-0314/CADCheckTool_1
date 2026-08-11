@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
 
 
 namespace Correct_test1.Models
@@ -14,6 +15,8 @@ namespace Correct_test1.Models
         /// NS282Z_
         /// </summary>
         public string DrawingNumber { get; set; }
+
+        public Point3d DrawingNumberPosition { get; set; }
 
 
         public int SourceRows { get; set; }

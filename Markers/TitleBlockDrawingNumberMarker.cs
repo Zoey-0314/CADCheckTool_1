@@ -57,7 +57,9 @@ namespace Correct_test1.Markers
 
             bool isHorizontal,
 
-            string correctNumber
+            string correctNumber,
+
+            Point3d textPosition = default(Point3d)
 
         )
         {
@@ -268,12 +270,9 @@ namespace Correct_test1.Markers
                         correctNumber;
 
 
-                    text.Position =
-                        new Point3d(
-                            x2 + 5,
-                            y2,
-                            0
-                        );
+                    text.Position = textPosition == Point3d.Origin
+                        ? new Point3d(x2 + 5, y2, 0)
+                        : textPosition;
 
 
                     text.Height =

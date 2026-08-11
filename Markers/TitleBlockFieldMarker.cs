@@ -1,3 +1,4 @@
+using System;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -58,14 +59,42 @@ namespace Correct_test1.Markers
                 space.AppendEntity(rectangle);
                 transaction.AddNewlyCreatedDBObject(rectangle, true);
 
+                double textHeight = MarkerConfig.TextHeight;
+                double textY = region.MaxY;
+
+                if (regionName == "DrawingNumber")
+                {
+                    bool hasExistingText = false;
+
+                    foreach (ObjectId entityId in space)
+                    {
+                        DBText existingText = transaction.GetObject(
+                            entityId,
+                            OpenMode.ForRead) as DBText;
+
+                        if (existingText != null &&
+                            existingText.Layer == MarkerConfig.TitleBlockLayerName &&
+                            Math.Abs(existingText.Position.X - (region.MaxX + 5)) < 0.001 &&
+                            existingText.Position.Y >= region.MaxY - 0.001)
+                        {
+                            hasExistingText = true;
+                            break;
+                        }
+                    }
+
+                    if (hasExistingText)
+                        textY += 10;
+                }
+
                 DBText text = new DBText
                 {
                     TextString = message,
                     Position = new Point3d(region.MaxX + 5, region.MaxY, 0),
-                    Height = MarkerConfig.TextHeight,
+                    Height = textHeight,
                     LayerId = layerId,
                     Color = Color.FromRgb(0, 255, 0)
                 };
+                text.Position = new Point3d(region.MaxX + 5, textY, 0);
                 space.AppendEntity(text);
                 transaction.AddNewlyCreatedDBObject(text, true);
 

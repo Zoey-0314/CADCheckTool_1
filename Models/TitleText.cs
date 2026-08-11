@@ -22,6 +22,11 @@
         public double Y { get; set; }
 
         /// <summary>
+        /// CAD文字高度
+        /// </summary>
+        public double Height { get; set; }
+
+        /// <summary>
         /// 所属布局
         /// </summary>
         public string LayoutName { get; set; }

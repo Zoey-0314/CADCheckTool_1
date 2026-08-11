@@ -27,7 +27,9 @@ namespace Correct_test1.Core
         public List<CheckResult> CheckDrawing(
             Database db,
             string filePath,
-            bool drawMarker)
+            bool drawMarker,
+            string bomDrawingNumber = null,
+            Autodesk.AutoCAD.Geometry.Point3d bomDrawingNumberPosition = default(Autodesk.AutoCAD.Geometry.Point3d))
         {
             List<CheckResult> results = new List<CheckResult>();
 
@@ -135,7 +137,9 @@ namespace Correct_test1.Core
                         fileName,
                         drawMarker,
                         currentPage,
-                        totalPages
+                        totalPages,
+                        bomDrawingNumber,
+                        bomDrawingNumberPosition
                     );
 
 

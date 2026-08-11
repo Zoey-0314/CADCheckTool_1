@@ -177,6 +177,7 @@
     <Compile Include="Models\RevisionTableTemplate.cs" />
     <Compile Include="Models\StandardPart.cs" />
     <Compile Include="Models\StandardPartCheckResult.cs" />
+    <Compile Include="Models\TextHeightIssue.cs" />
     <Compile Include="Models\TitleBlockData.cs" />
     <Compile Include="Models\TitleFieldRegion.cs" />
     <Compile Include="Models\TitleText.cs" />

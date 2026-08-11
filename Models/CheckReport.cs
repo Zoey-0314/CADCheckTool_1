@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
 
 namespace Correct_test1.Models
 {
@@ -8,6 +9,8 @@ namespace Correct_test1.Models
         public string DrawingName { get; set; }
 
         public string DrawingNumber { get; set; }
+
+        public Point3d DrawingNumberPosition { get; set; }
 
         public DateTime CheckTime { get; set; }
 

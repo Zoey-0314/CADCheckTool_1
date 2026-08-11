@@ -1,6 +1,7 @@
 ﻿using Correct_test1.Configs;
 using Correct_test1.Core;
 using Correct_test1.Models;
+using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Text.RegularExpressions;
 
@@ -89,10 +90,13 @@ namespace Correct_test1.Checks
 
             // 提取图号
 
+            Point3d drawingNumberPosition;
             bom.DrawingNumber =
                 FindDrawingNumber(
                     table,
-                    headerRow);
+                    headerRow,
+                    out drawingNumberPosition);
+            bom.DrawingNumberPosition = drawingNumberPosition;
 
 
 
@@ -381,14 +385,16 @@ namespace Correct_test1.Checks
         /// </summary>
         private string FindDrawingNumber(
     CadTableData table,
-    int headerRow)
+    int headerRow,
+    out Point3d position)
         {
+            position = Point3d.Origin;
 
-            // 只查表头之前
+            int firstRow = Math.Max(0, headerRow - 2);
 
-            for (int r = 0;
-                r < headerRow;
-                r++)
+            for (int r = headerRow - 1;
+                r >= firstRow;
+                r--)
             {
 
                 for (int c = 0;
@@ -408,6 +414,7 @@ namespace Correct_test1.Checks
 
                     if (IsDrawingNumber(value))
                     {
+                        position = table.GetCellPosition(r, c);
                         return value;
                     }
 

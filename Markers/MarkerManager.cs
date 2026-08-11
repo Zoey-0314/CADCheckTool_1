@@ -1,5 +1,7 @@
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Correct_test1.Configs;
 using Correct_test1.Core;
 using Correct_test1.Models;
 using Correct_test1.Readers;
@@ -36,7 +38,6 @@ namespace Correct_test1.Markers
                             Text = BuildText(result),
                             Position = result.CellPosition
                         };
-
                         marker.Create(database, transaction, database.CurrentSpaceId, layerId, info);
                     }
 
@@ -58,7 +59,6 @@ namespace Correct_test1.Markers
             try
             {
                 List<ProjectNumberLocation> locations = new ProjectReader().ReadProjectLocations(database);
-
                 using (Transaction transaction = database.TransactionManager.StartTransaction())
                 {
                     ObjectId layerId = EnsureLayer(database, transaction, LayerName, Color.FromRgb(255, 0, 0));
@@ -69,7 +69,6 @@ namespace Correct_test1.Markers
                     {
                         if (!string.Equals(location.ProjectNumber, currentProject, System.StringComparison.OrdinalIgnoreCase))
                             continue;
-
                         marker.Create(database, transaction, database.CurrentSpaceId, layerId, location, expectedProject);
                     }
 
@@ -79,6 +78,92 @@ namespace Correct_test1.Markers
             catch (System.Exception ex)
             {
                 AppLogger.Error(ex, "MarkerManager.CreateProjectMarkers");
+            }
+        }
+
+        public void CreateTextHeightMarkers(Database database, List<TextHeightIssue> issues)
+        {
+            if (database == null || issues == null || issues.Count == 0)
+                return;
+
+            try
+            {
+                using (Transaction transaction = database.TransactionManager.StartTransaction())
+                {
+                    ObjectId layerId = EnsureLayer(database, transaction, LayerName, Color.FromRgb(255, 0, 0));
+                    RegisterXDataApp(database, transaction);
+                    BlockTableRecord space = transaction.GetObject(
+                        database.CurrentSpaceId,
+                        OpenMode.ForWrite) as BlockTableRecord;
+
+                    if (space == null)
+                        return;
+
+                    foreach (TextHeightIssue issue in issues)
+                    {
+                        if (issue == null)
+                            continue;
+
+                        Point3d markerPosition = issue.Position;
+                        int markerIndex = 0;
+                        bool isDrawingNumberIssue =
+                            issue.Message != null &&
+                            issue.Message.StartsWith(
+                                "Í¼ºÅÎÄ×Ö¸ß¶È´íÎó",
+                                System.StringComparison.Ordinal);
+
+                        if (isDrawingNumberIssue)
+                        {
+                            string markerKey =
+                                (issue.LayoutName ?? "") + "|DrawingNumber";
+                            markerIndex = RegisterTextHeightMarker(markerKey);
+                        }
+
+                        if (isDrawingNumberIssue &&
+                            markerIndex >= 2)
+                        {
+                            markerPosition = new Autodesk.AutoCAD.Geometry.Point3d(
+                                issue.Position.X,
+                                issue.Position.Y + 10,
+                                issue.Position.Z);
+                        }
+
+                        DBText text = new DBText
+                        {
+                            Position = markerPosition,
+                            Height = MarkerConfig.TextHeight,
+                            TextString = issue.Message,
+                            LayerId = layerId,
+                            Color = Color.FromRgb(255, 0, 0)
+                        };
+                        space.AppendEntity(text);
+                        transaction.AddNewlyCreatedDBObject(text, true);
+                        text.XData = new ResultBuffer(
+                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, XDataAppName),
+                            new TypedValue((int)DxfCode.ExtendedDataAsciiString, "TextHeight"));
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(ex, "MarkerManager.CreateTextHeightMarkers");
+            }
+        }
+
+        private static readonly Dictionary<string, int> TextHeightMarkerStates =
+            new Dictionary<string, int>();
+
+        private static int RegisterTextHeightMarker(string key)
+        {
+            lock (TextHeightMarkerStates)
+            {
+                int count;
+                TextHeightMarkerStates.TryGetValue(key, out count);
+                count++;
+                TextHeightMarkerStates[key] = count;
+                return count;
             }
         }
 
@@ -106,8 +191,12 @@ namespace Correct_test1.Markers
                             entity.Erase();
                         }
                     }
-
                     transaction.Commit();
+
+                    lock (TextHeightMarkerStates)
+                    {
+                        TextHeightMarkerStates.Clear();
+                    }
                 }
             }
             catch (System.Exception ex)
