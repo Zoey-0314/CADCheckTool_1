@@ -50,13 +50,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>D:\Program Files\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
+      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>D:\Program Files\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
+      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>D:\Program Files\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
+      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
     </Reference>
     <Reference Include="EPPlus, Version=8.6.3.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>packages\EPPlus.8.6.3\lib\net462\EPPlus.dll</HintPath>
@@ -110,12 +110,7 @@
     <Compile Include="Checks\TitleBlockChecker.cs" />
     <Compile Include="Checks\TitleBlockCheckManager.cs" />
     <Compile Include="Checks\TitleInfoChecker.cs" />
-    <Compile Include="Command\CheckStandardPartsCommand.cs" />
-    <Compile Include="Command\StandardPartTestCommand.cs" />
-    <Compile Include="Command\TableDebug.cs" />
-    <Compile Include="Command\TableTestCommand.cs" />
     <Compile Include="Command\TestInstallerCommand.cs" />
-    <Compile Include="Command\TitleRegionTestCommand.cs" />
     <Compile Include="Configs\MarkerConfig.cs" />
     <Compile Include="Configs\BomConfig.cs" />
     <Compile Include="Configs\TitleBlockHorizontalConfig.cs" />
@@ -152,9 +147,7 @@
     </Compile>
     <Compile Include="Checks\RevisionChecker.cs" />
     <Compile Include="Checks\RevisionIssueMapper.cs" />
-    <Compile Include="Command\BatchTestCommand.cs" />
     <Compile Include="Command\CommandEntry.cs" />
-    <Compile Include="Command\TitleTestCommand.cs" />
     <Compile Include="Export\BatchCsvExporter.cs" />
     <Compile Include="Markers\MarkerBase.cs" />
     <Compile Include="Markers\MarkerManager.cs" />
