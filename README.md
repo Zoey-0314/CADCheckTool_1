@@ -4,7 +4,7 @@ AutoCAD engineering drawing automatic inspection plugin.
 
 ![AutoCAD](https://img.shields.io/badge/AutoCAD-.NET%20API-blue)
 ![CSharp](https://img.shields.io/badge/C%23-.NET-purple)
-![Version](https://img.shields.io/badge/version-v1.6.1-green)
+![Version](https://img.shields.io/badge/version-v1.6.5-green)
 ------------------------------------------------------------------------
 
 ## Project Introduction
@@ -21,7 +21,7 @@ Core workflow:
 
 ## Current Version
 
-v1.6.1 Release
+v1.6.5 Release
 
 ## Implemented Features
 
@@ -33,6 +33,9 @@ Supports:
 -   Title block inspection
 -   Revision inspection
 -   Basic project number checking
+-   Page number checking
+-   Technical requirements checking
+-   Title block text-height checking
 
 ### BOM Inspection
 
@@ -71,9 +74,20 @@ Supports:
 Supports:
 
 -   Error location markers
--   Dedicated marker layer
+-   Dedicated marker layer: `CADCHECK_MARKER`
 -   XData association
 -   Safe marker removal
+-   Text-height error markers
+-   Drawing-number marker position adjustment for repeated errors
+
+### Batch Inspection
+
+Supports:
+
+-   Batch drawing inspection
+-   Per-drawing result collection
+-   Batch marker generation
+-   Safe drawing saving
 
 ------------------------------------------------------------------------
 
@@ -195,7 +209,7 @@ CADCheckTool_1 是基于 AutoCAD .NET API 开发的机械工程图智能审核�
 
 ## 当前版本
 
-v1.6.1 Release
+v1.6.5
 
 ## 已实现功能
 
@@ -204,9 +218,14 @@ v1.6.1 Release
 支持：
 
 -   图号一致性检查
+-   标题栏图号与文件名图号比较
+-   标题栏图号与BOM表上方图号比较
 -   标题栏检查
 -   修改记录检查
 -   项目号检查基础逻辑
+-   页码检查
+-   技术要求检查
+-   标题栏文字高度检查
 
 ### BOM检查
 
@@ -215,6 +234,8 @@ v1.6.1 Release
 -   CAD BOM表读取
 -   BOM数据解析
 -   零件信息提取
+-   BOM表头附近图号识别
+-   BOM图号参与图号一致性检查
 
 ### 标准件检查
 
@@ -235,9 +256,20 @@ v1.6.1 Release
 支持：
 
 -   错误位置标记
--   专用Marker图层
+-   统一Marker图层：`CADCHECK_MARKER`
 -   XData关联
 -   安全清除
+-   字高错误Marker
+-   同一布局图号区域重复Marker位置调整
+
+### 批量检查
+
+支持：
+
+-   多张DWG批量检查
+-   批量结果汇总
+-   批量Marker生成
+-   安全保存图纸
 
 ------------------------------------------------------------------------
 
