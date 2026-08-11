@@ -9,8 +9,8 @@ namespace Correct_test1.Markers
 {
     public class MarkerManager : MarkerBase
     {
-        public const string LayerName = "Correct_test1_Marker";
-        public const string XDataAppName = "Correct_test1_Marker";
+        public const string LayerName = "CADCHECK_MARKER";
+        public const string XDataAppName = "CADCHECK_MARKER";
 
         public void CreateMarkers(Database database, List<StandardPartCheckResult> results)
         {

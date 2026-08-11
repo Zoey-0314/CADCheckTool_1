@@ -155,6 +155,7 @@
     <Compile Include="Markers\RevisionMarker.cs" />
     <Compile Include="Markers\StandardPartMarker.cs" />
     <Compile Include="Markers\TitleBlockDrawingNumberMarker.cs" />
+    <Compile Include="Markers\TitleBlockFieldMarker.cs" />
     <Compile Include="Markers\TitleBlockMarkerMapper.cs" />
     <Compile Include="Models\BatchReportInfo.cs" />
     <Compile Include="Models\BomColumnMapping.cs" />

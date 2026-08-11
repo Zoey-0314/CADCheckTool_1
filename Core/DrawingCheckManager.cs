@@ -108,10 +108,17 @@ namespace Correct_test1.Core
             RevisionIssueMapper mapper = new RevisionIssueMapper();
             RevisionMarker marker = new RevisionMarker();
 
+            List<LayoutInfo> paperLayouts =
+                layouts.FindAll(x => !x.IsModelSpace);
+            int currentPage = 0;
+            int totalPages = paperLayouts.Count;
+
             foreach (LayoutInfo layout in layouts)
             {
                 if (layout.IsModelSpace)
                     continue;
+
+                currentPage++;
                 //--------------------------------------
                 // 标题栏检查
                 //--------------------------------------
@@ -126,7 +133,9 @@ namespace Correct_test1.Core
                         layout,
                         filePath,
                         fileName,
-                        drawMarker
+                        drawMarker,
+                        currentPage,
+                        totalPages
                     );
 
 

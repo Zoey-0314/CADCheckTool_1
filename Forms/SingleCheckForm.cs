@@ -31,12 +31,10 @@ namespace Correct_test1
                     return;
                 }
 
-                List<CheckResult> results;
-
                 using (DocumentLock lockDoc = doc.LockDocument())
                 {
                     DrawingCheckManager manager = new DrawingCheckManager();
-                    results = manager.CheckDrawing(
+                    manager.CheckDrawing(
                         doc.Database,
                         doc.Name,
                         true
@@ -54,19 +52,7 @@ namespace Correct_test1
                         report.Results);
                 }
 
-                if (results == null || results.Count == 0)
-                {
-                    MessageBox.Show("检查完成，没有发现问题", "CAD检查助手");
-                    return;
-                }
-
-                string message = "";
-                foreach (CheckResult result in results)
-                {
-                    message += "\n类型：" + result.Type + "\n对象：" + result.ObjectName + "\n问题：" + result.Message + "\n";
-                }
-
-                MessageBox.Show(message, "CAD检查结果");
+                MessageBox.Show("检查完成，详细问题已标注在图纸中。", "CAD检查");
             }
             catch (Exception ex)
             {

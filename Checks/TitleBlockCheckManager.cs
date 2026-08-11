@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using Correct_test1.Models;
 using Correct_test1.Readers;
@@ -64,7 +65,9 @@ namespace Correct_test1.Checks
             LayoutInfo layout,
             string filePath,
             string fileName,
-            bool drawMarker)
+            bool drawMarker,
+            int expectedPage = 0,
+            int expectedPageCount = 0)
         {
 
 
@@ -164,6 +167,59 @@ namespace Correct_test1.Checks
                 )
             );
 
+            string pageMessage = CheckPageNumber(
+                info.PageNumber,
+                expectedPage,
+                expectedPageCount);
+
+            if (!string.IsNullOrEmpty(pageMessage))
+            {
+                results.Add(new CheckResult
+                {
+                    FilePath = filePath,
+                    FileName = fileName,
+                    LayoutName = info.LayoutName,
+                    Type = "页码检查",
+                    ObjectName = "页码",
+                    CurrentValue = info.PageNumber ?? "",
+                    ExpectedValue = expectedPage + "/" + expectedPageCount,
+                    Message = pageMessage,
+                    IsError = true
+                });
+            }
+
+            if (drawMarker)
+            {
+                TitleBlockFieldMarker fieldMarker =
+                    new TitleBlockFieldMarker();
+
+                foreach (CheckResult result in results)
+                {
+                    if (!result.IsError ||
+                        result.Type != "标题栏检查")
+                    {
+                        continue;
+                    }
+
+                    fieldMarker.DrawMarker(
+                        db,
+                        layout.LayoutName,
+                        info.IsHorizontal,
+                        result.ObjectName,
+                        "标题栏" + result.ObjectName + "未填写");
+                }
+
+                if (!string.IsNullOrEmpty(pageMessage))
+                {
+                    fieldMarker.DrawMarker(
+                        db,
+                        layout.LayoutName,
+                        info.IsHorizontal,
+                        "PageNumber",
+                        pageMessage);
+                }
+            }
+
 
 
 
@@ -251,6 +307,40 @@ namespace Correct_test1.Checks
 
             return results;
 
+        }
+
+        private string CheckPageNumber(
+            string value,
+            int expectedPage,
+            int expectedPageCount)
+        {
+            if (expectedPage <= 0 || expectedPageCount <= 0)
+                return "";
+
+            MatchCollection matches = Regex.Matches(
+                value ?? "",
+                @"\d+");
+
+            if (matches.Count < 2)
+            {
+                return "页码错误  当前页: " +
+                    (string.IsNullOrWhiteSpace(value) ? "空" : value) +
+                    "  正确页码: " + expectedPage + "/" + expectedPageCount;
+            }
+
+            int actualPage = 0;
+            int actualPageCount = 0;
+            if (!int.TryParse(matches[0].Value, out actualPage) ||
+                !int.TryParse(matches[1].Value, out actualPageCount) ||
+                actualPage != expectedPage ||
+                actualPageCount != expectedPageCount ||
+                actualPage > actualPageCount)
+            {
+                return "页码错误  当前页: " + actualPage + "/" + actualPageCount +
+                    "  正确页码: " + expectedPage + "/" + expectedPageCount;
+            }
+
+            return "";
         }
 
 

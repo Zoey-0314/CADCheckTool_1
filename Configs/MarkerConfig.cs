@@ -13,14 +13,14 @@
         /// Revision check marker layer.
         /// </summary>
         public const string RevisionLayerName =
-            "REVISION_CHECK";
+            "CADCHECK_MARKER";
 
 
         /// <summary>
         /// Title block drawing number marker layer.
         /// </summary>
         public const string TitleBlockLayerName =
-            "TITLEBLOCK_CHECK";
+            "CADCHECK_MARKER";
 
 
         #endregion
