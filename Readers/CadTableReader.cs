@@ -207,6 +207,7 @@ namespace Correct_test1.Readers
         /// <summary>
         /// 单个Table读取
         /// </summary>
+        [Obsolete]
         private CadTableData ReadTable(
             Table table)
         {

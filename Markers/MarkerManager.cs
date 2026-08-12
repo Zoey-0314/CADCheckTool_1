@@ -6,6 +6,7 @@ using Correct_test1.Core;
 using Correct_test1.Models;
 using Correct_test1.Readers;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Correct_test1.Markers
 {
@@ -44,9 +45,188 @@ namespace Correct_test1.Markers
                     transaction.Commit();
                 }
             }
+
             catch (System.Exception ex)
             {
                 AppLogger.Error(ex, "MarkerManager.CreateMarkers");
+            }
+        }
+
+        public void CreateBomCalloutMarkers(Database database, List<BomCalloutIssue> issues)
+        {
+            if (database == null || issues == null || issues.Count == 0)
+                return;
+
+            try
+            {
+                using (Transaction transaction = database.TransactionManager.StartTransaction())
+                {
+                    ObjectId layerId = EnsureLayer(database, transaction, LayerName, Color.FromRgb(255, 0, 0));
+                    RegisterXDataApp(database, transaction);
+                    BomCalloutMarker marker = new BomCalloutMarker();
+
+                    foreach (BomCalloutIssue issue in issues)
+                    {
+                        if (issue == null)
+                            continue;
+
+                        ObjectId spaceId = issue.SpaceId.IsNull
+                            ? database.CurrentSpaceId
+                            : issue.SpaceId;
+                        marker.Create(database, transaction, spaceId, layerId, issue);
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(ex, "MarkerManager.CreateBomCalloutMarkers");
+            }
+        }
+
+        public void CreateExtraCalloutMarkers(
+            Database database,
+            HashSet<int> extraCallouts,
+            List<TitleText> texts)
+        {
+            if (database == null ||
+                extraCallouts == null ||
+                extraCallouts.Count == 0 ||
+                texts == null ||
+                texts.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                using (Transaction transaction =
+                    database.TransactionManager.StartTransaction())
+                {
+                    ObjectId layerId = EnsureLayer(
+                        database,
+                        transaction,
+                        LayerName,
+                        Color.FromRgb(255, 0, 0));
+                    RegisterXDataApp(database, transaction);
+                    BomCalloutMarker marker =
+                        new BomCalloutMarker();
+
+                    foreach (TitleText text in texts)
+                    {
+                        int number;
+                        string value = text == null || text.Text == null
+                            ? ""
+                            : text.Text.Trim();
+
+                        if (text == null ||
+                            !int.TryParse(
+                                value,
+                                NumberStyles.None,
+                                CultureInfo.InvariantCulture,
+                                out number) ||
+                            !extraCallouts.Contains(number))
+                        {
+                            continue;
+                        }
+
+                        ObjectId spaceId = GetLayoutSpaceId(
+                            database,
+                            transaction,
+                            text.LayoutName);
+
+                        BomCalloutIssue issue = new BomCalloutIssue
+                        {
+                            Number = number,
+                            LayoutName = text.LayoutName,
+                            Position = new Autodesk.AutoCAD.Geometry.Point3d(
+                                text.X,
+                                text.Y,
+                                0),
+                            SpaceId = spaceId,
+                            Message = "ÐòºÅ´íÎó£º²»ÔÚBOMÖÐ"
+                        };
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            issue);
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateExtraCalloutMarkers");
+            }
+        }
+
+        public void CreateMissingCalloutMarkers(
+            Database database,
+            HashSet<int> missingCallouts,
+            List<BomData> boms)
+        {
+            if (database == null ||
+                missingCallouts == null ||
+                missingCallouts.Count == 0 ||
+                boms == null ||
+                boms.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                using (Transaction transaction =
+                    database.TransactionManager.StartTransaction())
+                {
+                    ObjectId layerId = EnsureLayer(
+                        database,
+                        transaction,
+                        LayerName,
+                        Color.FromRgb(255, 0, 0));
+                    RegisterXDataApp(database, transaction);
+                    BomCalloutMarker marker = new BomCalloutMarker();
+
+                    foreach (int missingNumber in missingCallouts)
+                    {
+                        BomItem matchedItem = FindBomItemByNumber(
+                            boms,
+                            missingNumber);
+
+                        if (matchedItem == null)
+                            continue;
+
+                        BomCalloutIssue issue = new BomCalloutIssue
+                        {
+                            Number = missingNumber,
+                            Position = matchedItem.NoCellPosition,
+                            SpaceId = database.CurrentSpaceId,
+                            Message = "È±ÉÙÐòºÅ£º" + missingNumber
+                        };
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            database.CurrentSpaceId,
+                            layerId,
+                            issue);
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateMissingCalloutMarkers");
             }
         }
 
@@ -232,6 +412,74 @@ namespace Correct_test1.Markers
             RegAppTableRecord record = new RegAppTableRecord { Name = XDataAppName };
             table.Add(record);
             transaction.AddNewlyCreatedDBObject(record, true);
+        }
+
+        private static ObjectId GetLayoutSpaceId(
+            Database database,
+            Transaction transaction,
+            string layoutName)
+        {
+            if (string.IsNullOrWhiteSpace(layoutName))
+                return database.CurrentSpaceId;
+
+            DBDictionary layoutDictionary =
+                transaction.GetObject(
+                    database.LayoutDictionaryId,
+                    OpenMode.ForRead) as DBDictionary;
+
+            if (layoutDictionary != null)
+            {
+                foreach (DBDictionaryEntry entry in layoutDictionary)
+                {
+                    Autodesk.AutoCAD.DatabaseServices.Layout layout =
+                        transaction.GetObject(
+                            entry.Value,
+                            OpenMode.ForRead)
+                        as Autodesk.AutoCAD.DatabaseServices.Layout;
+
+                    if (layout != null &&
+                        string.Equals(
+                            layout.LayoutName,
+                            layoutName,
+                            System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        return layout.BlockTableRecordId;
+                    }
+                }
+            }
+
+            return database.CurrentSpaceId;
+        }
+
+        private static BomItem FindBomItemByNumber(
+            List<BomData> boms,
+            int number)
+        {
+            foreach (BomData bom in boms)
+            {
+                if (bom == null || bom.Items == null)
+                    continue;
+
+                foreach (BomItem item in bom.Items)
+                {
+                    if (item == null)
+                        continue;
+
+                    int itemNumber;
+                    string cleaned = CadTextCleaner.Clean(item.No);
+                    if (int.TryParse(
+                        cleaned,
+                        NumberStyles.None,
+                        CultureInfo.InvariantCulture,
+                        out itemNumber) &&
+                        itemNumber == number)
+                    {
+                        return item;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

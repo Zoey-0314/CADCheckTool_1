@@ -36,6 +36,12 @@
         public const double TextHeight =
             3.0;
 
+        /// <summary>
+        /// BOM相关标记文字高度。
+        /// </summary>
+        public const double BomMarkerTextHeight =
+            3.0;
+
 
         /// <summary>
         /// Marker line width.

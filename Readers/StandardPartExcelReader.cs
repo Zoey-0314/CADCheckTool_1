@@ -16,9 +16,6 @@ namespace Correct_test1.Readers
         public List<StandardPart> Read(
             string filePath)
         {
-            ExcelPackage.License.SetNonCommercialPersonal(
-    "Correct_test1"
-);
 
             List<StandardPart> result =
                 new List<StandardPart>();

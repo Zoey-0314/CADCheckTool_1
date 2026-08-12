@@ -80,12 +80,50 @@ namespace Correct_test1.Readers
             return result;
         }
 
+        public List<TitleText> FilterNumericTexts(
+            List<TitleText> texts)
+        {
+            List<TitleText> result =
+                new List<TitleText>();
+
+            if (texts == null)
+                return result;
+
+            foreach (TitleText text in texts)
+            {
+                if (text == null ||
+                    string.IsNullOrWhiteSpace(text.Text))
+                {
+                    continue;
+                }
+
+                string value = text.Text.Trim();
+                bool isNumeric = true;
+
+                foreach (char character in value)
+                {
+                    if (character < '0' || character > '9')
+                    {
+                        isNumeric = false;
+                        break;
+                    }
+                }
+
+                if (isNumeric)
+                    result.Add(text);
+            }
+
+            return result;
+        }
+
         private string Clean(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return "";
 
-            return text.Replace("\\P", "").Trim();
+            return text
+                .Replace("\\P", "\n")
+                .Trim();
         }
     }
 }

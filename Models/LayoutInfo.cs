@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using System.Collections.Generic;
 
 
@@ -78,6 +79,15 @@ namespace Correct_test1.Models
 
         }
 
+    }
+
+    public class CadLineInfo
+    {
+        public Point3d StartPoint { get; set; }
+
+        public Point3d EndPoint { get; set; }
+
+        public string LayoutName { get; set; }
     }
 
 }

@@ -52,6 +52,9 @@ namespace Correct_test1
                     markerManager.CreateMarkers(
                         doc.Database,
                         report.Results);
+                    markerManager.CreateBomCalloutMarkers(
+                        doc.Database,
+                        report.BomCalloutIssues);
                 }
 
                 MessageBox.Show("检查完成，详细问题已标注在图纸中。", "CAD检查");

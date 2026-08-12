@@ -22,5 +22,11 @@ namespace Correct_test1.Models
 
         public List<StandardPartCheckResult> Results { get; set; }
             = new List<StandardPartCheckResult>();
+
+        public List<BomCalloutIssue> BomCalloutIssues { get; set; }
+            = new List<BomCalloutIssue>();
+
+        public BomCalloutResult BomCalloutResult { get; set; }
+            = new BomCalloutResult();
     }
 }
