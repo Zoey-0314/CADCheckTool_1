@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 
 namespace Correct_test1.Core
@@ -26,6 +27,9 @@ namespace Correct_test1.Core
         private static Dictionary<string, List<StandardPart>> nationalLooseIndex =
             new Dictionary<string, List<StandardPart>>(StringComparer.OrdinalIgnoreCase);
         private static bool loaded;
+        private static string loadedPath;
+        private static DateTime loadedLastWriteTime;
+        private static readonly object loadLock = new object();
 
 
         public static IReadOnlyList<StandardPart> Parts
@@ -39,28 +43,39 @@ namespace Correct_test1.Core
 
         public static void EnsureLoaded()
         {
-            if (loaded)
+            lock (loadLock)
             {
-                return;
+                string path = ResolveDatabasePath();
+                DateTime lastWriteTime = GetLastWriteTime(path);
+
+                if (loaded &&
+                    string.Equals(loadedPath, path, StringComparison.OrdinalIgnoreCase) &&
+                    loadedLastWriteTime == lastWriteTime)
+                {
+                    return;
+                }
+
+                Load(path);
+            }
+        }
+
+        private static string ResolveDatabasePath()
+        {
+            StandardPartDatabaseConfig config = ReadConfig();
+
+            if (config.UseExternalDatabase &&
+                !string.IsNullOrWhiteSpace(config.ExternalDatabasePath) &&
+                File.Exists(config.ExternalDatabasePath))
+            {
+                return config.ExternalDatabasePath;
             }
 
-            string folder = Path.GetDirectoryName(
-                Assembly.GetExecutingAssembly().Location);
-            string path = Path.Combine(
-                folder,
-                "Resources",
-                "StandardParts.xlsx");
+            if (config.FallbackToLocalDatabase)
+            {
+                return GetLocalDatabasePath();
+            }
 
-            Autodesk.AutoCAD.ApplicationServices.Application
-            .DocumentManager
-            .MdiActiveDocument
-            .Editor
-            .WriteMessage(
-                "\nStandardPartDatabase Excel path: "
-                + path
-            );
-
-            Load(path);
+            return config.ExternalDatabasePath;
         }
 
         public static void Load(string path)
@@ -68,9 +83,27 @@ namespace Correct_test1.Core
             StandardPartExcelReader reader =
                 new StandardPartExcelReader();
 
-            parts = reader.Read(path);
+            try
+            {
+                parts = reader.Read(path);
+            }
+            catch (Exception ex)
+            {
+                string localPath = GetLocalDatabasePath();
+                if (string.Equals(path, localPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw;
+                }
+
+                AppLogger.Error(ex, "StandardPartDatabase.LoadExternal");
+                parts = reader.Read(localPath);
+                path = localPath;
+            }
+
             BuildIndex();
             loaded = true;
+            loadedPath = path;
+            loadedLastWriteTime = GetLastWriteTime(path);
 
             Autodesk.AutoCAD.ApplicationServices.Application
             .DocumentManager
@@ -80,6 +113,80 @@ namespace Correct_test1.Core
                 "\nStandardPartDatabase loaded count: "
                 + parts.Count
             );
+        }
+
+        private static string GetLocalDatabasePath()
+        {
+            string folder = Path.GetDirectoryName(
+                Assembly.GetExecutingAssembly().Location);
+            return Path.Combine(folder, "Resources", "StandardParts.xlsx");
+        }
+
+        private static DateTime GetLastWriteTime(string path)
+        {
+            return !string.IsNullOrWhiteSpace(path) && File.Exists(path)
+                ? File.GetLastWriteTime(path)
+                : DateTime.MinValue;
+        }
+
+        private static StandardPartDatabaseConfig ReadConfig()
+        {
+            StandardPartDatabaseConfig config = new StandardPartDatabaseConfig
+            {
+                ExternalDatabasePath = @"Z:\图号管理\诺升标准件统一命名.xlsx",
+                UseExternalDatabase = true,
+                FallbackToLocalDatabase = true
+            };
+
+            string folder = Path.GetDirectoryName(
+                Assembly.GetExecutingAssembly().Location);
+            string configPath = Path.Combine(
+                folder,
+                "Configs",
+                "StandardPartConfig.json");
+
+            if (!File.Exists(configPath))
+                return config;
+
+            string json = File.ReadAllText(configPath);
+            Match pathMatch = Regex.Match(
+                json,
+                "\\\"ExternalDatabasePath\\\"\\s*:\\s*\\\"(?<value>[^\\\"]*)\\\"");
+            if (pathMatch.Success)
+            {
+                config.ExternalDatabasePath = pathMatch.Groups["value"].Value
+                    .Replace("\\\\", "\\");
+            }
+
+            config.UseExternalDatabase = ReadBoolean(
+                json,
+                "UseExternalDatabase",
+                config.UseExternalDatabase);
+            config.FallbackToLocalDatabase = ReadBoolean(
+                json,
+                "FallbackToLocalDatabase",
+                config.FallbackToLocalDatabase);
+            return config;
+        }
+
+        private static bool ReadBoolean(string json, string name, bool defaultValue)
+        {
+            Match match = Regex.Match(
+                json,
+                "\\\"" + name + "\\\"\\s*:\\s*(true|false)",
+                RegexOptions.IgnoreCase);
+            return match.Success
+                ? bool.Parse(match.Groups[1].Value)
+                : defaultValue;
+        }
+
+        private class StandardPartDatabaseConfig
+        {
+            public string ExternalDatabasePath { get; set; }
+
+            public bool UseExternalDatabase { get; set; }
+
+            public bool FallbackToLocalDatabase { get; set; }
         }
 
         public static void BuildIndex()

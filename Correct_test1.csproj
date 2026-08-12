@@ -222,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ARCHITECTURE.md" />
+    <None Include="Configs\StandardPartConfig.json" />
     <None Include="CONFIGURATION_GUIDE.md" />
     <None Include="DEVELOPMENT_WORKFLOW.md" />
     <None Include="Installer\INSTALLATION_GUIDE.md" />
