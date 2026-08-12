@@ -146,6 +146,23 @@ namespace Correct_test1.Batch
                         db,
                         report.Results);
 
+                    new BomCalloutMarker().CreateMarkers(
+                        db,
+                        report.BomCalloutIssues);
+
+                    foreach (BomCalloutIssue calloutIssue in report.BomCalloutIssues)
+                    {
+                        results.Add(new CheckResult
+                        {
+                            FilePath = file,
+                            FileName = Path.GetFileName(file),
+                            Type = "BOM序号一致性",
+                            ObjectName = "序号" + calloutIssue.Number,
+                            Message = calloutIssue.Message,
+                            IsError = true
+                        });
+                    }
+
                     foreach (StandardPartCheckResult standardResult in report.Results)
                     {
                         if (standardResult.Status == StandardPartCheckStatus.Correct)

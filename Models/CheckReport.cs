@@ -22,5 +22,9 @@ namespace Correct_test1.Models
 
         public List<StandardPartCheckResult> Results { get; set; }
             = new List<StandardPartCheckResult>();
+
+        /// <summary>BOM序号与图纸零件序号一致性检查结果</summary>
+        public List<BomCalloutIssue> BomCalloutIssues { get; set; }
+            = new List<BomCalloutIssue>();
     }
 }
