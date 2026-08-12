@@ -31,6 +31,8 @@ namespace Correct_test1.Checks
             List<CadTableData> tables =
                 tableReader.Read(database);
 
+            List<BomData> allBoms = new List<BomData>();
+
             foreach (CadTableData table in tables)
             {
                 if (!recognizer.IsBom(table))
@@ -39,6 +41,7 @@ namespace Correct_test1.Checks
                 }
 
                 BomData bom = recognizer.Parse(table);
+                allBoms.Add(bom);
 
                 if (string.IsNullOrEmpty(report.DrawingNumber) &&
                     !string.IsNullOrEmpty(bom.DrawingNumber))
@@ -62,6 +65,20 @@ namespace Correct_test1.Checks
                 {
                     report.DrawingNumber = result.DrawingNumber;
                 }
+            }
+
+            // BOM序号与图纸零件序号一致性检查
+            try
+            {
+                PartCalloutReader calloutReader = new PartCalloutReader();
+                List<PartCallout> callouts = calloutReader.Read(database, allBoms);
+
+                BomCalloutChecker calloutChecker = new BomCalloutChecker();
+                report.BomCalloutIssues = calloutChecker.Check(allBoms, callouts);
+            }
+            catch (Exception ex)
+            {
+                Core.AppLogger.Error(ex, "CheckService.BomCalloutCheck");
             }
 
             return report;

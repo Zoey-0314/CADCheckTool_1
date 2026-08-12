@@ -27,7 +27,7 @@ namespace Correct_test1
 
                 if (doc == null)
                 {
-                    MessageBox.Show("µ±Ç°Ã»ÓÐ´ò¿ªCADÍ¼Ö½");
+                    MessageBox.Show("ï¿½ï¿½Ç°Ã»ï¿½Ð´ï¿½CADÍ¼Ö½");
                     return;
                 }
 
@@ -52,13 +52,17 @@ namespace Correct_test1
                     markerManager.CreateMarkers(
                         doc.Database,
                         report.Results);
+
+                    new BomCalloutMarker().CreateMarkers(
+                        doc.Database,
+                        report.BomCalloutIssues);
                 }
 
-                MessageBox.Show("¼ì²éÍê³É£¬ÏêÏ¸ÎÊÌâÒÑ±ê×¢ÔÚÍ¼Ö½ÖÐ¡£", "CAD¼ì²é");
+                MessageBox.Show("ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½Ñ±ï¿½×¢ï¿½ï¿½Í¼Ö½ï¿½Ð¡ï¿½", "CADï¿½ï¿½ï¿½");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "³ÌÐò´íÎó");
+                MessageBox.Show(ex.Message, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             }
         }
 
@@ -72,7 +76,7 @@ namespace Correct_test1
 
                 if (doc == null)
                 {
-                    MessageBox.Show("µ±Ç°Ã»ÓÐ´ò¿ªCADÍ¼Ö½");
+                    MessageBox.Show("ï¿½ï¿½Ç°Ã»ï¿½Ð´ï¿½CADÍ¼Ö½");
                     return;
                 }
 
@@ -103,11 +107,11 @@ namespace Correct_test1
 
                 }
 
-                MessageBox.Show("¼ì²é±ê¼ÇÒÑÇå³ý", "CAD¼ì²éÖúÊÖ");
+                MessageBox.Show("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "CADï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Çå³ýÊ§°Ü");
+                MessageBox.Show(ex.Message, "ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");
             }
         }
 
