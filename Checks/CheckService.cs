@@ -1,5 +1,6 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.DatabaseServices;
 using Correct_test1.Models;
 using Correct_test1.Readers;
 using System;
@@ -21,6 +22,13 @@ namespace Correct_test1.Checks
             }
 
             report.DrawingName = database.Filename;
+
+            Database previousWorkingDatabase =
+                HostApplicationServices.WorkingDatabase;
+
+            try
+            {
+                HostApplicationServices.WorkingDatabase = database;
 
             CadTableReader tableReader =
                 new CadTableReader();
@@ -60,6 +68,7 @@ namespace Correct_test1.Checks
             {
                 bomNumbers.UnionWith(calloutChecker.GetBomNumbers(bom));
             }
+            report.BomNumbers = new HashSet<int>(bomNumbers);
 
             LayoutReader layoutReader = new LayoutReader();
 
@@ -95,11 +104,12 @@ namespace Correct_test1.Checks
 
             ViewportLineReader viewportLineReader =
                 new ViewportLineReader();
-            List<TitleText> drawingTexts =
-    viewportTextReader.Read(
-        database,
-        true);
-            report.DrawingTexts = drawingTexts;
+                List<TitleText> drawingTexts =
+                    viewportTextReader.Read(
+                        database,
+                        true,
+                        true);
+                report.DrawingTexts = drawingTexts;
 
             List<CadLineInfo> drawingLines =
                 viewportLineReader.Read(
@@ -111,50 +121,12 @@ namespace Correct_test1.Checks
                     drawingLines,
                     bomNumbers,
                     layoutDirections);
-            Editor editor =
-    Autodesk.AutoCAD.ApplicationServices.Application
-    .DocumentManager
-    .MdiActiveDocument
-    ?.Editor;
-            editor?.WriteMessage(
-    "\n===== BOM Numbers =====");
+            report.DrawingNumbers = new HashSet<int>(drawingNumbers);
 
-            foreach (int n in bomNumbers)
-            {
-                editor?.WriteMessage(
-                    "\nBOM:" + n);
-            }
-
-
-            editor?.WriteMessage(
-                "\n===== Drawing Numbers =====");
-
-            foreach (int n in drawingNumbers)
-            {
-                editor?.WriteMessage(
-                    "\nDRAW:" + n);
-            }
             report.BomCalloutResult = calloutChecker.Check(
                 bomNumbers,
                 drawingNumbers);
-            editor?.WriteMessage(
-    "\n===== MissingCallouts =====");
 
-            foreach (int n in report.BomCalloutResult.MissingCallouts)
-            {
-                editor?.WriteMessage(
-                    "\nMissing:" + n);
-            }
-            /*
-            List<PartCallout> drawingCallouts =
-                new PartCalloutReader().Read(database, bomNumbers);
-
-            foreach (BomData bom in boms)
-            {
-                report.BomCalloutIssues.AddRange(
-                    calloutChecker.Check(bom, drawingCallouts));
-            }
-            */
             report.TotalCount = report.Results.Count;
             report.CorrectCount = report.Results.Count(
                 result => result.Status == StandardPartCheckStatus.Correct);
@@ -170,6 +142,12 @@ namespace Correct_test1.Checks
             }
             report.Boms = boms;
             return report;
+            }
+            finally
+            {
+                HostApplicationServices.WorkingDatabase =
+                    previousWorkingDatabase;
+            }
         }
     }
 }

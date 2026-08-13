@@ -282,17 +282,6 @@ namespace Correct_test1.Readers
 
                     numericCandidateCount++;
 
-                    if (text.LayoutName == null ||
-                        !layoutDirections.TryGetValue(
-                            text.LayoutName,
-                            out bool isHorizontal))
-                    {
-                        editor?.WriteMessage(
-                            "\n方向判断:未知，忽略");
-
-                        continue;
-                    }
-
                     bool regionPass = true;
 
 
@@ -386,7 +375,7 @@ namespace Correct_test1.Readers
             return result;
         }
 
-        private IEnumerable<string> SplitNumericTexts(
+        public static IEnumerable<string> SplitNumericTexts(
             string text)
         {
             if (string.IsNullOrWhiteSpace(text))

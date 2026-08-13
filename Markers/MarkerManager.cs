@@ -116,60 +116,56 @@ namespace Correct_test1.Markers
 
                     foreach (TitleText text in texts)
                     {
-                        int number;
-                        string value = text == null || text.Text == null
-                            ? ""
-                            : text.Text.Trim();
-
-                        if (text == null)
+                        if (text == null ||
+                            string.IsNullOrWhiteSpace(text.Text))
                         {
                             continue;
                         }
 
-                        if (!int.TryParse(
-                                value,
-                                NumberStyles.None,
-                                CultureInfo.InvariantCulture,
-                                out number))
+                        foreach (string numericText in
+                            LayoutReader.SplitNumericTexts(text.Text))
                         {
-                            continue;
+                            int number;
+
+                            if (!int.TryParse(
+                                    numericText,
+                                    NumberStyles.None,
+                                    CultureInfo.InvariantCulture,
+                                    out number))
+                            {
+                                continue;
+                            }
+
+                            if (!extraCallouts.Contains(number))
+                            {
+                                continue;
+                            }
+
+                            ObjectId spaceId =
+                                SymbolUtilityServices.GetBlockModelSpaceId(database);
+
+                            BomCalloutIssue issue =
+                                new BomCalloutIssue
+                                {
+                                    Number = number,
+                                    LayoutName = text.LayoutName,
+                                    Position = new Point3d(
+                                        text.X,
+                                        text.Y,
+                                        0),
+                                    SpaceId = spaceId,
+                                    Message = "序号错误：不在BOM中"
+                                };
+
+                            marker.CreateExtraMarker(
+                                database,
+                                transaction,
+                                spaceId,
+                                layerId,
+                                issue);
+
+                            break;
                         }
-
-                        if (!extraCallouts.Contains(number))
-                        {
-                            continue;
-                        }
-
-                        ObjectId spaceId =
-                            SymbolUtilityServices.GetBlockModelSpaceId(database);
-
-                        BomCalloutIssue issue = new BomCalloutIssue
-                        {
-                            Number = number,
-                            LayoutName = text.LayoutName,
-                            Position = new Point3d(
-                                text.X,
-                                text.Y,
-                                0),
-                            SpaceId = spaceId,
-                            Message = "序号错误：不在BOM中",
-                        };
-                        Editor editor =
-    Autodesk.AutoCAD.ApplicationServices.Application
-    .DocumentManager
-    .MdiActiveDocument
-    ?.Editor;
-
-                        editor?.WriteMessage(
-                            "\nExtra创建:" + number +
-                            " Layout=" + text.LayoutName +
-                            " SpaceId=" + spaceId);
-                        marker.CreateExtraMarker(
-                            database,
-                            transaction,
-                            spaceId,
-                            layerId,
-                            issue);
                     }
 
                     transaction.Commit();

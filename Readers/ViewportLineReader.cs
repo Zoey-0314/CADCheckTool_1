@@ -36,20 +36,34 @@ namespace Correct_test1.Readers
                     if (paperSpace == null)
                         continue;
 
-                    foreach (ObjectId entityId in paperSpace)
-                    {
-                        Viewport viewport = tr.GetObject(entityId, OpenMode.ForRead) as Viewport;
-                        if (viewport == null)
-                            continue;
+                    ObjectIdCollection viewportIds = layout.GetViewports();
 
-                        if (viewport.Number <= 1 || !viewport.On || viewport.CustomScale <= 0)
+                    for (int i = 1; i < viewportIds.Count; i++)
+                    {
+                        Viewport viewport =
+                            tr.GetObject(
+                                viewportIds[i],
+                                OpenMode.ForRead) as Viewport;
+
+                        if (viewport == null ||
+                            !viewport.On ||
+                            viewport.CustomScale <= 0)
+                        {
                             continue;
+                        }
 
                         ModelWindow window = CreateWindow(viewport);
 
+                        string source =
+                            "Viewport(" + viewport.Handle.ToString() + ")";
+
                         foreach (ObjectId modelEntityId in modelSpace)
                         {
-                            Entity entity = tr.GetObject(modelEntityId, OpenMode.ForRead) as Entity;
+                            Entity entity =
+                                tr.GetObject(
+                                    modelEntityId,
+                                    OpenMode.ForRead) as Entity;
+
                             if (entity == null)
                                 continue;
 

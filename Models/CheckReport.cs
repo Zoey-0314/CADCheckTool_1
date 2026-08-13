@@ -34,5 +34,11 @@ namespace Correct_test1.Models
 
         public List<TitleText> DrawingTexts { get; set; }
     = new List<TitleText>();
+
+        public HashSet<int> BomNumbers { get; set; }
+    = new HashSet<int>();
+
+        public HashSet<int> DrawingNumbers { get; set; }
+    = new HashSet<int>();
     }
 }

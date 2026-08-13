@@ -8,6 +8,9 @@ using Correct_test1.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Globalization;
+using System.Text;
 
 namespace Correct_test1.Batch
 {
@@ -123,6 +126,9 @@ namespace Correct_test1.Batch
                         new CheckService();
                     CheckReport report =
                         checkService.Check(db);
+                    AppendBomCalloutDebugCsv(
+                        Path.GetFileName(file),
+                        report);
 
                     DrawingCheckManager manager =
                         new DrawingCheckManager();
@@ -142,9 +148,22 @@ namespace Correct_test1.Batch
 
                     MarkerManager markerManager =
                         new MarkerManager();
+
+                    markerManager.ClearMarkers(db);
+
                     markerManager.CreateMarkers(
                         db,
                         report.Results);
+
+                    markerManager.CreateMissingCalloutMarkers(
+                        db,
+                        report.BomCalloutResult.MissingCallouts,
+                        report.Boms);
+
+                    markerManager.CreateExtraCalloutMarkers(
+                        db,
+                        report.BomCalloutResult.ExtraCallouts,
+                        report.DrawingTexts);
 
 
                     foreach (StandardPartCheckResult standardResult in report.Results)
@@ -276,6 +295,127 @@ namespace Correct_test1.Batch
 
             return results;
 
+        }
+
+        private static void AppendBomCalloutDebugCsv(
+            string fileName,
+            CheckReport report)
+        {
+            string desktop =
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.DesktopDirectory);
+
+            if (string.IsNullOrWhiteSpace(desktop))
+                return;
+
+            string csvPath = Path.Combine(
+                desktop,
+                "BatchBomCalloutDebug.csv");
+
+            bool fileExists = File.Exists(csvPath);
+            StringBuilder sb = new StringBuilder();
+
+            if (!fileExists)
+            {
+                sb.AppendLine(
+                    "FileName,BOMNumbers,DrawingNumbers,MissingCallouts,ExtraCallouts");
+            }
+
+            IEnumerable<int> bomNumbers =
+                ExtractBomNumbers(report);
+
+            string drawingNumbers =
+                JoinNumbers(report?.DrawingNumbers);
+
+            string missingCallouts =
+                JoinNumbers(report?.BomCalloutResult?.MissingCallouts);
+
+            string extraCallouts =
+                JoinNumbers(report?.BomCalloutResult?.ExtraCallouts);
+
+            sb.AppendLine(
+                EscapeCsv(fileName) + "," +
+                EscapeCsv(JoinNumbers(bomNumbers)) + "," +
+                EscapeCsv(drawingNumbers) + "," +
+                EscapeCsv(missingCallouts) + "," +
+                EscapeCsv(extraCallouts));
+
+            File.AppendAllText(
+                csvPath,
+                sb.ToString(),
+                Encoding.UTF8);
+        }
+
+        private static IEnumerable<int> ExtractBomNumbers(
+            CheckReport report)
+        {
+            if (report?.BomNumbers != null &&
+                report.BomNumbers.Count > 0)
+            {
+                return report.BomNumbers;
+            }
+
+            HashSet<int> result = new HashSet<int>();
+
+            if (report?.Boms == null)
+                return result;
+
+            foreach (BomData bom in report.Boms)
+            {
+                if (bom?.Items == null)
+                    continue;
+
+                foreach (BomItem item in bom.Items)
+                {
+                    int number;
+                    string value = CadTextCleaner.Clean(item?.No);
+
+                    if (int.TryParse(
+                            value,
+                            NumberStyles.None,
+                            CultureInfo.InvariantCulture,
+                            out number))
+                    {
+                        result.Add(number);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static string JoinNumbers(IEnumerable<int> numbers)
+        {
+            if (numbers == null)
+                return "";
+
+            List<int> ordered = numbers
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            if (ordered.Count == 0)
+                return "";
+
+            return string.Join(";", ordered);
+        }
+
+        private static string EscapeCsv(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "";
+
+            if (value.Contains(",") ||
+                value.Contains("\"") ||
+                value.Contains("\n") ||
+                value.Contains("\r"))
+            {
+                return "\"" +
+                    value.Replace("\"", "\"\"") +
+                    "\"";
+            }
+
+            return value;
         }
 
     }

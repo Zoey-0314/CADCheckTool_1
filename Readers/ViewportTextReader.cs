@@ -11,7 +11,10 @@ namespace Correct_test1.Readers
 {
     public class ViewportTextReader
     {
-        public List<TitleText> Read(Database db, bool includeNestedBlocks = true)
+        public List<TitleText> Read(
+    Database db,
+    bool includeNestedBlocks = true,
+    bool useViewportFilter = true)
         {
             List<TitleText> result = new List<TitleText>();
             List<DebugRow> debugRows = new List<DebugRow>();
@@ -19,42 +22,72 @@ namespace Correct_test1.Readers
             if (db == null)
                 return result;
 
-            using (Transaction tr = db.TransactionManager.StartTransaction())
+            using (Transaction tr =
+                db.TransactionManager.StartTransaction())
             {
-                DBDictionary layoutDict = tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary;
+                DBDictionary layoutDict =
+                    tr.GetObject(
+                        db.LayoutDictionaryId,
+                        OpenMode.ForRead) as DBDictionary;
+
                 if (layoutDict == null)
                     return result;
 
-                ObjectId modelSpaceId = SymbolUtilityServices.GetBlockModelSpaceId(db);
-                BlockTableRecord modelSpace = tr.GetObject(modelSpaceId, OpenMode.ForRead) as BlockTableRecord;
+                ObjectId modelSpaceId =
+                    SymbolUtilityServices.GetBlockModelSpaceId(db);
+
+                BlockTableRecord modelSpace =
+                    tr.GetObject(
+                        modelSpaceId,
+                        OpenMode.ForRead) as BlockTableRecord;
+
                 if (modelSpace == null)
                     return result;
 
                 foreach (DBDictionaryEntry entry in layoutDict)
                 {
-                    Layout layout = tr.GetObject(entry.Value, OpenMode.ForRead) as Layout;
+                    Layout layout =
+                        tr.GetObject(
+                            entry.Value,
+                            OpenMode.ForRead) as Layout;
+
                     if (layout == null || layout.ModelType)
                         continue;
 
-                    BlockTableRecord paperSpace = tr.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
-                    if (paperSpace == null)
-                        continue;
+                    ObjectIdCollection viewportIds =
+                        layout.GetViewports();
 
-                    foreach (ObjectId entityId in paperSpace)
+                    // 第0个是PaperSpace自身Viewport，
+                    // 从第1个开始处理真正的浮动Viewport。
+                    for (int i = 1; i < viewportIds.Count; i++)
                     {
-                        Viewport viewport = tr.GetObject(entityId, OpenMode.ForRead) as Viewport;
-                        if (viewport == null)
-                            continue;
+                        Viewport viewport =
+                            tr.GetObject(
+                                viewportIds[i],
+                                OpenMode.ForRead) as Viewport;
 
-                        if (viewport.Number <= 1 || !viewport.On || viewport.CustomScale <= 0)
+                        if (viewport == null ||
+                            !viewport.On ||
+                            viewport.CustomScale <= 0)
+                        {
                             continue;
+                        }
 
-                        ModelWindow window = CreateWindow(viewport);
-                        string source = "Viewport#" + viewport.Number + "(" + viewport.Handle.ToString() + ")";
+                        ModelWindow window =
+                            CreateWindow(viewport);
+
+                        string source =
+                            "Viewport(" +
+                            viewport.Handle.ToString() +
+                            ")";
 
                         foreach (ObjectId modelEntityId in modelSpace)
                         {
-                            Entity entity = tr.GetObject(modelEntityId, OpenMode.ForRead) as Entity;
+                            Entity entity =
+                                tr.GetObject(
+                                    modelEntityId,
+                                    OpenMode.ForRead) as Entity;
+
                             if (entity == null)
                                 continue;
 
@@ -66,6 +99,7 @@ namespace Correct_test1.Readers
                                 source,
                                 window,
                                 includeNestedBlocks,
+                                useViewportFilter,
                                 result,
                                 debugRows);
                         }
@@ -76,6 +110,7 @@ namespace Correct_test1.Readers
             }
 
             WriteDebugCsv(debugRows);
+
             return result;
         }
 
@@ -100,6 +135,7 @@ namespace Correct_test1.Readers
             string source,
             ModelWindow window,
             bool includeNestedBlocks,
+            bool useViewportFilter,
             List<TitleText> output,
             List<DebugRow> debugRows)
         {
@@ -107,7 +143,16 @@ namespace Correct_test1.Readers
             if (dbText != null)
             {
                 Point3d position = dbText.Position.TransformBy(transform);
-                AddText("DBText", dbText.TextString, position, layoutName, source, window, output, debugRows);
+                AddText(
+                    "DBText",
+                    dbText.TextString,
+                    position,
+                    layoutName,
+                    source,
+                    window,
+                    useViewportFilter,
+                    output,
+                    debugRows);
                 return;
             }
 
@@ -115,7 +160,16 @@ namespace Correct_test1.Readers
             if (mText != null)
             {
                 Point3d position = mText.Location.TransformBy(transform);
-                AddText("MText", mText.Text, position, layoutName, source, window, output, debugRows);
+                AddText(
+                    "MText",
+                    mText.Text,
+                    position,
+                    layoutName,
+                    source,
+                    window,
+                    useViewportFilter,
+                    output,
+                    debugRows);
                 return;
             }
 
@@ -146,6 +200,7 @@ namespace Correct_test1.Readers
                     source,
                     window,
                     includeNestedBlocks,
+                    useViewportFilter,
                     output,
                     debugRows);
             }
@@ -158,11 +213,15 @@ namespace Correct_test1.Readers
             string layoutName,
             string source,
             ModelWindow window,
+            bool useViewportFilter,
             List<TitleText> output,
             List<DebugRow> debugRows)
         {
-            if (!window.Contains(position.X, position.Y))
+            if (useViewportFilter &&
+                !window.Contains(position.X, position.Y))
+            {
                 return;
+            }
 
             string text = Clean(rawText);
             TitleText titleText = new TitleText
