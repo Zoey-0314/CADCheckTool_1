@@ -28,5 +28,11 @@ namespace Correct_test1.Models
 
         public BomCalloutResult BomCalloutResult { get; set; }
             = new BomCalloutResult();
+
+        public List<BomData> Boms { get; set; }
+    = new List<BomData>();
+
+        public List<TitleText> DrawingTexts { get; set; }
+    = new List<TitleText>();
     }
 }

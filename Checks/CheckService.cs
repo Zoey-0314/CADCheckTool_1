@@ -1,4 +1,5 @@
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Correct_test1.Models;
 using Correct_test1.Readers;
 using System;
@@ -98,7 +99,7 @@ namespace Correct_test1.Checks
     viewportTextReader.Read(
         database,
         true);
-
+            report.DrawingTexts = drawingTexts;
 
             List<CadLineInfo> drawingLines =
                 viewportLineReader.Read(
@@ -110,11 +111,41 @@ namespace Correct_test1.Checks
                     drawingLines,
                     bomNumbers,
                     layoutDirections);
+            Editor editor =
+    Autodesk.AutoCAD.ApplicationServices.Application
+    .DocumentManager
+    .MdiActiveDocument
+    ?.Editor;
+            editor?.WriteMessage(
+    "\n===== BOM Numbers =====");
 
+            foreach (int n in bomNumbers)
+            {
+                editor?.WriteMessage(
+                    "\nBOM:" + n);
+            }
+
+
+            editor?.WriteMessage(
+                "\n===== Drawing Numbers =====");
+
+            foreach (int n in drawingNumbers)
+            {
+                editor?.WriteMessage(
+                    "\nDRAW:" + n);
+            }
             report.BomCalloutResult = calloutChecker.Check(
                 bomNumbers,
                 drawingNumbers);
+            editor?.WriteMessage(
+    "\n===== MissingCallouts =====");
 
+            foreach (int n in report.BomCalloutResult.MissingCallouts)
+            {
+                editor?.WriteMessage(
+                    "\nMissing:" + n);
+            }
+            /*
             List<PartCallout> drawingCallouts =
                 new PartCalloutReader().Read(database, bomNumbers);
 
@@ -123,7 +154,7 @@ namespace Correct_test1.Checks
                 report.BomCalloutIssues.AddRange(
                     calloutChecker.Check(bom, drawingCallouts));
             }
-
+            */
             report.TotalCount = report.Results.Count;
             report.CorrectCount = report.Results.Count(
                 result => result.Status == StandardPartCheckStatus.Correct);
@@ -137,7 +168,7 @@ namespace Correct_test1.Checks
                     report.DrawingNumber = result.DrawingNumber;
                 }
             }
-
+            report.Boms = boms;
             return report;
         }
     }

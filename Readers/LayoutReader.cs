@@ -254,6 +254,7 @@ namespace Correct_test1.Readers
 
             foreach (TitleText text in texts)
             {
+
                 if (text == null ||
                     string.IsNullOrWhiteSpace(text.Text))
                 {
@@ -263,6 +264,11 @@ namespace Correct_test1.Readers
                 foreach (string numericText in
                     SplitNumericTexts(text.Text))
                 {
+                    editor?.WriteMessage(
+"\n候选数字:" + text.Text +
+" X=" + text.X +
+" Y=" + text.Y
+);
                     int number;
                     if (!int.TryParse(
                         numericText,
@@ -272,6 +278,7 @@ namespace Correct_test1.Readers
                     {
                         continue;
                     }
+
 
                     numericCandidateCount++;
 
@@ -286,52 +293,26 @@ namespace Correct_test1.Readers
                         continue;
                     }
 
-                    bool regionPass =
-                        IsInsideValidRegion(
-                            text,
-                            isHorizontal);
+                    bool regionPass = true;
 
-                    if (!regionPass)
-                    {
-                        editor?.WriteMessage(
-                            "\n区域判断失败:" +
-                            " Text=" + text.Text +
-                            " X=" + text.X +
-                            " Y=" + text.Y +
-                            " Layout=" + text.LayoutName);
 
-                        continue;
-                    }
-                    bool existsInBom =
-    bomNumbers != null &&
-    bomNumbers.Contains(number);
-
-                    if (existsInBom &&
-                        number >= 100)
+                    validRegionPassCount++;
+                    if (number >= 100)
                     {
                         result.Add(number);
 
                         editor?.WriteMessage(
-                            "\nBOM命中:是");
-
-                        editor?.WriteMessage(
-                            "\n序号>=100:直接确认存在");
-
-                        editor?.WriteMessage(
-                            "\n最终结果:加入DrawingNumbers");
+                            "\n>=100确认加入:" + number
+                        );
 
                         continue;
                     }
-
-                    validRegionPassCount++;
                     bool weldingExcluded = false;
                     int nearbyLineCount =
                         CountNearbyLines(text, lines);
                     bool hasLeadLine = false;
 
-                    if (regionPass)
-                    {
-                        validRegionPassCount++;
+                 
 
                         weldingExcluded =
                             IsWeldingCandidateByRange(text, lines);
@@ -353,7 +334,7 @@ namespace Correct_test1.Readers
                             if (hasLeadLine)
                                 leadLinePassCount++;
                         }
-                    }
+                    
 
                     editor?.WriteMessage(
                         "\n[文字候选]");

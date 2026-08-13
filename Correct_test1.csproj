@@ -219,16 +219,6 @@
     <None Include="CONFIGURATION_GUIDE.md" />
     <None Include="DEVELOPMENT_WORKFLOW.md" />
     <None Include="InstallerLauncher\InstallerLauncher.csproj" />
-    <None Include="InstallerLauncher\obj\Debug\net8.0\InstallerLauncher.AssemblyInfoInputs.cache" />
-    <None Include="InstallerLauncher\obj\Debug\net8.0\InstallerLauncher.assets.cache" />
-    <None Include="InstallerLauncher\obj\Debug\net8.0\InstallerLauncher.csproj.CoreCompileInputs.cache" />
-    <None Include="InstallerLauncher\obj\Debug\net8.0\InstallerLauncher.GeneratedMSBuildEditorConfig.editorconfig" />
-    <None Include="InstallerLauncher\obj\Debug\net8.0\InstallerLauncher.sourcelink.json" />
-    <None Include="InstallerLauncher\obj\InstallerLauncher.csproj.nuget.dgspec.json" />
-    <None Include="InstallerLauncher\obj\InstallerLauncher.csproj.nuget.g.props" />
-    <None Include="InstallerLauncher\obj\InstallerLauncher.csproj.nuget.g.targets" />
-    <None Include="InstallerLauncher\obj\project.assets.json" />
-    <None Include="InstallerLauncher\obj\project.nuget.cache" />
     <None Include="Installer\INSTALLATION_GUIDE.md" />
     <None Include="packages.config" />
     <None Include="packages\EPPlus.5.8.0\.signature.p7s" />
@@ -299,8 +289,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="InstallerLauncher\obj\Debug\net8.0\apphost.exe" />
-    <Content Include="InstallerLauncher\obj\Debug\net8.0\InstallerLauncher.csproj.FileListAbsolute.txt" />
     <Content Include="packages\EPPlus.5.8.0\EPPlusLogo.png" />
     <Content Include="packages\EPPlus.5.8.0\lib\net35\EPPlus.dll" />
     <Content Include="packages\EPPlus.5.8.0\lib\net35\EPPlus.xml" />
@@ -461,11 +449,6 @@
     <Content Include="packages\System.Security.Cryptography.Xml.8.0.4\THIRD-PARTY-NOTICES.TXT" />
     <Content Include="packages\System.Security.Cryptography.Xml.8.0.4\useSharedDesignerContext.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="InstallerLauncher\bin\Debug\net8.0\Resources\" />
-    <Folder Include="InstallerLauncher\bin\Debug\net8.0\zh-CN\" />
-    <Folder Include="InstallerLauncher\obj\Debug\net8.0\refint\" />
-    <Folder Include="InstallerLauncher\obj\Debug\net8.0\ref\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

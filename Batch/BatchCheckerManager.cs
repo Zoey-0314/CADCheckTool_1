@@ -146,6 +146,7 @@ namespace Correct_test1.Batch
                         db,
                         report.Results);
 
+
                     foreach (StandardPartCheckResult standardResult in report.Results)
                     {
                         if (standardResult.Status == StandardPartCheckStatus.Correct)

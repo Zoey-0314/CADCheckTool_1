@@ -23,6 +23,7 @@ namespace Correct_test1.Models
         public ObjectId SpaceId { get; set; }
 
         public string Message { get; set; }
+        public bool IsBomCompareMarker { get; set; }
     }
 
     public class BomCalloutResult

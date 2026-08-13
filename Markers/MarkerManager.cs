@@ -1,5 +1,6 @@
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Configs;
 using Correct_test1.Core;
@@ -120,35 +121,50 @@ namespace Correct_test1.Markers
                             ? ""
                             : text.Text.Trim();
 
-                        if (text == null ||
-                            !int.TryParse(
-                                value,
-                                NumberStyles.None,
-                                CultureInfo.InvariantCulture,
-                                out number) ||
-                            !extraCallouts.Contains(number))
+                        if (text == null)
                         {
                             continue;
                         }
 
-                        ObjectId spaceId = GetLayoutSpaceId(
-                            database,
-                            transaction,
-                            text.LayoutName);
+                        if (!int.TryParse(
+                                value,
+                                NumberStyles.None,
+                                CultureInfo.InvariantCulture,
+                                out number))
+                        {
+                            continue;
+                        }
+
+                        if (!extraCallouts.Contains(number))
+                        {
+                            continue;
+                        }
+
+                        ObjectId spaceId =
+                            SymbolUtilityServices.GetBlockModelSpaceId(database);
 
                         BomCalloutIssue issue = new BomCalloutIssue
                         {
                             Number = number,
                             LayoutName = text.LayoutName,
-                            Position = new Autodesk.AutoCAD.Geometry.Point3d(
+                            Position = new Point3d(
                                 text.X,
                                 text.Y,
                                 0),
                             SpaceId = spaceId,
-                            Message = "序号错误：不在BOM中"
+                            Message = "序号错误：不在BOM中",
                         };
+                        Editor editor =
+    Autodesk.AutoCAD.ApplicationServices.Application
+    .DocumentManager
+    .MdiActiveDocument
+    ?.Editor;
 
-                        marker.Create(
+                        editor?.WriteMessage(
+                            "\nExtra创建:" + number +
+                            " Layout=" + text.LayoutName +
+                            " SpaceId=" + spaceId);
+                        marker.CreateExtraMarker(
                             database,
                             transaction,
                             spaceId,
@@ -200,6 +216,18 @@ namespace Correct_test1.Markers
                             boms,
                             missingNumber);
 
+                        Editor editor =
+                            Autodesk.AutoCAD.ApplicationServices.Application
+                            .DocumentManager
+                            .MdiActiveDocument
+                            ?.Editor;
+
+                        editor?.WriteMessage(
+                            "\n查找Missing序号:" + missingNumber);
+
+                        editor?.WriteMessage(
+                            "\nFind结果:" +
+                            (matchedItem == null ? "null" : matchedItem.No));
                         if (matchedItem == null)
                             continue;
 
@@ -208,7 +236,7 @@ namespace Correct_test1.Markers
                             Number = missingNumber,
                             Position = matchedItem.NoCellPosition,
                             SpaceId = database.CurrentSpaceId,
-                            Message = "缺少序号：" + missingNumber
+                            Message = "图中缺少序号：" + missingNumber
                         };
 
                         marker.Create(
