@@ -25,6 +25,10 @@ namespace Correct_test1.Models
         public BomItem BomItem { get; set; }
 
         public string DrawingNumber { get; set; }
+        /// <summary>
+        /// 当前标准件所在 BOM 的布局
+        /// </summary>
+        public string SourceLayoutName { get; set; }
 
         public int BomRow { get; set; }
 

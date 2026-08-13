@@ -30,8 +30,10 @@ namespace Correct_test1.Checks
 
                 StandardPartCheckResult result =
                     new StandardPartCheckResult();
+
                 result.BomItem = item;
                 result.DrawingNumber = bom.DrawingNumber;
+                result.SourceLayoutName = bom.SourceLayoutName;
 
                 if (matches.Count == 0)
                 {
@@ -54,24 +56,80 @@ namespace Correct_test1.Checks
                         : standardPart.ExportPartNumber;
                     result.CorrectName = standardPart.Name;
 
-                    if (!string.Equals(
-                        item.Name == null ? "" : item.Name.Trim(),
-                        standardPart.Name == null ? "" : standardPart.Name.Trim(),
-                        StringComparison.OrdinalIgnoreCase))
+                    bool nameError =
+    !string.Equals(
+        item.Name == null ? "" : item.Name.Trim(),
+        standardPart.Name == null ? "" : standardPart.Name.Trim(),
+        StringComparison.OrdinalIgnoreCase);
+
+                    bool formatError =
+                        !PartNumberNormalizer.StrictEquals(
+                            item.PartNumber,
+                            result.CorrectPartNumber);
+
+
+                    // 名称错误
+                    if (nameError)
                     {
-                        result.Status = StandardPartCheckStatus.NameError;
-                        result.Message = "标准件名称不一致";
+                        result.Status =
+                            StandardPartCheckStatus.NameError;
+
+                        result.Message =
+                            "标准件名称不一致";
+
+
+                        // 如果格式同时也错误，再单独生成一个格式错误结果
+                        if (formatError)
+                        {
+                            StandardPartCheckResult formatResult =
+                                new StandardPartCheckResult();
+
+                            formatResult.BomItem = item;
+                            formatResult.DrawingNumber = bom.DrawingNumber;
+                            formatResult.SourceLayoutName = bom.SourceLayoutName;
+                            formatResult.StandardPart = standardPart;
+                            formatResult.MatchSource = result.MatchSource;
+                            formatResult.CorrectPartNumber =
+                                result.CorrectPartNumber;
+                            formatResult.CorrectName =
+                                result.CorrectName;
+
+                            formatResult.Status =
+                                StandardPartCheckStatus.FormatDifference;
+
+                            formatResult.Message =
+                                "标准件图号格式不同";
+
+                            formatResult.BomRow =
+                                item.BomRow;
+
+                            formatResult.BomColumn =
+                                item.PartNumberColumn;
+
+                            formatResult.CellPosition =
+                                item.PartNumberCellPosition;
+
+                            results.Add(formatResult);
+                        }
                     }
-                    else if (PartNumberNormalizer.StrictEquals(
-                        item.PartNumber,
-                        result.CorrectPartNumber))
+
+
+                    // 名称正确，但格式错误
+                    else if (formatError)
                     {
-                        result.Status = StandardPartCheckStatus.Correct;
+                        result.Status =
+                            StandardPartCheckStatus.FormatDifference;
+
+                        result.Message =
+                            "标准件图号格式不同";
                     }
+
+
+                    // 两个都正确
                     else
                     {
-                        result.Status = StandardPartCheckStatus.FormatDifference;
-                        result.Message = "标准件图号格式不同";
+                        result.Status =
+                            StandardPartCheckStatus.Correct;
                     }
                 }
 

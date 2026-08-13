@@ -43,8 +43,7 @@ namespace Correct_test1
                         doc.Database,
                         doc.Name,
                         true,
-                        report.DrawingNumber,
-                        report.DrawingNumberPosition
+                        report.Boms
                     );
 
                     MarkerManager markerManager =

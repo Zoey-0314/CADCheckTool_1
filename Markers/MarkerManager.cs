@@ -40,7 +40,19 @@ namespace Correct_test1.Markers
                             Text = BuildText(result),
                             Position = result.CellPosition
                         };
-                        marker.Create(database, transaction, database.CurrentSpaceId, layerId, info);
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                result.SourceLayoutName);
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            info);
                     }
 
                     transaction.Commit();

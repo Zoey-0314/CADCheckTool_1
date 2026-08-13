@@ -77,7 +77,11 @@ namespace Correct_test1.Readers
 
                         if (btr == null)
                             continue;
-
+                        string sourceLayoutName =
+    GetLayoutName(
+        db,
+        tr,
+        btrId);
 
 
                         foreach (ObjectId id in btr)
@@ -122,6 +126,8 @@ namespace Correct_test1.Readers
                             CadTableData data =
                                 ReadTable(table);
 
+                            data.SourceLayoutName =
+                                sourceLayoutName;
 
                             tables.Add(data);
 
@@ -203,7 +209,41 @@ namespace Correct_test1.Readers
                 centerY <= frame.MaxPoint.Y;
 
         }
+        private string GetLayoutName(
+    Database db,
+    Transaction tr,
+    ObjectId blockTableRecordId)
+        {
+            DBDictionary layoutDictionary =
+                tr.GetObject(
+                    db.LayoutDictionaryId,
+                    OpenMode.ForRead)
+                as DBDictionary;
 
+            if (layoutDictionary == null)
+                return "";
+
+            foreach (DBDictionaryEntry entry
+                in layoutDictionary)
+            {
+                Layout layout =
+                    tr.GetObject(
+                        entry.Value,
+                        OpenMode.ForRead)
+                    as Layout;
+
+                if (layout == null)
+                    continue;
+
+                if (layout.BlockTableRecordId ==
+                    blockTableRecordId)
+                {
+                    return layout.LayoutName;
+                }
+            }
+
+            return "";
+        }
         /// <summary>
         /// 单个Table读取
         /// </summary>

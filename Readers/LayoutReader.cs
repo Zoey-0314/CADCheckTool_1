@@ -40,6 +40,7 @@ namespace Correct_test1.Readers
                     info.LayoutName = cadLayout.LayoutName;
                     info.BlockTableRecordId = cadLayout.BlockTableRecordId;
                     info.IsModelSpace = cadLayout.ModelType;
+                    info.TabOrder = cadLayout.TabOrder;
                     info.IsValidDrawing = false;
 
                     BlockTableRecord btr = trans.GetObject(cadLayout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
@@ -226,35 +227,19 @@ namespace Correct_test1.Readers
         }
 
         public HashSet<int> IdentifyDrawingBomNumbers(
-            List<TitleText> texts,
-            List<CadLineInfo> lines,
-            ISet<int> bomNumbers,
-            IDictionary<string, bool> layoutDirections)
+    List<TitleText> texts,
+    List<CadLineInfo> lines,
+    ISet<int> bomNumbers,
+    IDictionary<string, bool> layoutDirections)
         {
             HashSet<int> result =
                 new HashSet<int>();
 
-            if (texts == null ||
-                lines == null)
+            if (texts == null)
                 return result;
-
-            Editor editor =
-                Autodesk.AutoCAD.ApplicationServices.Application
-                .DocumentManager
-                .MdiActiveDocument
-                ?.Editor;
-
-            int totalTextCount = texts.Count;
-            int numericCandidateCount = 0;
-            int validRegionPassCount = 0;
-            int weldingExcludedCount = 0;
-            int leadLinePassCount = 0;
-
-
 
             foreach (TitleText text in texts)
             {
-
                 if (text == null ||
                     string.IsNullOrWhiteSpace(text.Text))
                 {
@@ -264,113 +249,39 @@ namespace Correct_test1.Readers
                 foreach (string numericText in
                     SplitNumericTexts(text.Text))
                 {
-                    editor?.WriteMessage(
-"\n候选数字:" + text.Text +
-" X=" + text.X +
-" Y=" + text.Y
-);
                     int number;
+
                     if (!int.TryParse(
-                        numericText,
-                        NumberStyles.None,
-                        CultureInfo.InvariantCulture,
-                        out number))
+                            numericText,
+                            NumberStyles.None,
+                            CultureInfo.InvariantCulture,
+                            out number))
                     {
                         continue;
                     }
-
-
-                    numericCandidateCount++;
-
-                    bool regionPass = true;
-
-
-                    validRegionPassCount++;
+                    // >=100 的序号直接确认，不做焊接符号判断
                     if (number >= 100)
                     {
                         result.Add(number);
-
-                        editor?.WriteMessage(
-                            "\n>=100确认加入:" + number
-                        );
-
                         continue;
                     }
-                    bool weldingExcluded = false;
-                    int nearbyLineCount =
-                        CountNearbyLines(text, lines);
-                    bool hasLeadLine = false;
 
-                 
+                    // 1~99 仍按原有规则排除焊接符号
+                    bool isWelding =
+                        lines != null &&
+                        IsWeldingCandidateByRange(
+                            text,
+                            lines);
 
-                        weldingExcluded =
-                            IsWeldingCandidateByRange(text, lines);
-
-                        if (weldingExcluded)
-                        {
-                            weldingExcludedCount++;
-                        }
-                        else
-                        {
-                            double matchedDeltaY = -1;
-
-                            hasLeadLine =
-                                HasHorizontalLineBelow(
-                                    text,
-                                    lines,
-                                    out matchedDeltaY);
-
-                            if (hasLeadLine)
-                                leadLinePassCount++;
-                        }
-                    
-
-                    editor?.WriteMessage(
-                        "\n[文字候选]");
-                    editor?.WriteMessage(
-                        "\nText:" + numericText);
-                    editor?.WriteMessage(
-                        "\n位置:X=" +
-                        text.X.ToString("0.####", CultureInfo.InvariantCulture) +
-                        " Y=" +
-                        text.Y.ToString("0.####", CultureInfo.InvariantCulture) +
-                        " Layout=" + (text.LayoutName ?? ""));
-                    editor?.WriteMessage(
-                        "\n区域判断:" +
-                        (regionPass ? "通过" : "失败"));
-                    editor?.WriteMessage(
-                        "\n焊接符号判断:" +
-                        (weldingExcluded ? "排除" : "通过"));
-                    editor?.WriteMessage(
-                        "\n附近线数量:" + nearbyLineCount);
-                    editor?.WriteMessage(
-                        "\n引线判断:" +
-                        (hasLeadLine ? "通过" : "失败"));
-
-                    if (regionPass &&
-                        !weldingExcluded &&
-                        hasLeadLine)
+                    if (isWelding)
                     {
-                        result.Add(number);
-                        editor?.WriteMessage(
-                            "\n最终结果:加入DrawingNumbers");
+                        continue;
                     }
-                    else
-                    {
-                        editor?.WriteMessage(
-                            "\n最终结果:忽略");
-                    }
+
+                    // 位于有效 Viewport，且不是焊接符号，就认为是图中序号
+                    result.Add(number);
                 }
             }
-
-            editor?.WriteMessage("\n============================");
-            editor?.WriteMessage("\n总文字数量:" + totalTextCount);
-            editor?.WriteMessage("\n纯数字候选:" + numericCandidateCount);
-            editor?.WriteMessage("\n有效区域通过:" + validRegionPassCount);
-            editor?.WriteMessage("\n焊接符号排除:" + weldingExcludedCount);
-            editor?.WriteMessage("\n找到引线:" + leadLinePassCount);
-            editor?.WriteMessage("\n最终DrawingNumbers:" + result.Count);
-            editor?.WriteMessage("\n============================");
 
             return result;
         }
@@ -456,7 +367,13 @@ namespace Correct_test1.Readers
                 double minY = System.Math.Min(line.StartPoint.Y, line.EndPoint.Y);
                 double maxY = System.Math.Max(line.StartPoint.Y, line.EndPoint.Y);
 
+                bool isVertical =
+     Math.Abs(
+         line.StartPoint.X -
+         line.EndPoint.X) <= 0.5;
+
                 if (!hasLeftLine &&
+                    isVertical &&
                     text.X - maxX > 0 &&
                     text.X - maxX <= 20 &&
                     text.Y >= minY - 5 &&

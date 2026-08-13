@@ -138,8 +138,7 @@ namespace Correct_test1.Batch
                             db,
                             file,
                             true,
-                            report.DrawingNumber,
-                            report.DrawingNumberPosition
+                            report.Boms
                         );
 
                     results.AddRange(

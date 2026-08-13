@@ -32,6 +32,11 @@ namespace Correct_test1.Models
         public int SourceTableIndex { get; set; }
 
         public string SourceLayer { get; set; }
+        /// <summary>
+        /// Table 所属布局
+        /// 例如 Layout1、Layout6
+        /// </summary>
+        public string SourceLayoutName { get; set; }
 
     }
 

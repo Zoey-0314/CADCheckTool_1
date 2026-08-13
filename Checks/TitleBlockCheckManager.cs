@@ -71,8 +71,7 @@ namespace Correct_test1.Checks
             bool drawMarker,
             int expectedPage = 0,
             int expectedPageCount = 0,
-            string bomDrawingNumber = null,
-            Autodesk.AutoCAD.Geometry.Point3d bomDrawingNumberPosition = default(Autodesk.AutoCAD.Geometry.Point3d))
+            List<BomData> boms = null)
         {
 
 
@@ -311,82 +310,66 @@ namespace Correct_test1.Checks
 
                 }
 
-                if (!string.IsNullOrWhiteSpace(bomDrawingNumber)
-                    && !string.IsNullOrWhiteSpace(titleDrawingNumber)
-                    && !bomDrawingNumber.Equals(
-                        titleDrawingNumber,
-                        System.StringComparison.Ordinal))
+                string expectedDrawingNumber =
+     !string.IsNullOrWhiteSpace(fileDrawingNumber)
+         ? fileDrawingNumber
+         : titleDrawingNumber;
+
+                if (boms != null &&
+                    !string.IsNullOrWhiteSpace(expectedDrawingNumber))
                 {
-                    results.Add(
-                        new CheckResult
-                        {
-                            FilePath = filePath,
-                            FileName = fileName,
-                            LayoutName = info.LayoutName,
-                            Mark = "",
-                            Type = "标题栏图号检查",
-                            ObjectName = "图号",
-                            CurrentValue = titleDrawingNumber,
-                            ExpectedValue = bomDrawingNumber,
-                            Message = "标题栏图号与BOM表上方图号不一致",
-                            IsError = true
-                        }
-                    );
-
-                     if (drawMarker &&
-                         string.IsNullOrWhiteSpace(fileDrawingNumber))
+                    foreach (BomData bom in boms)
                     {
-                        drawingNumberMarker.DrawMarker(
-                            db,
-                            layout.LayoutName,
-                            info.IsHorizontal,
-                            bomDrawingNumber,
-                            bomDrawingNumberPosition
-                        );
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(bomDrawingNumber)
-                    && ((!string.IsNullOrWhiteSpace(fileDrawingNumber)
-                            && !bomDrawingNumber.Equals(
-                                fileDrawingNumber,
-                                System.StringComparison.Ordinal))
-                        || (string.IsNullOrWhiteSpace(fileDrawingNumber)
-                            && !string.IsNullOrWhiteSpace(titleDrawingNumber)
-                            && !bomDrawingNumber.Equals(
-                                titleDrawingNumber,
-                                System.StringComparison.Ordinal))))
-                {
-                    string expectedDrawingNumber =
-                        !string.IsNullOrWhiteSpace(fileDrawingNumber)
-                            ? fileDrawingNumber
-                            : titleDrawingNumber;
-
-                    results.Add(
-                        new CheckResult
+                        if (bom == null ||
+                            string.IsNullOrWhiteSpace(bom.DrawingNumber))
                         {
-                            FilePath = filePath,
-                            FileName = fileName,
-                            LayoutName = info.LayoutName,
-                            Mark = "",
-                            Type = "标题栏图号检查",
-                            ObjectName = "图号",
-                            CurrentValue = bomDrawingNumber,
-                            ExpectedValue = expectedDrawingNumber,
-                            Message = "BOM表上方图号与文件名图号不一致",
-                            IsError = true
+                            continue;
                         }
-                    );
 
-                    if (drawMarker)
-                    {
-                        drawingNumberMarker.DrawMarker(
-                            db,
-                            layout.LayoutName,
-                            info.IsHorizontal,
+                        // 只检查属于当前布局的 BOM
+                        if (string.IsNullOrWhiteSpace(
+                                bom.SourceLayoutName) ||
+                            !string.Equals(
+                                bom.SourceLayoutName,
+                                layout.LayoutName,
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        if (IsCompatibleBomDrawingNumber(
                             expectedDrawingNumber,
-                            bomDrawingNumberPosition
+                            bom.DrawingNumber))
+                        {
+                            continue;
+                        }
+
+                        results.Add(
+                            new CheckResult
+                            {
+                                FilePath = filePath,
+                                FileName = fileName,
+                                LayoutName = info.LayoutName,
+                                Mark = "",
+                                Type = "BOM图号检查",
+                                ObjectName = "BOM图号",
+                                CurrentValue = bom.DrawingNumber,
+                                ExpectedValue = expectedDrawingNumber,
+                                Message = "BOM表上方图号与图纸图号不一致",
+                                IsError = true
+                            }
                         );
+
+                        if (drawMarker)
+                        {
+                            drawingNumberMarker.DrawMarker(
+                                db,
+                                layout.LayoutName,
+                                info.IsHorizontal,
+                                expectedDrawingNumber,
+                                bom.DrawingNumberPosition
+                            );
+                        }
                     }
                 }
 
@@ -402,7 +385,84 @@ namespace Correct_test1.Checks
             return results;
 
         }
+        private static bool IsCompatibleBomDrawingNumber(
+    string baseDrawingNumber,
+    string bomDrawingNumber)
+        {
+            string baseNumber =
+                CadTextCleaner.Clean(
+                    baseDrawingNumber ?? "")
+                .Trim();
 
+            string bomNumber =
+                CadTextCleaner.Clean(
+                    bomDrawingNumber ?? "")
+                .Trim();
+
+            if (string.IsNullOrWhiteSpace(baseNumber) ||
+                string.IsNullOrWhiteSpace(bomNumber))
+            {
+                return false;
+            }
+
+            // 完全相同
+            if (string.Equals(
+                baseNumber,
+                bomNumber,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // BOM图号必须以基础图号开头
+            if (!bomNumber.StartsWith(
+                baseNumber,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // 取后缀
+            string suffix =
+                bomNumber.Substring(
+                    baseNumber.Length);
+
+            if (suffix.Length == 0)
+                return true;
+
+            // 允许：
+            // NS282Z
+            // NS282Z1
+            // NS282Z001
+            // NS282Z_
+            // NS282Z_001
+
+            if (suffix == "_")
+            {
+                return true;
+            }
+
+            if (suffix.StartsWith("_"))
+            {
+                suffix =
+                    suffix.Substring(1);
+            }
+
+            if (suffix.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (char c in suffix)
+            {
+                if (!char.IsDigit(c))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
         private string CheckPageNumber(
             string value,
             int expectedPage,

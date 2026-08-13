@@ -174,7 +174,8 @@ namespace Correct_test1.Markers
                     double y2 = region.MaxY;
 
 
-
+                    bool isBomMarker =
+    textPosition != Point3d.Origin;
                     //--------------------------------
                     // 图号区域坐标
                     //--------------------------------
@@ -189,71 +190,72 @@ namespace Correct_test1.Markers
                     //--------------------------------
                     // 创建绿色矩形
                     //--------------------------------
+                    if (!isBomMarker)
+                    {
 
-
-                    Polyline rect =
+                        Polyline rect =
                         new Polyline();
 
 
-                    rect.AddVertexAt(
-                        0,
-                        new Point2d(x1, y1),
-                        0,
-                        0,
-                        0
-                    );
-
-
-                    rect.AddVertexAt(
-                        1,
-                        new Point2d(x2, y1),
-                        0,
-                        0,
-                        0
-                    );
-
-
-                    rect.AddVertexAt(
-                        2,
-                        new Point2d(x2, y2),
-                        0,
-                        0,
-                        0
-                    );
-
-
-                    rect.AddVertexAt(
-                        3,
-                        new Point2d(x1, y2),
-                        0,
-                        0,
-                        0
-                    );
-
-
-                    rect.Closed =
-                        true;
-
-
-                    // assign layer by id to be robust in batch Database scenarios
-                    rect.LayerId = layerId;
-
-                    rect.Color =
-                        Color.FromRgb(
+                        rect.AddVertexAt(
                             0,
-                            255,
+                            new Point2d(x1, y1),
+                            0,
+                            0,
                             0
                         );
 
-                    // set database defaults
-                    rect.SetDatabaseDefaults(db);
 
-                    btr.AppendEntity(rect);
-                    tr.AddNewlyCreatedDBObject(
-                        rect,
-                        true
-                    );
+                        rect.AddVertexAt(
+                            1,
+                            new Point2d(x2, y1),
+                            0,
+                            0,
+                            0
+                        );
 
+
+                        rect.AddVertexAt(
+                            2,
+                            new Point2d(x2, y2),
+                            0,
+                            0,
+                            0
+                        );
+
+
+                        rect.AddVertexAt(
+                            3,
+                            new Point2d(x1, y2),
+                            0,
+                            0,
+                            0
+                        );
+
+
+                        rect.Closed =
+                            true;
+
+
+                        // assign layer by id to be robust in batch Database scenarios
+                        rect.LayerId = layerId;
+
+                        rect.Color =
+                            Color.FromRgb(
+                                0,
+                                255,
+                                0
+                            );
+
+                        // set database defaults
+                        rect.SetDatabaseDefaults(db);
+
+                        btr.AppendEntity(rect);
+                        tr.AddNewlyCreatedDBObject(
+                            rect,
+                            true
+                        );
+                    }
 
                     //--------------------------------
                     // 创建提示文字
@@ -265,14 +267,18 @@ namespace Correct_test1.Markers
 
 
                     text.TextString =
-                        "应改为:"
-                        +
-                        correctNumber;
+                        isBomMarker
+                            ? "BOM图号错误  应改为:" + correctNumber
+                            : "应改为:" + correctNumber;
 
 
-                    text.Position = textPosition == Point3d.Origin
-                        ? new Point3d(x2 + 5, y2, 0)
-                        : textPosition;
+                    text.Position =
+                        isBomMarker
+                            ? textPosition + Vector3d.XAxis * 5.0
+                            : new Point3d(
+                                x2 + 5,
+                                y2,
+                                0);
 
 
                     text.Height =

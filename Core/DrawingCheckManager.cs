@@ -28,8 +28,7 @@ namespace Correct_test1.Core
             Database db,
             string filePath,
             bool drawMarker,
-            string bomDrawingNumber = null,
-            Autodesk.AutoCAD.Geometry.Point3d bomDrawingNumberPosition = default(Autodesk.AutoCAD.Geometry.Point3d))
+            List<BomData> boms = null)
         {
             List<CheckResult> results = new List<CheckResult>();
 
@@ -111,15 +110,18 @@ namespace Correct_test1.Core
             RevisionMarker marker = new RevisionMarker();
 
             List<LayoutInfo> paperLayouts =
-                layouts.FindAll(x => !x.IsModelSpace);
+                layouts
+                    .FindAll(x => !x.IsModelSpace);
+
+            paperLayouts.Sort(
+                (a, b) =>
+                    a.TabOrder.CompareTo(b.TabOrder));
+
             int currentPage = 0;
             int totalPages = paperLayouts.Count;
 
-            foreach (LayoutInfo layout in layouts)
+            foreach (LayoutInfo layout in paperLayouts)
             {
-                if (layout.IsModelSpace)
-                    continue;
-
                 currentPage++;
                 //--------------------------------------
                 // 标题栏检查
@@ -131,16 +133,15 @@ namespace Correct_test1.Core
 
                 List<CheckResult> titleResults =
                     titleManager.Check(
-                        db,
-                        layout,
-                        filePath,
-                        fileName,
-                        drawMarker,
-                        currentPage,
-                        totalPages,
-                        bomDrawingNumber,
-                        bomDrawingNumberPosition
-                    );
+                     db,
+                     layout,
+                     filePath,
+                     fileName,
+                     drawMarker,
+                     currentPage,
+                     totalPages,
+                     boms
+                        );
 
 
                 results.AddRange(

@@ -63,7 +63,8 @@ namespace Correct_test1.Checks
             if (table == null)
                 return bom;
 
-
+            bom.SourceLayoutName =
+    table.SourceLayoutName;
 
             int headerRow =
                 FindHeaderRow(table);

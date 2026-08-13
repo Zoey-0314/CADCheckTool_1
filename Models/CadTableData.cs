@@ -19,7 +19,11 @@ namespace Correct_test1.Models
         /// </summary>
         public string LayerName { get; set; }
 
-
+        /// <summary>
+        /// Table 所属布局
+        /// 例如 Layout1、Layout6
+        /// </summary>
+        public string SourceLayoutName { get; set; }
 
         /// <summary>
         /// 表格行数

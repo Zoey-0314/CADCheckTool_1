@@ -33,6 +33,10 @@ namespace Correct_test1.Models
         /// </summary>
         public bool IsModelSpace { get; set; }
 
+        /// <summary>
+        /// AutoCAD 底部布局标签顺序
+        /// </summary>
+        public int TabOrder { get; set; }
 
 
         /// <summary>
