@@ -20,6 +20,30 @@ namespace Correct_test1.Models
 
         public int ErrorCount { get; set; }
 
+        public List<NonStandardArchiveCheckResult>
+    NonStandardArchiveResults
+        { get; set; }
+        = new List<NonStandardArchiveCheckResult>();
+
+
+        /// <summary>
+        /// Z盘非标归档是否可以正常检查。
+        /// </summary>
+        public bool NonStandardArchiveAvailable
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// 归档检查无法执行时的原因。
+        /// </summary>
+        public string NonStandardArchiveError
+        {
+            get;
+            set;
+        } = "";
         public List<StandardPartCheckResult> Results { get; set; }
             = new List<StandardPartCheckResult>();
 

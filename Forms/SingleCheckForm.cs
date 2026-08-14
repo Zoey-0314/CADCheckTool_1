@@ -194,8 +194,8 @@ namespace Correct_test1
         //==================================================
 
         private void btnCheck_Click(
-            object sender,
-            EventArgs e)
+    object sender,
+    EventArgs e)
         {
             try
             {
@@ -212,6 +212,14 @@ namespace Correct_test1
                 }
 
 
+                //--------------------------------
+                // report必须声明在using外面，
+                // 因为检查完成后的提示也要使用它。
+                //--------------------------------
+
+                CheckReport report = null;
+
+
                 using (
                     DocumentLock lockDoc =
                         doc.LockDocument())
@@ -220,7 +228,16 @@ namespace Correct_test1
                         new CheckService();
 
 
-                    CheckReport report =
+                    //--------------------------------
+                    // 执行所有检查
+                    //
+                    // 包括：
+                    // 标准件
+                    // BOM序号
+                    // 非标归档
+                    //--------------------------------
+
+                    report =
                         checkService.Check(
                             doc.Database);
 
@@ -240,10 +257,30 @@ namespace Correct_test1
                         new MarkerManager();
 
 
+                    //--------------------------------
+                    // 原有标准件标记
+                    //--------------------------------
+
                     markerManager.CreateMarkers(
                         doc.Database,
                         report.Results);
 
+
+                    //--------------------------------
+                    // 新增：
+                    // NS非标件归档缺失标记
+                    //--------------------------------
+
+                    markerManager
+                        .CreateNonStandardArchiveMarkers(
+                            doc.Database,
+                            report.NonStandardArchiveResults);
+
+
+                    //--------------------------------
+                    // 原有：
+                    // BOM有，但图中没有的序号
+                    //--------------------------------
 
                     markerManager
                         .CreateMissingCalloutMarkers(
@@ -253,6 +290,11 @@ namespace Correct_test1
                                 .MissingCallouts,
                             report.Boms);
 
+
+                    //--------------------------------
+                    // 原有：
+                    // 图中有，但BOM没有的序号
+                    //--------------------------------
 
                     markerManager
                         .CreateExtraCalloutMarkers(
@@ -264,8 +306,40 @@ namespace Correct_test1
                 }
 
 
+                //--------------------------------
+                // 正常完成提示
+                //--------------------------------
+
+                string completeMessage =
+                    "检查完成，详细问题已标注在图纸中。";
+
+
+                //--------------------------------
+                // Z盘不可用时：
+                //
+                // 不把NS件误报成“归档不存在”，
+                // 但明确告诉用户这一项没有检查。
+                //--------------------------------
+
+                if (report != null &&
+                    !report.NonStandardArchiveAvailable)
+                {
+                    completeMessage +=
+                        "\n\n注意：非标件归档检查未执行。";
+
+
+                    if (!string.IsNullOrWhiteSpace(
+                            report.NonStandardArchiveError))
+                    {
+                        completeMessage +=
+                            "\n"
+                            + report.NonStandardArchiveError;
+                    }
+                }
+
+
                 MessageBox.Show(
-                    "检查完成，详细问题已标注在图纸中。",
+                    completeMessage,
                     "CAD检查");
             }
             catch (Exception ex)

@@ -155,7 +155,52 @@ namespace Correct_test1.Batch
             //--------------------------------
             // 第二步：正式检查
             //--------------------------------
+            //--------------------------------
+            // 非标归档索引
+            //
+            // 整个批量任务只建立一次。
+            //
+            // 无论下面有多少张DWG，
+            // 都共用这一份Z盘文件索引。
+            //--------------------------------
 
+            //--------------------------------
+            // 整个批量检查使用AutoCAD会话级缓存。
+            //--------------------------------
+
+            NonStandardArchiveIndex archiveIndex =
+                NonStandardArchiveCache
+                    .GetOrBuild();
+
+
+            if (!archiveIndex.IsAvailable)
+            {
+                results.Add(
+                    new CheckResult
+                    {
+                        FilePath = "",
+
+                        FileName = "",
+
+                        Type =
+                            "非标归档检查",
+
+                        ObjectName =
+                            "归档目录",
+
+                        CurrentValue =
+                            archiveIndex.RootPath,
+
+                        ExpectedValue =
+                            "归档目录可访问",
+
+                        Message =
+                            archiveIndex.ErrorMessage,
+
+                        IsError =
+                            true
+                    });
+            }
             foreach (string file in files)
             {
                 Database db = null;
@@ -225,7 +270,9 @@ namespace Correct_test1.Batch
                         new CheckService();
 
                     CheckReport report =
-                        checkService.Check(db);
+                        checkService.Check(
+                            db,
+                            archiveIndex);
 
                     if (report == null)
                     {
@@ -269,6 +316,17 @@ namespace Correct_test1.Batch
                             db,
                             report.Results
                         );
+                    }
+                    //--------------------------------
+                    // 非标归档缺失标记
+                    //--------------------------------
+
+                    if (report.NonStandardArchiveResults != null)
+                    {
+                        markerManager
+                            .CreateNonStandardArchiveMarkers(
+                                db,
+                                report.NonStandardArchiveResults);
                     }
 
                     if (report.BomCalloutResult != null)
@@ -356,7 +414,77 @@ namespace Correct_test1.Batch
                             );
                         }
                     }
+                    //--------------------------------
+                    // 非标件归档检查结果
+                    //--------------------------------
 
+                    if (report.NonStandardArchiveResults != null)
+                    {
+                        foreach (
+                            NonStandardArchiveCheckResult archiveResult
+                            in report.NonStandardArchiveResults)
+                        {
+                            if (archiveResult == null)
+                                continue;
+
+
+                            BomItem item =
+                                archiveResult.BomItem;
+
+
+                            results.Add(
+                                new CheckResult
+                                {
+                                    FilePath =
+                                        file,
+
+                                    FileName =
+                                        Path.GetFileName(
+                                            file),
+
+                                    LayoutName =
+                                        archiveResult
+                                            .SourceLayoutName,
+
+                                    DrawingNumber =
+                                        archiveResult
+                                            .DrawingNumber,
+
+                                    PartNumber =
+                                        archiveResult
+                                            .OriginalPartNumber,
+
+                                    PartName =
+                                        item == null
+                                            ? ""
+                                            : item.Name,
+
+                                    Type =
+                                        "非标归档检查",
+
+                                    ObjectName =
+                                        "非标件",
+
+                                    CurrentValue =
+                                        archiveResult
+                                            .OriginalPartNumber,
+
+                                    ExpectedValue =
+                                        "Z:\\归档图纸中存在包含 "
+                                        + archiveResult.SearchKey
+                                        + " 的文件",
+
+                                    CorrectValue =
+                                        archiveResult.SearchKey,
+
+                                    Message =
+                                        archiveResult.Message,
+
+                                    IsError =
+                                        true
+                                });
+                        }
+                    }
                     //--------------------------------
                     // 保存
                     //--------------------------------
