@@ -1,9 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
-using Correct_test1;
-using Correct_test1.Core;
-using System;
+﻿using Autodesk.AutoCAD.Runtime;
 
 namespace Correct_test1
 {

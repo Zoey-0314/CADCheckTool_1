@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 
@@ -31,15 +30,6 @@ namespace Correct_test1.Core
         private static DateTime loadedLastWriteTime;
         private static readonly object loadLock = new object();
 
-
-        public static IReadOnlyList<StandardPart> Parts
-        {
-            get
-            {
-                EnsureLoaded();
-                return parts;
-            }
-        }
 
         public static void EnsureLoaded()
         {
@@ -78,7 +68,7 @@ namespace Correct_test1.Core
             return config.ExternalDatabasePath;
         }
 
-        public static void Load(string path)
+        private static void Load(string path)
         {
             StandardPartExcelReader reader =
                 new StandardPartExcelReader();
@@ -104,15 +94,6 @@ namespace Correct_test1.Core
             loaded = true;
             loadedPath = path;
             loadedLastWriteTime = GetLastWriteTime(path);
-
-            Autodesk.AutoCAD.ApplicationServices.Application
-            .DocumentManager
-            .MdiActiveDocument
-            .Editor
-            .WriteMessage(
-                "\nStandardPartDatabase loaded count: "
-                + parts.Count
-            );
         }
 
         private static string GetLocalDatabasePath()
@@ -189,7 +170,7 @@ namespace Correct_test1.Core
             public bool FallbackToLocalDatabase { get; set; }
         }
 
-        public static void BuildIndex()
+        private static void BuildIndex()
         {
             // 清空所有索引
             exportStrictIndex.Clear();
@@ -255,99 +236,62 @@ namespace Correct_test1.Core
             string partNumber)
         {
             EnsureLoaded();
+            return FindByPartNumberLoaded(partNumber);
+        }
+
+        internal static List<StandardPart> FindByPartNumberLoaded(
+            string partNumber)
+        {
             if (string.IsNullOrWhiteSpace(partNumber))
             {
                 return new List<StandardPart>();
             }
-            // 准备调试输出数据
-            string strictKey = partNumber.Trim();
-            string looseKey = PartNumberNormalizer.LooseNormalize(partNumber);
 
-            List<StandardPart> exportStrictMatches = null;
-            List<StandardPart> nationalStrictMatches = null;
-            List<StandardPart> exportLooseMatches = null;
-            List<StandardPart> nationalLooseMatches = null;
+            string strictKey = partNumber.Trim();
+            string looseKey =
+                PartNumberNormalizer.LooseNormalize(partNumber);
+
+            List<StandardPart> matches;
 
             if (!string.IsNullOrEmpty(strictKey))
             {
-                exportStrictIndex.TryGetValue(strictKey, out exportStrictMatches);
-                nationalStrictIndex.TryGetValue(strictKey, out nationalStrictMatches);
+                if (exportStrictIndex.TryGetValue(
+                        strictKey,
+                        out matches) &&
+                    matches.Count > 0)
+                {
+                    return matches;
+                }
+
+                if (nationalStrictIndex.TryGetValue(
+                        strictKey,
+                        out matches) &&
+                    matches.Count > 0)
+                {
+                    return matches;
+                }
             }
 
             if (!string.IsNullOrEmpty(looseKey))
             {
-                exportLooseIndex.TryGetValue(looseKey, out exportLooseMatches);
-                nationalLooseIndex.TryGetValue(looseKey, out nationalLooseMatches);
+                if (exportLooseIndex.TryGetValue(
+                        looseKey,
+                        out matches) &&
+                    matches.Count > 0)
+                {
+                    return matches;
+                }
+
+                if (nationalLooseIndex.TryGetValue(
+                        looseKey,
+                        out matches) &&
+                    matches.Count > 0)
+                {
+                    return matches;
+                }
             }
 
-            if (exportStrictMatches == null) exportStrictMatches = new List<StandardPart>();
-            if (nationalStrictMatches == null) nationalStrictMatches = new List<StandardPart>();
-            if (exportLooseMatches == null) exportLooseMatches = new List<StandardPart>();
-            if (nationalLooseMatches == null) nationalLooseMatches = new List<StandardPart>();
-
-            // 选择最终返回值（按优先级）
-            List<StandardPart> finalReturn = null;
-            if (exportStrictMatches.Count > 0)
-            {
-                finalReturn = exportStrictMatches;
-            }
-            else if (nationalStrictMatches.Count > 0)
-            {
-                finalReturn = nationalStrictMatches;
-            }
-            else if (exportLooseMatches.Count > 0)
-            {
-                finalReturn = exportLooseMatches;
-            }
-            else if (nationalLooseMatches.Count > 0)
-            {
-                finalReturn = nationalLooseMatches;
-            }
-            else
-            {
-                finalReturn = new List<StandardPart>();
-            }
-
-            // 输出临时调试信息
-            var ed = Autodesk.AutoCAD.ApplicationServices.Application
-                .DocumentManager
-                .MdiActiveDocument
-                .Editor;
-
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.AppendLine("\n输入图号:");
-            sb.AppendLine(partNumber);
-            sb.AppendLine();
-            sb.AppendLine("LooseKey:");
-            sb.AppendLine(looseKey);
-            sb.AppendLine();
-
-            sb.AppendLine("Export匹配:");
-            foreach (var p in exportLooseMatches)
-            {
-                sb.AppendLine($"{p.ExportPartNumber} | {p.NationalPartNumber} | {p.Name}");
-            }
-            if (exportLooseMatches.Count == 0) sb.AppendLine("(none)");
-            sb.AppendLine();
-
-            sb.AppendLine("National匹配:");
-            foreach (var p in nationalLooseMatches)
-            {
-                sb.AppendLine($"{p.ExportPartNumber} | {p.NationalPartNumber} | {p.Name}");
-            }
-            if (nationalLooseMatches.Count == 0) sb.AppendLine("(none)");
-            sb.AppendLine();
-
-            sb.AppendLine("最终返回:");
-            foreach (var p in finalReturn)
-            {
-                sb.AppendLine($"{p.ExportPartNumber} | {p.NationalPartNumber} | {p.Name}");
-            }
-            if (finalReturn.Count == 0) sb.AppendLine("(none)");
-
-            ed.WriteMessage(sb.ToString());
-
-            return finalReturn;
+            return new List<StandardPart>();
         }
 
     }

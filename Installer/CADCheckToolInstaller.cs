@@ -64,16 +64,6 @@ namespace Correct_test1.Installer
 
 
 
-        public string InstallationDirectory
-        {
-            get
-            {
-                return installationDirectory;
-            }
-        }
-
-
-
         /// <summary>
         /// 执行安装后的初始化。
         /// 

@@ -1,6 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Models;
 using System;
@@ -33,191 +31,23 @@ namespace Correct_test1.Readers
         //================================================
 
 
-        private readonly double[] HorizontalXLines =
-        {
-    // 左五列
-
-    45.2828,
-    55.2828,
-    130.2828,
-    150.2828,
-    170.2828,
-
-    // 中间分割线
-
-    187.5633,
-
-    // 右五列
-
-    197.5633,
-    272.5633,
-    292.5633,
-    312.5633,
-    329.8438
-};
-
-
-
-        private readonly double[] HorizontalYLines =
-        {
-            67.145,
-            61.145,
-            55.145,
-            49.145,
-            43.145,
-            37.145
-        };
-
-
-
         /// <summary>
         /// 横版修改记录读取
         ///
         /// 返回：
         /// 左五列 + 右五列
         /// </summary>
-        public List<HorizontalRevisionRow> ReadHorizontalRows(
-            Database db,
-            ObjectId blockId)
+        private List<HorizontalRevisionRow> ReadHorizontalRows(
+            List<TitleText> texts)
         {
-
-
-
-            List<TitleText> texts =
-                ReadTexts(
-                    db,
-                    blockId
-                );
-            Editor ed = null;
-
-            Document doc =
-                Autodesk.AutoCAD.ApplicationServices.Application
-                .DocumentManager
-                .MdiActiveDocument;
-
-
-            if (doc != null)
+            if (texts == null)
             {
-                ed = doc.Editor;
+                return new List<HorizontalRevisionRow>();
             }
 
-            foreach (TitleText t in texts)
-            {
-                if (
-                    t.Y < 80 &&
-                    t.Y > 30 &&
-                    t.X > 40 &&
-                    t.X < 330
-                )
-                {
-                    if (ed != null)
-                    {
-                        ed.WriteMessage(
-                        "\n文字:"
-                        + t.Text
-                        +
-                        " X="
-                        +
-                        t.X
-                        +
-                        " Y="
-                        +
-                        t.Y
-                    );
-                    }
-
-                }
-            }
-            // 调试横版文字坐标
-
-            foreach (TitleText t in texts)
-            {
-                if (
-                    t.Y < 80 &&
-                    t.Y > 30 &&
-                    t.X > 40 &&
-                    t.X < 330
-                )
-                {
-                    AppLogger.Debug(
-                        t.Text
-                        +
-                        "   X="
-                        +
-                        t.X
-                        +
-                        "   Y="
-                        +
-                        t.Y
-                    );
-                }
-            }
-
-
-            List<HorizontalRevisionRow> result =
-                ParseHorizontalTable(
-                    texts
-                );
-
-            // ---------- 新增调试输出：逐行显示 HorizontalRevisionRow 内容 ----------
-            try
-            {
-                if (ed != null)
-                {
-                    foreach (HorizontalRevisionRow row in result)
-                    {
-                        ed.WriteMessage("\nROW:");
-                        ed.WriteMessage(
-                            "\nLeft.Mark="
-                            +
-                            (row.Left?.Mark ?? "")
-                        );
-
-                        ed.WriteMessage(
-                            "\nLeft.Description="
-                            +
-                            (row.Left?.Description ?? "")
-                        );
-
-                        ed.WriteMessage(
-                            "\nLeft.Date="
-                            +
-                            (row.Left?.Date ?? "")
-                        );
-
-                        ed.WriteMessage(
-                            "\nLeft.Signer="
-                            +
-                            (row.Left?.Signer ?? "")
-                        );
-
-                        ed.WriteMessage(
-                            "\nRight.Mark="
-                            +
-                            (row.Right?.Mark ?? "")
-                        );
-
-                        ed.WriteMessage(
-                            "\nRight.Description="
-                            +
-                            (row.Right?.Description ?? "")
-                        );
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                AppLogger.Debug(
-                    "Debug ROW output failed: "
-                    +
-                    ex.Message
-                );
-            }
-            // --------------------------------------------------------------------
-
-            return result;
-
+            return ParseHorizontalTable(texts);
         }
+
 
 
 
@@ -236,77 +66,30 @@ namespace Correct_test1.Readers
         /// 横版返回普通RevisionInfo列表
         /// </summary>
         public List<RevisionInfo> ReadHorizontal(
-            Database db,
-            ObjectId blockId)
+            List<TitleText> texts)
         {
+            List<HorizontalRevisionRow> rows =
+                ReadHorizontalRows(texts);
 
-    List<HorizontalRevisionRow> rows =
-        ReadHorizontalRows(
-            db,
-            blockId
-        );
-
-
-    List<RevisionInfo> result =
-        new List<RevisionInfo>();
-
-            // 调试用 Editor
-            Editor ed = null;
-
-            Document doc =
-                Autodesk.AutoCAD.ApplicationServices.Application
-                .DocumentManager
-                .MdiActiveDocument;
-
-
-            if (doc != null)
-            {
-                ed = doc.Editor;
-            }
+            List<RevisionInfo> result =
+                new List<RevisionInfo>();
 
             foreach (HorizontalRevisionRow row in rows)
-    {
-        // 新增调试输出：观察 ParseHorizontalTable 产生的每一行及其 IsValid 判断结果（左侧）
-        try
-        {
-                    if (ed != null)
-                    {
-                        ed.WriteMessage(
-                            "\nDEBUG ROW LEFT: Mark="
-                            +
-                            (row.Left?.Mark ?? "")
-                            +
-                            " Description="
-                            +
-                            (row.Left?.Description ?? "")
-                            +
-                            " IsValid="
-                            +
-                            IsValid(row.Left)
-                        );
-                    }
+            {
+                if (IsValid(row.Left))
+                {
+                    result.Add(row.Left);
                 }
-        catch
-        {
-            // 忽略调试输出异常，不影响主流程
+
+                if (IsValid(row.Right))
+                {
+                    result.Add(row.Right);
+                }
+            }
+
+            return result;
         }
 
-        if (IsValid(row.Left))
-        {
-            result.Add(row.Left);
-        }
-
-        if (IsValid(row.Right))
-        {
-            result.Add(row.Right);
-        }
-
-    }
-
-
-    return result;
-
-        }
 
 
 
@@ -326,93 +109,44 @@ namespace Correct_test1.Readers
         /// 读取竖版修改记录
         /// </summary>
         public List<RevisionInfo> ReadVertical(
-            Database db,
-            ObjectId blockId)
+            List<TitleText> texts)
         {
+            if (texts == null)
+            {
+                return new List<RevisionInfo>();
+            }
 
-
-
-            List<TitleText> texts =
-                ReadTexts(
-                    db,
-                    blockId
-                );
-
-
-
-
-            // 竖版原坐标
             List<TitleText> revisionTexts =
                 texts
-                .Where(t =>
-
-                    t.X >= 82.7599
-                    &&
-                    t.X <= 192.7611
-                    &&
-                    t.Y >= 65.4386
-                    &&
-                    t.Y <= 95.4386
-
-                )
-                .ToList();
-
-
-
-
+                    .Where(t =>
+                        t.X >= 82.7599 &&
+                        t.X <= 192.7611 &&
+                        t.Y >= 65.4386 &&
+                        t.Y <= 95.4386)
+                    .ToList();
 
             List<List<TitleText>> rows =
-                GroupByRow(
-                    revisionTexts
-                );
-
-
-
-
+                GroupByRow(revisionTexts);
 
             List<RevisionInfo> result =
                 new List<RevisionInfo>();
 
-
-
-
-
             foreach (List<TitleText> row in rows)
             {
-
-
-
                 RevisionInfo info =
                     ParseRow(row);
 
-
-
-
-
-                if (!string.IsNullOrWhiteSpace(info.Mark)
-                    ||
-                   !string.IsNullOrWhiteSpace(info.Description)
-                    ||
-                   !string.IsNullOrWhiteSpace(info.Date))
+                if (!string.IsNullOrWhiteSpace(info.Mark) ||
+                    !string.IsNullOrWhiteSpace(info.Description) ||
+                    !string.IsNullOrWhiteSpace(info.Date))
                 {
-
-
                     result.Add(info);
-
-
                 }
-
-
-
             }
 
-
-
-
             return result;
-
-
         }
+
         //================================================
         // 横版十列表格读取核心
         //================================================
@@ -474,48 +208,6 @@ namespace Correct_test1.Readers
                 )
                 .OrderByDescending(t => t.Y)
                 .ToList();
-
-            // --- 新增调试输出：列出 potentialMarks 中的候选标记 ---
-    try
-    {
-                Editor ed = null;
-
-                Document doc =
-                    Autodesk.AutoCAD.ApplicationServices.Application
-                    .DocumentManager
-                    .MdiActiveDocument;
-
-
-                if (doc != null)
-                {
-                    ed = doc.Editor;
-                }
-
-                foreach (var t in potentialMarks)
-        {
-                    if (ed != null)
-                    {
-                        ed.WriteMessage(
-                            "\n候选标记:"
-                            +
-                            t.Text
-                            +
-                            " X="
-                            +
-                            t.X
-                            +
-                            " Y="
-                            +
-                            t.Y
-                        );
-                    }
-                }
-    }
-    catch
-    {
-        // 忽略调试输出异常，不影响主流程
-    }
-    // -------------------------------------------------------
 
             // 防止重复：以坐标与文本唯一标识
             HashSet<string> processed = new HashSet<string>();
@@ -611,174 +303,7 @@ namespace Correct_test1.Readers
         /// right=true:
         /// 右侧五列
         /// </summary>
-        private RevisionInfo ParseHorizontalSide(
-            List<TitleText> rowTexts,
-            bool right)
-        {
 
-            RevisionInfo info =
-                new RevisionInfo();
-
-
-            foreach (TitleText text in rowTexts)
-            {
-
-                int column =
-                    GetHorizontalColumn(
-                        text.X
-                    );
-                AppLogger.Debug(
-    "Parse:"
-    + text.Text
-    + " X="
-    + text.X
-    + " column="
-    + column
-);
-
-
-                if (column < 0)
-                    continue;
-
-
-
-
-
-
-                // 左侧五列
-
-                if (!right)
-                {
-
-
-                    if (column == 0)
-                    {
-                        info.Mark =
-                            Append(
-                                info.Mark,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 1)
-                    {
-                        info.Description =
-                            Append(
-                                info.Description,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 2)
-                    {
-                        info.Date =
-                            Append(
-                                info.Date,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 3)
-                    {
-                        info.Signer =
-                            Append(
-                                info.Signer,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 4)
-                    {
-                        info.RevisionNumber =
-                            Append(
-                                info.RevisionNumber,
-                                text.Text
-                            );
-                    }
-
-
-                }
-
-
-
-
-
-
-                // 右侧五列
-
-                else
-                {
-
-
-                    if (column == 5)
-                    {
-                        info.Mark =
-                            Append(
-                                info.Mark,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 6)
-                    {
-                        info.Description =
-                            Append(
-                                info.Description,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 7)
-                    {
-                        info.Date =
-                            Append(
-                                info.Date,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 8)
-                    {
-                        info.Signer =
-                            Append(
-                                info.Signer,
-                                text.Text
-                            );
-                    }
-
-
-                    else if (column == 9)
-                    {
-                        info.RevisionNumber =
-                            Append(
-                                info.RevisionNumber,
-                                text.Text
-                            );
-                    }
-
-
-
-                }
-
-
-
-            }
-
-
-
-
-
-            return info;
-
-
-        }
 
 
 
@@ -790,54 +315,7 @@ namespace Correct_test1.Readers
         /// <summary>
         /// 根据X坐标判断所在列
         /// </summary>
-        private int GetHorizontalColumn(
-            double x)
-        {
 
-
-
-            for (int i = 0;
-                i < HorizontalXLines.Length - 1;
-                i++)
-            {
-
-
-
-                if (
-                    x >= HorizontalXLines[i]
-                    &&
-                    x < HorizontalXLines[i + 1]
-                )
-                {
-
-                    return i;
-
-                }
-
-
-
-            }
-
-
-
-
-            // 最后一列边界
-
-            if (
-                x >= HorizontalXLines[
-                    HorizontalXLines.Length - 1]
-            )
-            {
-                return 9;
-            }
-
-
-
-
-            return -1;
-
-
-        }
 
 
 
@@ -848,52 +326,7 @@ namespace Correct_test1.Readers
         /// <summary>
         /// 判断横版模板
         /// </summary>
-        private bool IsHorizontalTable(
-            List<TitleText> texts)
-        {
-            // 容差
-            double eps = 1.0;
 
-            // 横版总区域 X 范围
-            double minX = HorizontalXLines.First();
-            double maxX = HorizontalXLines.Last();
-
-            // 标题和表头的 Y 区间（参考项目文档）
-            double titleTop = 77.145;
-            double titleBottom = 73.145;
-
-            double headerTop = 73.145;
-            double headerBottom = 67.145;
-
-            // 1) 检查是否存在 "更改记录" 标题，且位于标题区间内并在横版 X 范围内
-            bool hasTitle =
-                texts.Any(t =>
-                    t.Text.Contains("更改记录")
-                    && t.X >= minX - eps
-                    && t.X <= maxX + eps
-                    && t.Y < titleTop + eps
-                    && t.Y > titleBottom - eps
-                );
-
-            if (!hasTitle)
-                return false;
-
-            // 2) 检查五个表头关键字是否都出现在表头区间（位置约束），要求至少五项命中
-            string[] headers = new[] { "标记", "更改内容", "更改日期", "签名", "变更号" };
-
-            int headerCount =
-                headers.Count(h =>
-                    texts.Any(t =>
-                        t.Text.Contains(h)
-                        && t.X >= minX - eps
-                        && t.X <= maxX + eps
-                        && t.Y < headerTop + eps
-                        && t.Y > headerBottom - eps
-                    )
-                );
-
-            return headerCount >= 5;
-        }
 
 
 
@@ -1236,11 +669,7 @@ namespace Correct_test1.Readers
                     // 块参照：先读取属性属性引用（AttributeReference），再递归读取块定义内实体（含嵌套块）
                     else if (ent is BlockReference br)
                     {
-                        AppLogger.Debug(
-    "发现块:"
-    + br.Name
-);
-                        // 1) 尝试读取 AttributeReference（实例属性）
+// 1) 尝试读取 AttributeReference（实例属性）
                         try
                         {
                             foreach (ObjectId aid in br.AttributeCollection)
@@ -1295,11 +724,7 @@ namespace Correct_test1.Readers
                     tr.GetObject(br.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
                 if (blockDef != null)
                 {
-                    AppLogger.Debug(
-                        "读取块定义:"
-                        + blockDef.Name
-                    );
-                }
+}
 
                 if (blockDef == null)
                     return;
@@ -1327,25 +752,14 @@ namespace Correct_test1.Readers
         {
             if (blockDef == null || tr == null || result == null)
                 return;
-
-            // 调试：输出块信息
-            try
-            {
-                AppLogger.Debug($"Processing blockDef: {blockDef.Name}, Transform present.");
-            }
-            catch { }
-
-            foreach (ObjectId innerId in blockDef)
+foreach (ObjectId innerId in blockDef)
             {
                 Entity innerEnt =
                     tr.GetObject(innerId, OpenMode.ForRead) as Entity;
 
                 if (innerEnt == null)
                     continue;
-
-                AppLogger.Debug($"  InnerEntType: {innerEnt.GetType().Name}");
-
-                // DBText：把定义坐标通过 transformToWorld 转换为世界坐标
+// DBText：把定义坐标通过 transformToWorld 转换为世界坐标
                 if (innerEnt is DBText innerText)
                 {
                     try

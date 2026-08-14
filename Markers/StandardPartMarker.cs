@@ -1,6 +1,8 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Correct_test1.Core;
 using Correct_test1.Models;
+using System;
 
 namespace Correct_test1.Markers
 {
@@ -13,27 +15,84 @@ namespace Correct_test1.Markers
             ObjectId layerId,
             MarkerInfo info)
         {
+            if (database == null ||
+                transaction == null ||
+                info == null ||
+                spaceId.IsNull ||
+                !spaceId.IsValid ||
+                layerId.IsNull ||
+                !layerId.IsValid)
+            {
+                return;
+            }
+
+            if (!IsValidPoint(info.Position))
+            {
+                AppLogger.Info(
+                    "跳过StandardPartMarker：坐标无效",
+                    "StandardPartMarker");
+
+                return;
+            }
+
             BlockTableRecord space =
                 transaction.GetObject(
                     spaceId,
                     OpenMode.ForWrite) as BlockTableRecord;
 
-            MText text = new MText();
-            text.Location = info.Position + Vector3d.XAxis * 5.0;
-            text.TextHeight = 3.0;
-            text.Contents = info.Text;
-            text.LayerId = layerId;
+            if (space == null)
+                return;
 
-            space.AppendEntity(text);
-            transaction.AddNewlyCreatedDBObject(text, true);
+            Point3d markerPosition =
+                info.Position + Vector3d.XAxis * 5.0;
 
-            text.XData = new ResultBuffer(
-                new TypedValue(
-                    (int)DxfCode.ExtendedDataRegAppName,
-                    MarkerManager.XDataAppName),
-                new TypedValue(
-                    (int)DxfCode.ExtendedDataAsciiString,
-                    info.Text));
+            if (!IsValidPoint(markerPosition))
+                return;
+
+            string markerText =
+                info.Text ?? "";
+
+            using (MText text = new MText())
+            {
+                text.SetDatabaseDefaults(database);
+
+                text.Location = markerPosition;
+                text.TextHeight = 3.0;
+                text.Contents = markerText;
+                text.LayerId = layerId;
+
+                space.AppendEntity(text);
+
+                transaction.AddNewlyCreatedDBObject(
+                    text,
+                    true);
+
+                using (ResultBuffer xdata =
+                    new ResultBuffer(
+                        new TypedValue(
+                            (int)DxfCode.ExtendedDataRegAppName,
+                            MarkerManager.XDataAppName),
+                        new TypedValue(
+                            (int)DxfCode.ExtendedDataAsciiString,
+                            "StandardPart")))
+                {
+                    text.XData = xdata;
+                }
+            }
+        }
+
+        private static bool IsValidPoint(Point3d point)
+        {
+            return IsValidNumber(point.X) &&
+                   IsValidNumber(point.Y) &&
+                   IsValidNumber(point.Z);
+        }
+
+        private static bool IsValidNumber(double value)
+        {
+            return !double.IsNaN(value) &&
+                   !double.IsInfinity(value) &&
+                   Math.Abs(value) < 1E12;
         }
     }
 }

@@ -3,21 +3,17 @@ using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Models;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
 
 namespace Correct_test1.Readers
 {
     public class ViewportTextReader
     {
         public List<TitleText> Read(
-    Database db,
-    bool includeNestedBlocks = true,
-    bool useViewportFilter = true)
+            Database db,
+            bool includeNestedBlocks = true,
+            bool useViewportFilter = true)
         {
             List<TitleText> result = new List<TitleText>();
-            List<DebugRow> debugRows = new List<DebugRow>();
 
             if (db == null)
                 return result;
@@ -76,11 +72,6 @@ namespace Correct_test1.Readers
                         ModelWindow window =
                             CreateWindow(viewport);
 
-                        string source =
-                            "Viewport(" +
-                            viewport.Handle.ToString() +
-                            ")";
-
                         foreach (ObjectId modelEntityId in modelSpace)
                         {
                             Entity entity =
@@ -96,20 +87,16 @@ namespace Correct_test1.Readers
                                 entity,
                                 Matrix3d.Identity,
                                 layout.LayoutName,
-                                source,
                                 window,
                                 includeNestedBlocks,
                                 useViewportFilter,
-                                result,
-                                debugRows);
+                                result);
                         }
                     }
                 }
 
                 tr.Commit();
             }
-
-            WriteDebugCsv(debugRows);
 
             return result;
         }
@@ -132,27 +119,22 @@ namespace Correct_test1.Readers
             Entity entity,
             Matrix3d transform,
             string layoutName,
-            string source,
             ModelWindow window,
             bool includeNestedBlocks,
             bool useViewportFilter,
-            List<TitleText> output,
-            List<DebugRow> debugRows)
+            List<TitleText> output)
         {
             DBText dbText = entity as DBText;
             if (dbText != null)
             {
                 Point3d position = dbText.Position.TransformBy(transform);
                 AddText(
-                    "DBText",
                     dbText.TextString,
                     position,
                     layoutName,
-                    source,
                     window,
                     useViewportFilter,
-                    output,
-                    debugRows);
+                    output);
                 return;
             }
 
@@ -161,15 +143,12 @@ namespace Correct_test1.Readers
             {
                 Point3d position = mText.Location.TransformBy(transform);
                 AddText(
-                    "MText",
                     mText.Text,
                     position,
                     layoutName,
-                    source,
                     window,
                     useViewportFilter,
-                    output,
-                    debugRows);
+                    output);
                 return;
             }
 
@@ -180,15 +159,24 @@ namespace Correct_test1.Readers
             if (blockRef == null)
                 return;
 
-            BlockTableRecord blockDef = tr.GetObject(blockRef.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+            BlockTableRecord blockDef =
+                tr.GetObject(
+                    blockRef.BlockTableRecord,
+                    OpenMode.ForRead) as BlockTableRecord;
+
             if (blockDef == null)
                 return;
 
-            Matrix3d nestedTransform = transform * blockRef.BlockTransform;
+            Matrix3d nestedTransform =
+                transform * blockRef.BlockTransform;
 
             foreach (ObjectId childId in blockDef)
             {
-                Entity child = tr.GetObject(childId, OpenMode.ForRead) as Entity;
+                Entity child =
+                    tr.GetObject(
+                        childId,
+                        OpenMode.ForRead) as Entity;
+
                 if (child == null)
                     continue;
 
@@ -197,25 +185,20 @@ namespace Correct_test1.Readers
                     child,
                     nestedTransform,
                     layoutName,
-                    source,
                     window,
                     includeNestedBlocks,
                     useViewportFilter,
-                    output,
-                    debugRows);
+                    output);
             }
         }
 
         private static void AddText(
-            string type,
             string rawText,
             Point3d position,
             string layoutName,
-            string source,
             ModelWindow window,
             bool useViewportFilter,
-            List<TitleText> output,
-            List<DebugRow> debugRows)
+            List<TitleText> output)
         {
             if (useViewportFilter &&
                 !window.Contains(position.X, position.Y))
@@ -223,24 +206,12 @@ namespace Correct_test1.Readers
                 return;
             }
 
-            string text = Clean(rawText);
-            TitleText titleText = new TitleText
+            output.Add(new TitleText
             {
-                Text = text,
+                Text = Clean(rawText),
                 X = position.X,
                 Y = position.Y,
                 LayoutName = layoutName
-            };
-
-            output.Add(titleText);
-            debugRows.Add(new DebugRow
-            {
-                Type = type,
-                Text = text,
-                X = position.X,
-                Y = position.Y,
-                Layout = layoutName,
-                Source = source
             });
         }
 
@@ -256,45 +227,13 @@ namespace Correct_test1.Readers
                 .Trim();
         }
 
-        private static void WriteDebugCsv(List<DebugRow> rows)
-        {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            if (string.IsNullOrWhiteSpace(desktopPath))
-                return;
-
-            string filePath = Path.Combine(desktopPath, "ViewportTextDebug.csv");
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Type,Text,X,Y,Layout,Source(Viewport)");
-
-            foreach (DebugRow row in rows)
-            {
-                sb.AppendLine(
-                    Escape(row.Type) + "," +
-                    Escape(row.Text) + "," +
-                    row.X.ToString("0.####", CultureInfo.InvariantCulture) + "," +
-                    row.Y.ToString("0.####", CultureInfo.InvariantCulture) + "," +
-                    Escape(row.Layout) + "," +
-                    Escape(row.Source));
-            }
-
-            File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
-        }
-
-        private static string Escape(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return string.Empty;
-
-            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
-                return "\"" + value.Replace("\"", "\"\"") + "\"";
-
-            return value;
-        }
-
         private struct ModelWindow
         {
-            public ModelWindow(double minX, double minY, double maxX, double maxY)
+            public ModelWindow(
+                double minX,
+                double minY,
+                double maxX,
+                double maxY)
             {
                 MinX = minX;
                 MinY = minY;
@@ -309,18 +248,11 @@ namespace Correct_test1.Readers
 
             public bool Contains(double x, double y)
             {
-                return x >= MinX && x <= MaxX && y >= MinY && y <= MaxY;
+                return x >= MinX &&
+                    x <= MaxX &&
+                    y >= MinY &&
+                    y <= MaxY;
             }
-        }
-
-        private class DebugRow
-        {
-            public string Type { get; set; }
-            public string Text { get; set; }
-            public double X { get; set; }
-            public double Y { get; set; }
-            public string Layout { get; set; }
-            public string Source { get; set; }
         }
     }
 }

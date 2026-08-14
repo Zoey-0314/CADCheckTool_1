@@ -39,33 +39,6 @@ namespace Correct_test1.Models
         public int TabOrder { get; set; }
 
 
-        /// <summary>
-        /// 是否有效图纸
-        /// </summary>
-        public bool IsValidDrawing { get; set; }
-
-
-
-        //==============================
-        // 布局整体范围
-        //==============================
-
-
-        public double MinX { get; set; }
-
-
-
-        public double MinY { get; set; }
-
-
-
-        public double Width { get; set; }
-
-
-
-        public double Height { get; set; }
-
-
 
         //==============================
         // 标题栏文字

@@ -21,12 +21,6 @@ namespace Correct_test1.Models
         /// 项目号
         /// </summary>
         public string ProjectNumber { get; set; }
-
-        /// <summary>
-        /// 项目版本
-        /// </summary>
-        public string ProjectVersion { get; set; }
-
         //=========================
         // 标题栏基础信息
         //=========================
@@ -40,12 +34,6 @@ namespace Correct_test1.Models
         /// 图纸名称
         /// </summary>
         public string DrawingName { get; set; }
-
-        /// <summary>
-        /// 公司名称
-        /// </summary>
-        public string Company { get; set; }
-
         /// <summary>
         /// 材料
         /// </summary>

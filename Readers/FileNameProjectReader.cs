@@ -24,26 +24,6 @@ namespace Correct_test1.Readers
 
 
 
-            //完整编号
-            //例如 N2607US004-L0
-            public string FullNumber
-            {
-                get
-                {
-
-                    if (string.IsNullOrEmpty(Version))
-                    {
-                        return ProjectNumber;
-                    }
-
-
-                    return ProjectNumber
-                        + "-"
-                        + Version;
-
-                }
-            }
-
         }
 
 

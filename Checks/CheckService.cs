@@ -1,6 +1,4 @@
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.DatabaseServices;
 using Correct_test1.Models;
 using Correct_test1.Readers;
 using System;
@@ -70,35 +68,9 @@ namespace Correct_test1.Checks
             }
             report.BomNumbers = new HashSet<int>(bomNumbers);
 
-            LayoutReader layoutReader = new LayoutReader();
+            LayoutReader layoutReader =
+                new LayoutReader();
 
-            List<LayoutInfo> layouts =
-                layoutReader.ReadLayouts(database, null)
-                    .Where(x => x != null && !x.IsModelSpace)
-                    .ToList();
-            Dictionary<string, bool> layoutDirections =
-    new Dictionary<string, bool>(
-        StringComparer.OrdinalIgnoreCase);
-
-            FrameReader frameReader = new FrameReader();
-
-            foreach (LayoutInfo layout in layouts)
-            {
-                FrameInfo frame =
-                    frameReader.ReadFrame(
-                        database,
-                        layout.BlockTableRecordId,
-                        null);
-
-                if (frame.Direction == "Horizontal")
-                {
-                    layoutDirections[layout.LayoutName] = true;
-                }
-                else if (frame.Direction == "Vertical")
-                {
-                    layoutDirections[layout.LayoutName] = false;
-                }
-            }
             ViewportTextReader viewportTextReader =
     new ViewportTextReader();
 
@@ -118,9 +90,7 @@ namespace Correct_test1.Checks
             HashSet<int> drawingNumbers =
                 layoutReader.IdentifyDrawingBomNumbers(
                     drawingTexts,
-                    drawingLines,
-                    bomNumbers,
-                    layoutDirections);
+                    drawingLines);
             report.DrawingNumbers = new HashSet<int>(drawingNumbers);
 
             report.BomCalloutResult = calloutChecker.Check(

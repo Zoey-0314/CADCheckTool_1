@@ -9,14 +9,6 @@ namespace Correct_test1.Core
 {
     public class DrawingCheckManager
     {
-        public List<CheckResult> CheckDrawing(
-            Database db,
-            Autodesk.AutoCAD.EditorInput.Editor ed,
-            string expectedProject)
-        {
-            return CheckDrawing(db, "", true);
-        }
-
         /// <summary>
         /// 检查一张图纸
         /// db: CAD数据库
@@ -99,15 +91,15 @@ namespace Correct_test1.Core
             //--------------------------------------
             LayoutReader layoutReader = new LayoutReader();
 
-            // 注意：这里暂时不能调用带Editor输出的版本
-            // 后续如果批量使用，需要给LayoutReader增加无Editor重载
-            List<LayoutInfo> layouts = layoutReader.ReadLayouts(db, null);
+            List<LayoutInfo> layouts = layoutReader.ReadLayouts(db);
 
             RevisionTableReader revisionReader = new RevisionTableReader();
             RevisionChecker revisionChecker = new RevisionChecker();
             RevisionLocationReader locationReader = new RevisionLocationReader();
             RevisionIssueMapper mapper = new RevisionIssueMapper();
             RevisionMarker marker = new RevisionMarker();
+            TitleBlockCheckManager titleManager =
+                new TitleBlockCheckManager();
 
             List<LayoutInfo> paperLayouts =
                 layouts
@@ -126,10 +118,6 @@ namespace Correct_test1.Core
                 //--------------------------------------
                 // 标题栏检查
                 //--------------------------------------
-
-                TitleBlockCheckManager titleManager =
-                    new TitleBlockCheckManager();
-
 
                 List<CheckResult> titleResults =
                     titleManager.Check(
@@ -153,13 +141,13 @@ namespace Correct_test1.Core
                     continue;
 
                 // 先尝试横版
-                List<RevisionInfo> revisions = revisionReader.ReadHorizontal(db, layout.BlockTableRecordId);
+                List<RevisionInfo> revisions = revisionReader.ReadHorizontal(texts);
                 List<RevisionLocation> locations = locationReader.ReadHorizontalLocations(layout.LayoutName, texts);
 
                 // 横版无结果，尝试竖版
                 if (revisions.Count == 0)
                 {
-                    revisions = revisionReader.ReadVertical(db, layout.BlockTableRecordId);
+                    revisions = revisionReader.ReadVertical(texts);
                     locations = locationReader.ReadVerticalLocations(layout.LayoutName, texts);
                 }
 

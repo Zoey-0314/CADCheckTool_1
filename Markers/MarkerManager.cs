@@ -1,6 +1,5 @@
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Configs;
 using Correct_test1.Core;
@@ -62,39 +61,6 @@ namespace Correct_test1.Markers
             catch (System.Exception ex)
             {
                 AppLogger.Error(ex, "MarkerManager.CreateMarkers");
-            }
-        }
-
-        public void CreateBomCalloutMarkers(Database database, List<BomCalloutIssue> issues)
-        {
-            if (database == null || issues == null || issues.Count == 0)
-                return;
-
-            try
-            {
-                using (Transaction transaction = database.TransactionManager.StartTransaction())
-                {
-                    ObjectId layerId = EnsureLayer(database, transaction, LayerName, Color.FromRgb(255, 0, 0));
-                    RegisterXDataApp(database, transaction);
-                    BomCalloutMarker marker = new BomCalloutMarker();
-
-                    foreach (BomCalloutIssue issue in issues)
-                    {
-                        if (issue == null)
-                            continue;
-
-                        ObjectId spaceId = issue.SpaceId.IsNull
-                            ? database.CurrentSpaceId
-                            : issue.SpaceId;
-                        marker.Create(database, transaction, spaceId, layerId, issue);
-                    }
-
-                    transaction.Commit();
-                }
-            }
-            catch (System.Exception ex)
-            {
-                AppLogger.Error(ex, "MarkerManager.CreateBomCalloutMarkers");
             }
         }
 
@@ -224,18 +190,6 @@ namespace Correct_test1.Markers
                             boms,
                             missingNumber);
 
-                        Editor editor =
-                            Autodesk.AutoCAD.ApplicationServices.Application
-                            .DocumentManager
-                            .MdiActiveDocument
-                            ?.Editor;
-
-                        editor?.WriteMessage(
-                            "\n≤È’“Missing–Ú∫≈:" + missingNumber);
-
-                        editor?.WriteMessage(
-                            "\nFindΩ·π˚:" +
-                            (matchedItem == null ? "null" : matchedItem.No));
                         if (matchedItem == null)
                             continue;
 
@@ -344,14 +298,15 @@ namespace Correct_test1.Markers
                                 issue.Position.Z);
                         }
 
-                        DBText text = new DBText
-                        {
-                            Position = markerPosition,
-                            Height = MarkerConfig.TextHeight,
-                            TextString = issue.Message,
-                            LayerId = layerId,
-                            Color = Color.FromRgb(255, 0, 0)
-                        };
+                        DBText text = new DBText();
+
+                        text.SetDatabaseDefaults(database);
+
+                        text.Position = markerPosition;
+                        text.Height = MarkerConfig.TextHeight;
+                        text.TextString = issue.Message ?? "";
+                        text.LayerId = layerId;
+                        text.Color = Color.FromRgb(255, 0, 0);
                         space.AppendEntity(text);
                         transaction.AddNewlyCreatedDBObject(text, true);
                         text.XData = new ResultBuffer(

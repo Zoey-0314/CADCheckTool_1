@@ -82,7 +82,9 @@ namespace Correct_test1.Core
 
                 db.SaveAs(
                     tempFile,
-                    DwgVersion.Current
+                    true,
+                    DwgVersion.Current,
+                    db.SecurityParameters
                 );
 
                 FileInfo savedInfo = new FileInfo(tempFile);
@@ -138,10 +140,10 @@ namespace Correct_test1.Core
                 // 替换原文件
                 //--------------------------------
 
-
-                File.Copy(
+                File.Replace(
                     tempFile,
                     originalFile,
+                    backupFile,
                     true
                 );
 

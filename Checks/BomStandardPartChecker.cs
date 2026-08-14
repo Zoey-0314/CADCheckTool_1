@@ -17,6 +17,8 @@ namespace Correct_test1.Checks
                 return results;
             }
 
+            StandardPartDatabase.EnsureLoaded();
+
             foreach (BomItem item in bom.Items)
             {
                 if (PartNumberTypeClassifier.Classify(item.PartNumber)
@@ -26,7 +28,7 @@ namespace Correct_test1.Checks
                 }
 
                 List<StandardPart> matches =
-                    StandardPartDatabase.FindByPartNumber(item.PartNumber);
+                    StandardPartDatabase.FindByPartNumberLoaded(item.PartNumber);
 
                 StandardPartCheckResult result =
                     new StandardPartCheckResult();
