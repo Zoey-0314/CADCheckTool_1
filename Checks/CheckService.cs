@@ -73,7 +73,23 @@ namespace Correct_test1.Checks
             report.NonStandardArchiveAvailable =
                 archiveIndex != null &&
                 archiveIndex.IsAvailable;
+            //--------------------------------
+            // 标准件数据库状态
+            //--------------------------------
 
+            string standardPartError;
+
+
+            report.StandardPartDatabaseAvailable =
+                StandardPartDatabase.TryEnsureLoaded(
+                    out standardPartError);
+
+
+            if (!report.StandardPartDatabaseAvailable)
+            {
+                report.StandardPartDatabaseError =
+                    standardPartError ?? "";
+            }
 
             if (!report.NonStandardArchiveAvailable)
             {
@@ -172,9 +188,12 @@ namespace Correct_test1.Checks
                     // 原有标准件检查
                     //--------------------------------
 
-                    report.Results.AddRange(
-                        checker.Check(
-                            bom));
+                    if (report.StandardPartDatabaseAvailable)
+                    {
+                        report.Results.AddRange(
+                            checker.Check(
+                                bom));
+                    }
 
 
                     //--------------------------------

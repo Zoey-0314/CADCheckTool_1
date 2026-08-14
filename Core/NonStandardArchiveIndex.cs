@@ -79,9 +79,12 @@ namespace Correct_test1.Core
         /// </summary>
         public static NonStandardArchiveIndex Build()
         {
+            AppPathSettings settings =
+                AppPathConfig.Current;
+
+
             return Build(
-                NonStandardArchiveConfig
-                    .ArchiveRootPath);
+                settings.NonStandardArchivePath);
         }
 
 

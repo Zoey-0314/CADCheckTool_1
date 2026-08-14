@@ -35,7 +35,24 @@ namespace Correct_test1.Models
             set;
         }
 
+        /// <summary>
+        /// 标准件数据库本次是否可用。
+        /// </summary>
+        public bool StandardPartDatabaseAvailable
+        {
+            get;
+            set;
+        }
 
+
+        /// <summary>
+        /// 标准件数据库无法使用时的原因。
+        /// </summary>
+        public string StandardPartDatabaseError
+        {
+            get;
+            set;
+        } = "";
         /// <summary>
         /// 归档检查无法执行时的原因。
         /// </summary>

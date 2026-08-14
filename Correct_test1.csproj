@@ -103,6 +103,8 @@
     <Compile Include="Checks\NonStandardArchiveChecker.cs" />
     <Compile Include="Checks\TitleBlockChecker.cs" />
     <Compile Include="Checks\TitleBlockCheckManager.cs" />
+    <Compile Include="Configs\AppPathConfig.cs" />
+    <Compile Include="Configs\AppPathSettings.cs" />
     <Compile Include="Configs\MarkerConfig.cs" />
     <Compile Include="Configs\BomConfig.cs" />
     <Compile Include="Configs\NonStandardArchiveConfig.cs" />
@@ -110,6 +112,12 @@
     <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
     <Compile Include="Core\NonStandardArchiveCache.cs" />
     <Compile Include="Core\NonStandardArchiveIndex.cs" />
+    <Compile Include="Forms\PathSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PathSettingsForm.Designer.cs">
+      <DependentUpon>PathSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Installer\CADCheckToolInstaller.cs" />
     <Compile Include="Installer\CADPluginRegistryManager.cs" />
     <Compile Include="Core\AppLogger.cs" />
@@ -229,6 +237,9 @@
     <EmbeddedResource Include="Forms\BatchProgressForm.resx">
       <DependentUpon>BatchProgressForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PathSettingsForm.resx">
+      <DependentUpon>PathSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -302,9 +313,6 @@
     <None Include="packages\System.Security.Cryptography.Xml.8.0.4\buildTransitive\netcoreapp2.0\System.Security.Cryptography.Xml.targets" />
     <None Include="packages\System.Security.Cryptography.Xml.8.0.4\System.Security.Cryptography.Xml.8.0.4.nupkg" />
     <None Include="README.md" />
-    <None Include="Resources\StandardParts.xlsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages\EPPlus.5.8.0\EPPlusLogo.png" />
