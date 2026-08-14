@@ -172,6 +172,34 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\DrawingCheckManager.cs" />
     <Compile Include="Models\CheckResult.cs" />
+    <Compile Include="QuickRevision\Commands\QuickRevisionCommand.cs" />
+    <Compile Include="QuickRevision\Commands\QuickRevisionPickTestCommand.cs" />
+    <Compile Include="QuickRevision\Commands\ViewportPickTestCommand.cs" />
+    <Compile Include="QuickRevision\Forms\RevisionInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuickRevision\Models\RevisionTarget.cs" />
+    <Compile Include="QuickRevision\Models\TableRevisionContext.cs" />
+    <Compile Include="QuickRevision\Models\ViewportContext.cs" />
+    <Compile Include="QuickRevision\Picking\QuickRevisionPicker.cs" />
+    <Compile Include="QuickRevision\Resolvers\ModelSpace\DbTextResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\ModelSpace\DimensionResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\ModelSpace\MTextResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\PaperSpaceTargetResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\PaperSpace\DbTextResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\PaperSpace\MTextResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\PaperSpace\TableCellResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\RevisionTargetResolver.cs" />
+    <Compile Include="QuickRevision\Resolvers\TextGeometryHelper.cs" />
+    <Compile Include="QuickRevision\Resolvers\ViewportTargetResolver.cs" />
+    <Compile Include="QuickRevision\Services\QuickRevisionClearService.cs" />
+    <Compile Include="QuickRevision\Services\QuickRevisionService.cs" />
+    <Compile Include="QuickRevision\Viewports\ViewportCoordinateConverter.cs" />
+    <Compile Include="QuickRevision\Viewports\ViewportResolver.cs" />
+    <Compile Include="QuickRevision\Writers\ProjectNumberWriter.cs" />
+    <Compile Include="QuickRevision\Writers\ReplacementTextWriter.cs" />
+    <Compile Include="QuickRevision\Writers\RevisionEntityHelper.cs" />
+    <Compile Include="QuickRevision\Writers\StrikeLineWriter.cs" />
     <Compile Include="Readers\CadTableReader.cs" />
     <Compile Include="Readers\DrawingFrameReader.cs" />
     <Compile Include="Readers\FileNameDrawingNumberReader.cs" />
