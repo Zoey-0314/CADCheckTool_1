@@ -393,6 +393,120 @@ namespace Correct_test1.Markers
             }
         }
 
+        /// <summary>
+        /// 为“归档中不存在”的NS非标件创建标记。
+        ///
+        /// 继续使用：
+        /// CADCHECK_MARKER
+        ///
+        /// 因此原有“清除检查标记”
+        /// 可以统一清除这些标记。
+        /// </summary>
+        public void CreateNonStandardArchiveMarkers(
+            Database database,
+            List<NonStandardArchiveCheckResult> results)
+        {
+            if (database == null ||
+                results == null ||
+                results.Count == 0)
+            {
+                return;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
+
+
+                    RegisterXDataApp(
+                        database,
+                        transaction);
+
+
+                    StandardPartMarker marker =
+                        new StandardPartMarker();
+
+
+                    foreach (
+                        NonStandardArchiveCheckResult result
+                        in results)
+                    {
+                        if (result == null ||
+                            result.BomItem == null)
+                        {
+                            continue;
+                        }
+
+
+                        //--------------------------------
+                        // 标记放在Part No.单元格旁边
+                        //--------------------------------
+
+                        MarkerInfo info =
+                            new MarkerInfo
+                            {
+                                Text =
+                                    result.Message,
+
+                                Position =
+                                    result
+                                        .BomItem
+                                        .PartNumberCellPosition
+                            };
+
+
+                        //--------------------------------
+                        // 找到这个BOM真正所在的Layout
+                        //--------------------------------
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                result.SourceLayoutName);
+
+
+                        //--------------------------------
+                        // 复用StandardPartMarker绘图。
+                        //
+                        // 只改变XData类型。
+                        //--------------------------------
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            info,
+                            "NonStandardArchive");
+                    }
+
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateNonStandardArchiveMarkers");
+            }
+        }
         private static void RegisterXDataApp(Database database, Transaction transaction)
         {
             RegAppTable table = transaction.GetObject(database.RegAppTableId, OpenMode.ForRead) as RegAppTable;

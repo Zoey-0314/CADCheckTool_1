@@ -9,11 +9,12 @@ namespace Correct_test1.Markers
     public class StandardPartMarker : MarkerBase
     {
         public void Create(
-            Database database,
-            Transaction transaction,
-            ObjectId spaceId,
-            ObjectId layerId,
-            MarkerInfo info)
+    Database database,
+    Transaction transaction,
+    ObjectId spaceId,
+    ObjectId layerId,
+    MarkerInfo info,
+    string markerType = "StandardPart")
         {
             if (database == null ||
                 transaction == null ||
@@ -73,8 +74,10 @@ namespace Correct_test1.Markers
                             (int)DxfCode.ExtendedDataRegAppName,
                             MarkerManager.XDataAppName),
                         new TypedValue(
-                            (int)DxfCode.ExtendedDataAsciiString,
-                            "StandardPart")))
+    (int)DxfCode.ExtendedDataAsciiString,
+    string.IsNullOrWhiteSpace(markerType)
+        ? "StandardPart"
+        : markerType)))
                 {
                     text.XData = xdata;
                 }

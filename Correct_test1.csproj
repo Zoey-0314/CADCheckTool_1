@@ -100,12 +100,16 @@
     <Compile Include="Checks\BomStandardPartChecker.cs" />
     <Compile Include="Checks\BomTableRecognizer.cs" />
     <Compile Include="Checks\CheckService.cs" />
+    <Compile Include="Checks\NonStandardArchiveChecker.cs" />
     <Compile Include="Checks\TitleBlockChecker.cs" />
     <Compile Include="Checks\TitleBlockCheckManager.cs" />
     <Compile Include="Configs\MarkerConfig.cs" />
     <Compile Include="Configs\BomConfig.cs" />
+    <Compile Include="Configs\NonStandardArchiveConfig.cs" />
     <Compile Include="Configs\TitleBlockHorizontalConfig.cs" />
     <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
+    <Compile Include="Core\NonStandardArchiveCache.cs" />
+    <Compile Include="Core\NonStandardArchiveIndex.cs" />
     <Compile Include="Installer\CADCheckToolInstaller.cs" />
     <Compile Include="Installer\CADPluginRegistryManager.cs" />
     <Compile Include="Core\AppLogger.cs" />
@@ -158,6 +162,7 @@
     <Compile Include="Models\DrawingInfo.cs" />
     <Compile Include="Models\LayoutInfo.cs" />
     <Compile Include="Models\MarkerInfo.cs" />
+    <Compile Include="Models\NonStandardArchiveCheckResult.cs" />
     <Compile Include="Models\PartNumberType.cs" />
     <Compile Include="Models\ProjectNumberLocation.cs" />
     <Compile Include="Models\RevisionCheckIssue.cs" />
