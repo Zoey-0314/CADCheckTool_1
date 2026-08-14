@@ -1,47 +1,66 @@
 ﻿using Autodesk.AutoCAD.Runtime;
 
+using Correct_test1.Configs;
+
 namespace Correct_test1.Core
 {
-    /// <summary>
-    /// CADCheckTool插件生命周期入口。
-    ///
-    /// NETLOAD或AutoCAD自动加载插件后，
-    /// Initialize会执行一次。
-    /// </summary>
     public class PluginInitializer :
         IExtensionApplication
     {
         public void Initialize()
         {
+            //--------------------------------
+            // 三件事：
+            //
+            // 1. 读取用户路径配置
+            // 2. 后台预加载归档索引
+            // 3. 后台预加载标准件Excel
+            //--------------------------------
+
             try
             {
-                //--------------------------------
-                // 不等待。
-                //
-                // AutoCAD继续正常启动，
-                // Z盘归档索引在后台建立。
-                //--------------------------------
-
-                NonStandardArchiveCache
-                    .Preload();
-
-
-                AppLogger.Info(
-                    "CADCheckTool初始化完成，"
-                    + "非标归档索引已开始后台预加载。",
-                    "PluginInitializer");
+                AppPathConfig
+                    .Initialize();
             }
             catch (System.Exception ex)
             {
-                //--------------------------------
-                // Z盘索引失败不能导致整个插件
-                // 加载失败。
-                //--------------------------------
-
                 AppLogger.Error(
                     ex,
-                    "PluginInitializer.Initialize");
+                    "PluginInitializer.PathConfig");
             }
+
+
+            try
+            {
+                NonStandardArchiveCache
+                    .Preload();
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "PluginInitializer.ArchivePreload");
+            }
+
+
+            try
+            {
+                StandardPartDatabase
+                    .PreloadAsync();
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "PluginInitializer.StandardPartPreload");
+            }
+
+
+            AppLogger.Info(
+                "CADCheckTool初始化完成。"
+                + "归档索引和标准件数据库"
+                + "已开始后台预加载。",
+                "PluginInitializer");
         }
 
 

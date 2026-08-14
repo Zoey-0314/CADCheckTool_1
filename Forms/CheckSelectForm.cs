@@ -11,13 +11,10 @@ namespace Correct_test1
         }
 
 
-        /// <summary>
-        /// 进入单张图纸检查。
-        ///
-        /// SingleCheckForm必须使用AutoCAD的
-        /// Modeless方式打开，
-        /// 因为快速划改需要继续操作CAD图面。
-        /// </summary>
+        //==================================================
+        // 单张检查
+        //==================================================
+
         private void btnSingle_Click(
             object sender,
             EventArgs e)
@@ -37,7 +34,7 @@ namespace Correct_test1
 
                 //--------------------------------
                 // SingleCheckForm关闭以后，
-                // 回到检查模式选择窗口。
+                // 回到检查模式选择窗口
                 //--------------------------------
 
                 form.FormClosed +=
@@ -58,15 +55,7 @@ namespace Correct_test1
 
 
                 //--------------------------------
-                // 关键：
-                //
-                // 不再使用：
-                // form.ShowDialog(this);
-                //
-                // 改成AutoCAD的Modeless窗口。
-                //
-                // 这样QREVMODE运行时，
-                // 用户仍然可以操作CAD图面。
+                // 使用AutoCAD Modeless窗口
                 //--------------------------------
 
                 Autodesk.AutoCAD
@@ -77,11 +66,6 @@ namespace Correct_test1
             }
             catch (Exception ex)
             {
-                //--------------------------------
-                // 如果打开失败，
-                // 把选择窗口恢复。
-                //--------------------------------
-
                 try
                 {
                     this.Show();
@@ -99,12 +83,10 @@ namespace Correct_test1
         }
 
 
-        /// <summary>
-        /// 进入批量检查。
-        ///
-        /// 批量检查不需要图面连续交互，
-        /// 暂时保持原有逻辑。
-        /// </summary>
+        //==================================================
+        // 批量检查
+        //==================================================
+
         private void btnBatch_Click(
             object sender,
             EventArgs e)
@@ -140,6 +122,41 @@ namespace Correct_test1
                 MessageBox.Show(
                     "BatchCheckForm is not available yet.",
                     "Info");
+            }
+        }
+
+
+        //==================================================
+        // 路径设置
+        //==================================================
+
+        /// <summary>
+        /// 打开路径设置窗口。
+        ///
+        /// 可以修改：
+        /// 1. 非标归档图纸目录
+        /// 2. 诺升标准件数据库Excel路径
+        /// </summary>
+        private void btnPathSettings_Click(
+            object sender,
+            EventArgs e)
+        {
+            try
+            {
+                using (
+                    PathSettingsForm form =
+                        new PathSettingsForm())
+                {
+                    form.ShowDialog(
+                        this);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "无法打开路径设置："
+                    + ex.Message,
+                    "CAD检查助手");
             }
         }
     }

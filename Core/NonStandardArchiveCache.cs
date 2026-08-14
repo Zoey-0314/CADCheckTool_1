@@ -227,15 +227,58 @@ namespace Correct_test1.Core
         {
             lock (SyncRoot)
             {
-                if (IsLoadingNoLock())
+                //--------------------------------
+                // 当前没有加载：
+                // 直接按最新配置刷新。
+                //--------------------------------
+
+                if (!IsLoadingNoLock())
+                {
+                    StartBuildNoLock();
+
+                    return;
+                }
+
+
+                //--------------------------------
+                // 当前正在加载：
+                //
+                // 不丢掉用户的新路径。
+                //
+                // 当前任务完成以后，
+                // 自动再按照最新配置建立一次。
+                //--------------------------------
+
+                if (_refreshQueued)
                     return;
 
 
-                StartBuildNoLock();
+                _refreshQueued =
+                    true;
+
+
+                Task<NonStandardArchiveIndex>
+                    currentTask =
+                        _loadTask;
+
+
+                currentTask.ContinueWith(
+                    task =>
+                    {
+                        lock (SyncRoot)
+                        {
+                            _refreshQueued =
+                                false;
+
+
+                            StartBuildNoLock();
+                        }
+                    });
             }
         }
 
-
+        private static bool
+    _refreshQueued;
         /// <summary>
         /// 启动一次后台扫描。
         ///
