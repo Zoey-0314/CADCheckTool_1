@@ -325,12 +325,41 @@ namespace Correct_test1
         /// 关闭窗口
         /// </summary>
         private void btnClose_Click(
-            object sender,
-            EventArgs e)
+    object sender,
+    EventArgs e)
         {
+            try
+            {
+                Document doc =
+                    Autodesk.AutoCAD
+                        .ApplicationServices
+                        .Application
+                        .DocumentManager
+                        .MdiActiveDocument;
 
-            Close();
 
+                if (doc != null)
+                {
+                    //--------------------------------
+                    // 两个Ctrl+C字符。
+                    //
+                    // 如果当前QREVMODE正在等待选点，
+                    // 相当于Esc取消当前CAD命令。
+                    //--------------------------------
+
+                    doc.SendStringToExecute(
+                        "\x03\x03",
+                        true,
+                        false,
+                        false);
+                }
+            }
+            catch
+            {
+            }
+
+
+            this.Close();
         }
 
     }
