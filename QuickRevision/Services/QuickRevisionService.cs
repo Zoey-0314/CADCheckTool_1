@@ -548,22 +548,42 @@ namespace Correct_test1.QuickRevision.Services
                     // 所有需要的对象全部成功
                     //--------------------------------
 
+                    //--------------------------------
+                    // 在Commit前把当前事务中的图形变化
+                    // 加入AutoCAD图形刷新队列。
+                    //
+                    // 连续模式下如果不做这一层，
+                    // 下一次GetPoint可能立即开始，
+                    // 新生成的线和文字暂时不会显示。
+                    //--------------------------------
+
+                    try
+                    {
+                        database
+                            .TransactionManager
+                            .QueueForGraphicsFlush();
+                    }
+                    catch (System.Exception)
+                    {
+                        // 图形刷新失败不影响数据库提交
+                    }
+
+
                     transaction.Commit();
                 }
             }
 
 
             //--------------------------------
-            // 刷新显示
+            // 强制立即刷新图面
+            //
+            // 目的：
+            // 每完成一次划改，就马上看到这一次结果，
+            // 然后才进入下一次选择。
             //--------------------------------
 
-            try
-            {
-                editor.Regen();
-            }
-            catch (System.Exception)
-            {
-            }
+            RefreshDrawingImmediately(
+                editor);
 
 
             //--------------------------------
@@ -590,6 +610,77 @@ namespace Correct_test1.QuickRevision.Services
             return true;
         }
 
+        /// <summary>
+        /// 强制立即刷新AutoCAD图面。
+        ///
+        /// 连续快速划改时：
+        ///
+        /// 第1次划改
+        /// ↓
+        /// Commit
+        /// ↓
+        /// 立即显示删除线/新文字
+        /// ↓
+        /// 才进入第2次选择
+        ///
+        /// 避免必须按Esc后才一次性看到全部修改。
+        /// </summary>
+        private static void RefreshDrawingImmediately(
+            Editor editor)
+        {
+            if (editor == null)
+                return;
+
+
+            //--------------------------------
+            // 1. Regen
+            //
+            // 重新生成当前图形对象和显示数据。
+            //--------------------------------
+
+            try
+            {
+                editor.Regen();
+            }
+            catch (System.Exception)
+            {
+            }
+
+
+            //--------------------------------
+            // 2. 刷新当前Document窗口
+            //--------------------------------
+
+            try
+            {
+                editor.UpdateScreen();
+            }
+            catch (System.Exception)
+            {
+            }
+
+
+            //--------------------------------
+            // 3. 刷新整个AutoCAD应用窗口
+            //
+            // 注意QuickRevisionService中有：
+            // using System.Windows.Forms;
+            //
+            // 所以这里必须写完整命名空间，
+            // 否则Application会产生歧义。
+            //--------------------------------
+
+            try
+            {
+                Autodesk.AutoCAD
+                    .ApplicationServices
+                    .Application
+                    .UpdateScreen();
+            }
+            catch (System.Exception)
+            {
+            }
+        }
         /// <summary>
         /// 连续快速划改模式。
         ///
