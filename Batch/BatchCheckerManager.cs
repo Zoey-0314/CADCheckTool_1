@@ -404,17 +404,20 @@ namespace Correct_test1.Batch
 
                     if (report.BomCalloutResult != null)
                     {
-                        markerManager.CreateMissingCalloutMarkers(
-                            db,
-                            report.BomCalloutResult.MissingCallouts,
-                            report.Boms
-                        );
+                        markerManager
+                            .CreateMissingCalloutMarkers(
+                                db,
+                                report
+                                    .BomCalloutResult
+                                    .MissingIssues);
 
-                        markerManager.CreateExtraCalloutMarkers(
-                            db,
-                            report.BomCalloutResult.ExtraCallouts,
-                            report.DrawingTexts
-                        );
+
+                        markerManager
+                            .CreateExtraCalloutMarkers(
+                                db,
+                                report
+                                    .BomCalloutResult
+                                    .ExtraIssues);
                     }
 
                     //--------------------------------
