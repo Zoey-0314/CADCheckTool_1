@@ -33,6 +33,45 @@ namespace Correct_test1
 
             try
             {
+                //==================================================
+                // 选择批量检查模式
+                //==================================================
+
+                DialogResult modeResult =
+                    MessageBox.Show(
+                        "请选择批量检查模式：\n\n"
+                        + "【是】检查并修改\n"
+                        + "自动修正页码、写入检查标记并保存DWG。\n\n"
+                        + "【否】只检查\n"
+                        + "只生成CSV报告，不修改任何DWG。\n"
+                        + "大量图纸测试推荐使用此模式。\n\n"
+                        + "【取消】退出",
+
+                        "批量检查模式",
+
+                        MessageBoxButtons
+                            .YesNoCancel,
+
+                        MessageBoxIcon
+                            .Question);
+
+
+                if (modeResult ==
+                    DialogResult.Cancel)
+                {
+                    return;
+                }
+
+
+                BatchCheckMode mode =
+                    modeResult ==
+                    DialogResult.Yes
+
+                        ? BatchCheckMode
+                            .ApplyChanges
+
+                        : BatchCheckMode
+                            .ReportOnly;
 
                 FolderBrowserDialog dialog =
                     new FolderBrowserDialog();
@@ -61,19 +100,16 @@ namespace Correct_test1
 
                 List<CheckResult> results =
                     manager.CheckFolder(
-
                         folderPath,
 
                         (percent, total, name) =>
                         {
-
                             progressForm.UpdateProgress(
                                 percent,
-                                name
-                            );
+                                name);
+                        },
 
-                        }
-
+                        mode
                     );
 
                 //关闭进度窗口
@@ -97,9 +133,18 @@ namespace Correct_test1
                 DialogResult dr =
                     MessageBox.Show(
 
-                        "批量检查完成\n\n"
-                        +
-                        "问题数量："
+"批量检查完成\n\n"
++
+"运行模式："
++
+(
+    mode ==
+    BatchCheckMode.ApplyChanges
+        ? "检查并修改"
+        : "只检查（原DWG未修改）"
+)
++
+"\n\n问题数量："
                         +
                         results.Count
                         +

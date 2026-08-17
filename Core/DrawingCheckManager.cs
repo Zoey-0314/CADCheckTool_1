@@ -20,7 +20,8 @@ namespace Correct_test1.Core
             Database db,
             string filePath,
             bool drawMarker,
-            List<BomData> boms = null)
+            List<BomData> boms = null,
+            bool allowAutoFix = true)
         {
             List<CheckResult> results = new List<CheckResult>();
 
@@ -121,15 +122,16 @@ namespace Correct_test1.Core
 
                 List<CheckResult> titleResults =
                     titleManager.Check(
-                     db,
-                     layout,
-                     filePath,
-                     fileName,
-                     drawMarker,
-                     currentPage,
-                     totalPages,
-                     boms
-                        );
+                        db,
+                        layout,
+                        filePath,
+                        fileName,
+                        drawMarker,
+                        currentPage,
+                        totalPages,
+                        boms,
+                        allowAutoFix
+                    );
 
 
                 results.AddRange(
