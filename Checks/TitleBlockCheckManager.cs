@@ -71,7 +71,8 @@ namespace Correct_test1.Checks
             bool drawMarker,
             int expectedPage = 0,
             int expectedPageCount = 0,
-            List<BomData> boms = null)
+            List<BomData> boms = null,
+            bool allowAutoFix = true)
         {
 
 
@@ -186,11 +187,31 @@ namespace Correct_test1.Checks
 
 
                 bool corrected =
-                    TryCorrectPageNumber(
-                        db,
-                        texts,
-                        isHorizontal,
-                        expectedPageText);
+                    false;
+
+
+                //==================================================
+                // 只有明确允许修改时，
+                // 才真正写入页码。
+                //
+                // ReportOnly模式：
+                //
+                // 只报告：
+                // 当前页码错误
+                // 正确页码应该是什么
+                //
+                // 绝不修改CAD实体。
+                //==================================================
+
+                if (allowAutoFix)
+                {
+                    corrected =
+                        TryCorrectPageNumber(
+                            db,
+                            texts,
+                            isHorizontal,
+                            expectedPageText);
+                }
 
 
                 if (corrected)

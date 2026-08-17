@@ -304,8 +304,7 @@ namespace Correct_test1
                             doc.Database,
                             report
                                 .BomCalloutResult
-                                .MissingCallouts,
-                            report.Boms);
+                                .MissingIssues);
 
 
                     //--------------------------------
@@ -318,8 +317,7 @@ namespace Correct_test1
                             doc.Database,
                             report
                                 .BomCalloutResult
-                                .ExtraCallouts,
-                            report.DrawingTexts);
+                                .ExtraIssues);
                 }
 
 

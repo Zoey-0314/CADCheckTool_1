@@ -598,7 +598,194 @@ namespace Correct_test1.Markers
                 return count;
             }
         }
+        //==================================================
+        // 新版：
+        // 根据已经绑定Layout的Issue绘制缺少序号Marker。
+        //==================================================
 
+        public void CreateMissingCalloutMarkers(
+            Database database,
+            List<BomCalloutIssue> issues)
+        {
+            if (database == null ||
+                issues == null ||
+                issues.Count == 0)
+            {
+                return;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
+
+
+                    RegisterXDataApp(
+                        database,
+                        transaction);
+
+
+                    BomCalloutMarker marker =
+                        new BomCalloutMarker();
+
+
+                    foreach (
+                        BomCalloutIssue issue
+                        in issues)
+                    {
+                        if (issue == null ||
+                            string.IsNullOrWhiteSpace(
+                                issue.LayoutName))
+                        {
+                            continue;
+                        }
+
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                issue.LayoutName);
+
+
+                        if (spaceId.IsNull ||
+                            !spaceId.IsValid)
+                        {
+                            continue;
+                        }
+
+
+                        issue.SpaceId =
+                            spaceId;
+
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            issue);
+                    }
+
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateMissingCalloutMarkers");
+            }
+        }
+        //==================================================
+        // 新版：
+        // 图中多余序号已经绑定所属Layout和位置。
+        //
+        // 实体本身位于ModelSpace，
+        // 所以Marker仍然画到ModelSpace。
+        //==================================================
+
+        public void CreateExtraCalloutMarkers(
+            Database database,
+            List<BomCalloutIssue> issues)
+        {
+            if (database == null ||
+                issues == null ||
+                issues.Count == 0)
+            {
+                return;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
+
+
+                    RegisterXDataApp(
+                        database,
+                        transaction);
+
+
+                    BomCalloutMarker marker =
+                        new BomCalloutMarker();
+
+
+                    ObjectId modelSpaceId =
+                        SymbolUtilityServices
+                            .GetBlockModelSpaceId(
+                                database);
+
+
+                    if (modelSpaceId.IsNull ||
+                        !modelSpaceId.IsValid)
+                    {
+                        return;
+                    }
+
+
+                    foreach (
+                        BomCalloutIssue issue
+                        in issues)
+                    {
+                        if (issue == null)
+                        {
+                            continue;
+                        }
+
+
+                        issue.SpaceId =
+                            modelSpaceId;
+
+
+                        marker.CreateExtraMarker(
+                            database,
+                            transaction,
+                            modelSpaceId,
+                            layerId,
+                            issue);
+                    }
+
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateExtraCalloutMarkers");
+            }
+        }
         public void ClearMarkers(Database database)
         {
             if (database == null)
