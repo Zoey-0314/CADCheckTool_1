@@ -86,6 +86,19 @@ namespace Correct_test1.Models
         =
         new List<NonStandardArchiveCheckResult>();
 
+        //==================================================
+        // 非标件号检查
+        //==================================================
+
+        public List<NonStandardPartNumberCheckResult>
+            NonStandardPartNumberResults
+        {
+            get;
+            set;
+        }
+        =
+        new List<NonStandardPartNumberCheckResult>();
+
 
         public bool NonStandardArchiveAvailable
         {

@@ -12,6 +12,20 @@
 
         public int PartNumberColumn { get; set; } = -1;
 
+        /// <summary>
+        /// 可选的P/N列。
+        ///
+        /// 有些BOM没有这一列，
+        /// 所以不能加入IsValid()必填判断。
+        /// </summary>
+        public int PartNumberSuffixColumn
+        {
+            get;
+            set;
+        }
+        =
+        -1;
+
 
         public int NameColumn { get; set; } = -1;
 

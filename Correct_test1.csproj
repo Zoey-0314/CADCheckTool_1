@@ -101,6 +101,7 @@
     <Compile Include="Checks\BomTableRecognizer.cs" />
     <Compile Include="Checks\CheckService.cs" />
     <Compile Include="Checks\NonStandardArchiveChecker.cs" />
+    <Compile Include="Checks\NonStandardPartNumberChecker.cs" />
     <Compile Include="Checks\TitleBlockChecker.cs" />
     <Compile Include="Checks\TitleBlockCheckManager.cs" />
     <Compile Include="Configs\AppPathConfig.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
     <Compile Include="Core\NonStandardArchiveCache.cs" />
     <Compile Include="Core\NonStandardArchiveIndex.cs" />
+    <Compile Include="Core\NonStandardPartNumberInspectionCache.cs" />
     <Compile Include="Core\TitleBlockOrientationDetector.cs" />
     <Compile Include="Forms\PathSettingsForm.cs">
       <SubType>Form</SubType>
@@ -178,6 +180,7 @@
     <Compile Include="Models\LayoutInfo.cs" />
     <Compile Include="Models\MarkerInfo.cs" />
     <Compile Include="Models\NonStandardArchiveCheckResult.cs" />
+    <Compile Include="Models\NonStandardPartNumberCheckResult.cs" />
     <Compile Include="Models\PartNumberType.cs" />
     <Compile Include="Models\ProjectNumberLocation.cs" />
     <Compile Include="Models\RevisionCheckIssue.cs" />
@@ -231,6 +234,7 @@
     <Compile Include="Readers\FileNameDrawingNumberReader.cs" />
     <Compile Include="Readers\FileNameProjectReader.cs" />
     <Compile Include="Readers\LayoutReader.cs" />
+    <Compile Include="Readers\NonStandardPartNumberLayoutReader.cs" />
     <Compile Include="Readers\ProjectReader.cs" />
     <Compile Include="Readers\RevisionLocationReader.cs" />
     <Compile Include="Readers\RevisionTableReader.cs" />

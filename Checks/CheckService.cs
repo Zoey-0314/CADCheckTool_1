@@ -187,6 +187,14 @@ namespace Correct_test1.Checks
                     nonStandardArchiveChecker =
                         new NonStandardArchiveChecker();
 
+                //--------------------------------
+                // 新增：非标件号存在性检查
+                //--------------------------------
+
+                NonStandardPartNumberChecker
+                    nonStandardPartNumberChecker =
+                        new NonStandardPartNumberChecker();
+
 
                 List<CadTableData> tables =
                     tableReader.Read(
@@ -202,9 +210,13 @@ namespace Correct_test1.Checks
                 //==================================================
 
                 foreach (
-                    CadTableData table
-                    in tables)
+    CadTableData table
+    in tables)
                 {
+                    //--------------------------------
+                    // 不是BOM表则跳过
+                    //--------------------------------
+
                     if (!recognizer.IsBom(
                             table))
                     {
@@ -212,18 +224,32 @@ namespace Correct_test1.Checks
                     }
 
 
+                    //--------------------------------
+                    // 解析BOM
+                    //--------------------------------
+
                     BomData bom =
                         recognizer.Parse(
                             table);
 
 
+                    if (bom == null)
+                    {
+                        continue;
+                    }
+
+
+                    //--------------------------------
+                    // 保存BOM
+                    //--------------------------------
+
                     boms.Add(
                         bom);
 
 
-                    //--------------------------------
-                    // 图号
-                    //--------------------------------
+                    //==================================================
+                    // 当前图纸图号
+                    //==================================================
 
                     if (string.IsNullOrEmpty(
                             report.DrawingNumber) &&
@@ -239,9 +265,9 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //--------------------------------
+                    //==================================================
                     // 原有标准件检查
-                    //--------------------------------
+                    //==================================================
 
                     if (report
                         .StandardPartDatabaseAvailable)
@@ -252,9 +278,15 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //--------------------------------
-                    // 原有NS归档检查
-                    //--------------------------------
+                    //==================================================
+                    // 原有NS非标归档存在性检查
+                    //
+                    // 例如：
+                    //
+                    // NS333T1
+                    // ↓
+                    // 检查Z盘是否存在NS333T对应归档文件
+                    //==================================================
 
                     if (report
                         .NonStandardArchiveAvailable)
@@ -267,7 +299,48 @@ namespace Correct_test1.Checks
                                         bom,
                                         archiveIndex));
                     }
+
+
+                    //==================================================
+                    // 新增：NS非标件号存在性检查
+                    //
+                    // 例如：
+                    //
+                    // BOM：
+                    // NS333T1
+                    //
+                    // ↓
+                    //
+                    // 找：
+                    // NS333T + 当前项目号 的归档DWG
+                    //
+                    // ↓
+                    //
+                    // 打开归档DWG所有Layout
+                    //
+                    // ↓
+                    //
+                    // 查找：
+                    //
+                    // NS333T    _1
+                    // 重量
+                    // 备注
+                    //==================================================
+
+                    if (report
+                        .NonStandardArchiveAvailable)
+                    {
+                        report
+                            .NonStandardPartNumberResults
+                            .AddRange(
+                                nonStandardPartNumberChecker
+                                    .Check(
+                                        bom,
+                                        database.Filename,
+                                        archiveIndex));
+                    }
                 }
+
 
 
                 //==================================================

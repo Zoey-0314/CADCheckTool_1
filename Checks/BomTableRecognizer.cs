@@ -142,6 +142,29 @@ namespace Correct_test1.Checks
                         r,
                         mapping.QuantityColumn);
 
+                //--------------------------------
+                // 可选P/N列
+                //--------------------------------
+
+                if (mapping.PartNumberSuffixColumn >= 0)
+                {
+                    item.PartNumberSuffix =
+                        CadTextCleaner.Clean(
+                            table.GetCell(
+                                r,
+                                mapping.PartNumberSuffixColumn));
+
+
+                    item.PartNumberSuffixColumn =
+                        mapping.PartNumberSuffixColumn;
+
+
+                    item.PartNumberSuffixCellPosition =
+                        table.GetCellPosition(
+                            r,
+                            mapping.PartNumberSuffixColumn);
+                }
+
                 item.BomRow = r;
                 item.NoColumn = mapping.NoColumn;
                 item.PartNumberColumn = mapping.PartNumberColumn;
@@ -323,6 +346,16 @@ namespace Correct_test1.Checks
                         headerRow,
                         c);
 
+                //--------------------------------
+                // 可选P/N列
+                //--------------------------------
+
+                if (IsPartNumberSuffixHeader(
+                        header))
+                {
+                    mapping.PartNumberSuffixColumn =
+                        c;
+                }
 
 
                 if (IsHeader(
@@ -375,7 +408,33 @@ namespace Correct_test1.Checks
 
         #region 图号提取
 
+        private bool IsPartNumberSuffixHeader(
+    string value)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    value))
+            {
+                return false;
+            }
 
+
+            string text =
+                value
+                    .Trim()
+                    .ToUpperInvariant()
+                    .Replace(
+                        " ",
+                        "")
+                    .Replace(
+                        "／",
+                        "/");
+
+
+            return
+                text == "P/N"
+                ||
+                text == "PN";
+        }
         /// <summary>
         /// 提取图号
         ///

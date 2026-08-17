@@ -377,6 +377,19 @@ namespace Correct_test1.Batch
                                 db,
                                 report.NonStandardArchiveResults);
                     }
+
+                    //--------------------------------
+                    // 非标件号检查标记
+                    //--------------------------------
+
+                    if (report.NonStandardPartNumberResults != null)
+                    {
+                        markerManager
+                            .CreateNonStandardPartNumberMarkers(
+                                db,
+                                report.NonStandardPartNumberResults);
+                    }
+
                     //--------------------------------
                     // 版本号检查标记
                     //--------------------------------
@@ -539,6 +552,96 @@ namespace Correct_test1.Batch
 
                                     Message =
                                         archiveResult.Message,
+
+                                    IsError =
+                                        true
+                                });
+                        }
+                    }
+                    //--------------------------------
+                    // 非标件号检查结果
+                    //--------------------------------
+
+                    if (report.NonStandardPartNumberResults != null)
+                    {
+                        foreach (
+                            NonStandardPartNumberCheckResult partResult
+                            in report.NonStandardPartNumberResults)
+                        {
+                            if (partResult == null)
+                            {
+                                continue;
+                            }
+
+
+                            BomItem item =
+                                partResult.BomItem;
+
+
+                            results.Add(
+                                new CheckResult
+                                {
+                                    FilePath =
+                                        file,
+
+                                    FileName =
+                                        Path.GetFileName(
+                                            file),
+
+                                    LayoutName =
+                                        partResult
+                                            .SourceLayoutName,
+
+                                    DrawingNumber =
+                                        partResult
+                                            .DrawingNumber,
+
+                                    //--------------------------------
+                                    // 当前BOM中的完整件号
+                                    //
+                                    // NS333T1
+                                    //--------------------------------
+
+                                    PartNumber =
+                                        partResult
+                                            .OriginalPartNumber,
+
+                                    PartName =
+                                        item == null
+                                            ? ""
+                                            : item.Name,
+
+                                    Type =
+                                        "非标件号检查",
+
+                                    ObjectName =
+                                        "非标件号",
+
+                                    CurrentValue =
+                                        partResult
+                                            .OriginalPartNumber,
+
+                                    //--------------------------------
+                                    // 正确要求：
+                                    //
+                                    // NS333T + _1
+                                    //--------------------------------
+
+                                    ExpectedValue =
+                                        partResult
+                                            .ArchiveDrawingNumber
+                                        + " + _"
+                                        + partResult
+                                            .PartSuffix,
+
+                                    CorrectValue =
+                                        partResult
+                                            .ArchiveDrawingNumber
+                                        + partResult
+                                            .PartSuffix,
+
+                                    Message =
+                                        partResult.Message,
 
                                     IsError =
                                         true
