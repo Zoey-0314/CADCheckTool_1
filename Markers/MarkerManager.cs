@@ -369,6 +369,11 @@ namespace Correct_test1.Markers
         database,
         transaction,
         location.LayoutName);
+                        if (spaceId.IsNull ||
+    !spaceId.IsValid)
+                        {
+                            continue;
+                        }
 
 
                         marker.Create(
@@ -444,6 +449,13 @@ namespace Correct_test1.Markers
                                 database,
                                 transaction,
                                 issue.LayoutName);
+
+
+                        if (spaceId.IsNull ||
+                            !spaceId.IsValid)
+                        {
+                            continue;
+                        }
 
 
                         BlockTableRecord space =
@@ -989,40 +1001,91 @@ namespace Correct_test1.Markers
         }
 
         private static ObjectId GetLayoutSpaceId(
-            Database database,
-            Transaction transaction,
-            string layoutName)
+    Database database,
+    Transaction transaction,
+    string layoutName)
         {
-            if (string.IsNullOrWhiteSpace(layoutName))
-                return database.CurrentSpaceId;
+            if (database == null ||
+                transaction == null)
+            {
+                return ObjectId.Null;
+            }
+
+
+            //==================================================
+            // Layout来源不明确：
+            //
+            // 宁可不画，
+            // 也绝对不能画到当前Layout。
+            //==================================================
+
+            if (string.IsNullOrWhiteSpace(
+                    layoutName))
+            {
+                AppLogger.Info(
+                    "跳过标记：LayoutName为空",
+                    "MarkerManager.GetLayoutSpaceId");
+
+                return ObjectId.Null;
+            }
+
 
             DBDictionary layoutDictionary =
                 transaction.GetObject(
                     database.LayoutDictionaryId,
-                    OpenMode.ForRead) as DBDictionary;
+                    OpenMode.ForRead)
+                as DBDictionary;
 
-            if (layoutDictionary != null)
+
+            if (layoutDictionary == null)
             {
-                foreach (DBDictionaryEntry entry in layoutDictionary)
-                {
-                    Autodesk.AutoCAD.DatabaseServices.Layout layout =
-                        transaction.GetObject(
-                            entry.Value,
-                            OpenMode.ForRead)
-                        as Autodesk.AutoCAD.DatabaseServices.Layout;
+                return ObjectId.Null;
+            }
 
-                    if (layout != null &&
-                        string.Equals(
-                            layout.LayoutName,
-                            layoutName,
-                            System.StringComparison.OrdinalIgnoreCase))
-                    {
-                        return layout.BlockTableRecordId;
-                    }
+
+            foreach (
+                DBDictionaryEntry entry
+                in layoutDictionary)
+            {
+                Layout layout =
+                    transaction.GetObject(
+                        entry.Value,
+                        OpenMode.ForRead)
+                    as Layout;
+
+
+                if (layout == null)
+                {
+                    continue;
+                }
+
+
+                if (string.Equals(
+                        layout.LayoutName,
+                        layoutName,
+                        System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return
+                        layout.BlockTableRecordId;
                 }
             }
 
-            return database.CurrentSpaceId;
+
+            AppLogger.Info(
+                "跳过标记：找不到Layout："
+                + layoutName,
+                "MarkerManager.GetLayoutSpaceId");
+
+
+            //==================================================
+            // 原来这里是：
+            //
+            // return database.CurrentSpaceId;
+            //
+            // 这就是布局串位的重要来源。
+            //==================================================
+
+            return ObjectId.Null;
         }
 
         private static BomItem FindBomItemByNumber(
