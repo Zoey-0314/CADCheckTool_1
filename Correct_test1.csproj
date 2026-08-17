@@ -245,6 +245,12 @@
     <Compile Include="Readers\TitleBlockRegionParser.cs" />
     <Compile Include="Readers\ViewportLineReader.cs" />
     <Compile Include="Readers\ViewportTextReader.cs" />
+    <Compile Include="VersionCheck\Core\VersionArchiveCache.cs" />
+    <Compile Include="VersionCheck\Core\VersionArchiveIndex.cs" />
+    <Compile Include="VersionCheck\Models\DrawingVersionInfo.cs" />
+    <Compile Include="VersionCheck\Models\VersionCheckResult.cs" />
+    <Compile Include="VersionCheck\Readers\DrawingVersionReader.cs" />
+    <Compile Include="VersionCheck\Services\VersionCheckService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\BatchProgressForm.resx">

@@ -43,6 +43,10 @@ namespace Correct_test1.Configs
             DefaultStandardPartDatabasePath =
                 @"Z:\图号管理\诺升标准件统一命名.xlsx";
 
+        public const string
+    DefaultVersionArchivePath =
+        @"Z:\归档图纸";
+
 
         /// <summary>
         /// 用户配置文件。
@@ -128,7 +132,12 @@ namespace Correct_test1.Configs
                     StandardPartDatabasePath =
                         NormalizePath(
                             settings
-                                .StandardPartDatabasePath)
+                                .StandardPartDatabasePath),
+
+                    VersionArchivePath =
+                        NormalizePath(
+                            settings
+                                .VersionArchivePath)
                 };
 
 
@@ -147,6 +156,13 @@ namespace Correct_test1.Configs
             {
                 throw new InvalidOperationException(
                     "标准件数据库路径不能为空。");
+            }
+            if (string.IsNullOrWhiteSpace(
+        normalized
+            .VersionArchivePath))
+            {
+                throw new InvalidOperationException(
+                    "版本检查归档路径不能为空。");
             }
 
 
@@ -236,24 +252,34 @@ namespace Correct_test1.Configs
                         json,
                         "StandardPartDatabasePath");
 
+                string versionArchivePath =
+    ReadJsonString(
+        json,
+        "VersionArchivePath");
+
 
                 return new AppPathSettings
                 {
                     NonStandardArchivePath =
-                        string.IsNullOrWhiteSpace(
-                            archivePath)
-                            ? defaults
-                                .NonStandardArchivePath
-                            : NormalizePath(
-                                archivePath),
+        string.IsNullOrWhiteSpace(
+            archivePath)
+            ? defaults.NonStandardArchivePath
+            : NormalizePath(
+                archivePath),
 
                     StandardPartDatabasePath =
-                        string.IsNullOrWhiteSpace(
-                            standardPartPath)
-                            ? defaults
-                                .StandardPartDatabasePath
-                            : NormalizePath(
-                                standardPartPath)
+        string.IsNullOrWhiteSpace(
+            standardPartPath)
+            ? defaults.StandardPartDatabasePath
+            : NormalizePath(
+                standardPartPath),
+
+                    VersionArchivePath =
+        string.IsNullOrWhiteSpace(
+            versionArchivePath)
+            ? defaults.VersionArchivePath
+            : NormalizePath(
+                versionArchivePath)
                 };
             }
             catch (Exception ex)
@@ -276,7 +302,7 @@ namespace Correct_test1.Configs
 
 
         private static AppPathSettings
-            CreateDefault()
+    CreateDefault()
         {
             return new AppPathSettings
             {
@@ -284,7 +310,10 @@ namespace Correct_test1.Configs
                     DefaultNonStandardArchivePath,
 
                 StandardPartDatabasePath =
-                    DefaultStandardPartDatabasePath
+                    DefaultStandardPartDatabasePath,
+
+                VersionArchivePath =
+                    DefaultVersionArchivePath
             };
         }
 
@@ -314,14 +343,17 @@ namespace Correct_test1.Configs
                 + Environment.NewLine
                 + "  \"NonStandardArchivePath\": \""
                 + EscapeJson(
-                    settings
-                        .NonStandardArchivePath)
+                    settings.NonStandardArchivePath)
                 + "\","
                 + Environment.NewLine
                 + "  \"StandardPartDatabasePath\": \""
                 + EscapeJson(
-                    settings
-                        .StandardPartDatabasePath)
+                    settings.StandardPartDatabasePath)
+                + "\","
+                + Environment.NewLine
+                + "  \"VersionArchivePath\": \""
+                + EscapeJson(
+                    settings.VersionArchivePath)
                 + "\""
                 + Environment.NewLine
                 + "}"

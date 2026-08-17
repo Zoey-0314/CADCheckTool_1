@@ -9,6 +9,8 @@ using Correct_test1.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Correct_test1.VersionCheck.Core;
+using Correct_test1.VersionCheck.Models;
 
 namespace Correct_test1.Batch
 {
@@ -201,6 +203,52 @@ namespace Correct_test1.Batch
                             true
                     });
             }
+            //--------------------------------
+            // 版本号归档索引
+            //
+            // 整个批量任务只建立/取得一次。
+            //--------------------------------
+
+            VersionArchiveIndex versionArchiveIndex =
+                VersionArchiveCache
+                    .GetOrBuild();
+
+
+            if (versionArchiveIndex == null ||
+                !versionArchiveIndex.IsAvailable)
+            {
+                results.Add(
+                    new CheckResult
+                    {
+                        FilePath =
+                            "",
+
+                        FileName =
+                            "",
+
+                        Type =
+                            "版本号检查",
+
+                        ObjectName =
+                            "版本归档目录",
+
+                        CurrentValue =
+                            versionArchiveIndex == null
+                                ? ""
+                                : versionArchiveIndex.RootPath,
+
+                        ExpectedValue =
+                            "版本归档目录可访问",
+
+                        Message =
+                            versionArchiveIndex == null
+                                ? "版本归档索引未建立。"
+                                : versionArchiveIndex.ErrorMessage,
+
+                        IsError =
+                            true
+                    });
+            }
             foreach (string file in files)
             {
                 Database db = null;
@@ -272,7 +320,8 @@ namespace Correct_test1.Batch
                     CheckReport report =
                         checkService.Check(
                             db,
-                            archiveIndex);
+                            archiveIndex,
+                            versionArchiveIndex);
 
                     if (report == null)
                     {
@@ -327,6 +376,17 @@ namespace Correct_test1.Batch
                             .CreateNonStandardArchiveMarkers(
                                 db,
                                 report.NonStandardArchiveResults);
+                    }
+                    //--------------------------------
+                    // 版本号检查标记
+                    //--------------------------------
+
+                    if (report.VersionCheckResults != null)
+                    {
+                        markerManager
+                            .CreateVersionMarkers(
+                                db,
+                                report.VersionCheckResults);
                     }
 
                     if (report.BomCalloutResult != null)
@@ -479,6 +539,59 @@ namespace Correct_test1.Batch
 
                                     Message =
                                         archiveResult.Message,
+
+                                    IsError =
+                                        true
+                                });
+                        }
+                    }
+                    //--------------------------------
+                    // 版本号检查结果
+                    //--------------------------------
+
+                    if (report.VersionCheckResults != null)
+                    {
+                        foreach (
+                            VersionCheckResult versionResult
+                            in report.VersionCheckResults)
+                        {
+                            if (versionResult == null)
+                                continue;
+
+
+                            results.Add(
+                                new CheckResult
+                                {
+                                    FilePath =
+                                        file,
+
+                                    FileName =
+                                        Path.GetFileName(
+                                            file),
+
+                                    LayoutName =
+                                        versionResult.LayoutName,
+
+                                    DrawingNumber =
+                                        versionResult.DrawingNumber,
+
+                                    Type =
+                                        "版本号检查",
+
+                                    ObjectName =
+                                        "版本号",
+
+                                    CurrentValue =
+                                        versionResult.CurrentVersion,
+
+                                    ExpectedValue =
+                                        versionResult.LatestVersion,
+
+                                    CorrectValue =
+                                        versionResult.LatestVersion,
+
+                                    Message =
+                                        versionResult.Message,
 
                                     IsError =
                                         true
@@ -675,6 +788,7 @@ namespace Correct_test1.Batch
 
             return results;
         }
+
 
         /// <summary>
         /// 确保存在一个有效AutoCAD Document。

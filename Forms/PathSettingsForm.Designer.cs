@@ -32,6 +32,7 @@
             this.btnBrowseArchive =
                 new System.Windows.Forms.Button();
 
+
             this.lblStandardPart =
                 new System.Windows.Forms.Label();
 
@@ -40,6 +41,17 @@
 
             this.btnBrowseStandardPart =
                 new System.Windows.Forms.Button();
+
+
+            this.lblVersionArchive =
+                new System.Windows.Forms.Label();
+
+            this.txtVersionArchivePath =
+                new System.Windows.Forms.TextBox();
+
+            this.btnBrowseVersionArchive =
+                new System.Windows.Forms.Button();
+
 
             this.btnSave =
                 new System.Windows.Forms.Button();
@@ -54,7 +66,10 @@
             this.SuspendLayout();
 
 
-            // lblArchive
+            //==================================================
+            // 非标归档
+            //==================================================
+
             this.lblArchive.AutoSize =
                 true;
 
@@ -67,7 +82,6 @@
                 "非标归档图纸：";
 
 
-            // txtArchivePath
             this.txtArchivePath.Location =
                 new System.Drawing.Point(
                     27,
@@ -79,7 +93,6 @@
                     21);
 
 
-            // btnBrowseArchive
             this.btnBrowseArchive.Location =
                 new System.Drawing.Point(
                     470,
@@ -95,11 +108,13 @@
 
             this.btnBrowseArchive.Click +=
                 new System.EventHandler(
-                    this
-                        .btnBrowseArchive_Click);
+                    this.btnBrowseArchive_Click);
 
 
-            // lblStandardPart
+            //==================================================
+            // 标准件数据库
+            //==================================================
+
             this.lblStandardPart.AutoSize =
                 true;
 
@@ -112,7 +127,6 @@
                 "诺升标准件数据库：";
 
 
-            // txtStandardPartPath
             this.txtStandardPartPath.Location =
                 new System.Drawing.Point(
                     27,
@@ -124,7 +138,6 @@
                     21);
 
 
-            // btnBrowseStandardPart
             this.btnBrowseStandardPart.Location =
                 new System.Drawing.Point(
                     470,
@@ -140,15 +153,62 @@
 
             this.btnBrowseStandardPart.Click +=
                 new System.EventHandler(
-                    this
-                        .btnBrowseStandardPart_Click);
+                    this.btnBrowseStandardPart_Click);
 
 
-            // btnDefault
+            //==================================================
+            // 版本归档
+            //==================================================
+
+            this.lblVersionArchive.AutoSize =
+                true;
+
+            this.lblVersionArchive.Location =
+                new System.Drawing.Point(
+                    24,
+                    159);
+
+            this.lblVersionArchive.Text =
+                "版本检查归档图纸：";
+
+
+            this.txtVersionArchivePath.Location =
+                new System.Drawing.Point(
+                    27,
+                    182);
+
+            this.txtVersionArchivePath.Size =
+                new System.Drawing.Size(
+                    430,
+                    21);
+
+
+            this.btnBrowseVersionArchive.Location =
+                new System.Drawing.Point(
+                    470,
+                    180);
+
+            this.btnBrowseVersionArchive.Size =
+                new System.Drawing.Size(
+                    80,
+                    25);
+
+            this.btnBrowseVersionArchive.Text =
+                "浏览...";
+
+            this.btnBrowseVersionArchive.Click +=
+                new System.EventHandler(
+                    this.btnBrowseVersionArchive_Click);
+
+
+            //==================================================
+            // 按钮
+            //==================================================
+
             this.btnDefault.Location =
                 new System.Drawing.Point(
                     214,
-                    170);
+                    235);
 
             this.btnDefault.Size =
                 new System.Drawing.Size(
@@ -163,11 +223,10 @@
                     this.btnDefault_Click);
 
 
-            // btnSave
             this.btnSave.Location =
                 new System.Drawing.Point(
                     326,
-                    170);
+                    235);
 
             this.btnSave.Size =
                 new System.Drawing.Size(
@@ -182,11 +241,10 @@
                     this.btnSave_Click);
 
 
-            // btnCancel
             this.btnCancel.Location =
                 new System.Drawing.Point(
                     438,
-                    170);
+                    235);
 
             this.btnCancel.Size =
                 new System.Drawing.Size(
@@ -201,7 +259,10 @@
                     this.btnCancel_Click);
 
 
-            // PathSettingsForm
+            //==================================================
+            // Form
+            //==================================================
+
             this.AutoScaleDimensions =
                 new System.Drawing.SizeF(
                     6F,
@@ -212,10 +273,12 @@
                     .AutoScaleMode
                     .Font;
 
+
             this.ClientSize =
                 new System.Drawing.Size(
                     580,
-                    230);
+                    295);
+
 
             this.Controls.Add(
                 this.lblArchive);
@@ -226,6 +289,7 @@
             this.Controls.Add(
                 this.btnBrowseArchive);
 
+
             this.Controls.Add(
                 this.lblStandardPart);
 
@@ -234,6 +298,17 @@
 
             this.Controls.Add(
                 this.btnBrowseStandardPart);
+
+
+            this.Controls.Add(
+                this.lblVersionArchive);
+
+            this.Controls.Add(
+                this.txtVersionArchivePath);
+
+            this.Controls.Add(
+                this.btnBrowseVersionArchive);
+
 
             this.Controls.Add(
                 this.btnDefault);
@@ -244,10 +319,12 @@
             this.Controls.Add(
                 this.btnCancel);
 
+
             this.FormBorderStyle =
                 System.Windows.Forms
                     .FormBorderStyle
                     .FixedDialog;
+
 
             this.MaximizeBox =
                 false;
@@ -255,13 +332,16 @@
             this.MinimizeBox =
                 false;
 
+
             this.StartPosition =
                 System.Windows.Forms
                     .FormStartPosition
                     .CenterParent;
 
+
             this.Name =
                 "PathSettingsForm";
+
 
             this.Text =
                 "CADCheckTool 路径设置";
@@ -283,6 +363,7 @@
         private System.Windows.Forms.Button
             btnBrowseArchive;
 
+
         private System.Windows.Forms.Label
             lblStandardPart;
 
@@ -291,6 +372,17 @@
 
         private System.Windows.Forms.Button
             btnBrowseStandardPart;
+
+
+        private System.Windows.Forms.Label
+            lblVersionArchive;
+
+        private System.Windows.Forms.TextBox
+            txtVersionArchivePath;
+
+        private System.Windows.Forms.Button
+            btnBrowseVersionArchive;
+
 
         private System.Windows.Forms.Button
             btnSave;

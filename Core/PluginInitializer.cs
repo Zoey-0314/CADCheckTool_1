@@ -1,6 +1,8 @@
 ﻿using Autodesk.AutoCAD.Runtime;
 
 using Correct_test1.Configs;
+using Correct_test1.VersionCheck.Core;
+
 
 namespace Correct_test1.Core
 {
@@ -9,13 +11,9 @@ namespace Correct_test1.Core
     {
         public void Initialize()
         {
-            //--------------------------------
-            // 三件事：
-            //
-            // 1. 读取用户路径配置
-            // 2. 后台预加载归档索引
-            // 3. 后台预加载标准件Excel
-            //--------------------------------
+            //==================================================
+            // 1. 路径配置
+            //==================================================
 
             try
             {
@@ -30,6 +28,10 @@ namespace Correct_test1.Core
             }
 
 
+            //==================================================
+            // 2. 非标归档索引
+            //==================================================
+
             try
             {
                 NonStandardArchiveCache
@@ -42,6 +44,27 @@ namespace Correct_test1.Core
                     "PluginInitializer.ArchivePreload");
             }
 
+
+            //==================================================
+            // 3. 版本归档索引
+            //==================================================
+
+            try
+            {
+                VersionArchiveCache
+                    .Preload();
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "PluginInitializer.VersionArchivePreload");
+            }
+
+
+            //==================================================
+            // 4. 标准件数据库
+            //==================================================
 
             try
             {
@@ -58,7 +81,7 @@ namespace Correct_test1.Core
 
             AppLogger.Info(
                 "CADCheckTool初始化完成。"
-                + "归档索引和标准件数据库"
+                + "归档索引、版本索引和标准件数据库"
                 + "已开始后台预加载。",
                 "PluginInitializer");
         }

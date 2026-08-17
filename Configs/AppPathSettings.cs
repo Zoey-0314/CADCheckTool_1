@@ -25,6 +25,16 @@
         }
 
 
+        /// <summary>
+        /// 版本号检查使用的归档图纸目录。
+        /// </summary>
+        public string VersionArchivePath
+        {
+            get;
+            set;
+        }
+
+
         public AppPathSettings Clone()
         {
             return new AppPathSettings
@@ -33,7 +43,10 @@
                     NonStandardArchivePath,
 
                 StandardPartDatabasePath =
-                    StandardPartDatabasePath
+                    StandardPartDatabasePath,
+
+                VersionArchivePath =
+                    VersionArchivePath
             };
         }
     }
