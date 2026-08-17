@@ -44,8 +44,8 @@ namespace Correct_test1.Configs
                 @"Z:\图号管理\诺升标准件统一命名.xlsx";
 
         public const string
-    DefaultVersionArchivePath =
-        @"Z:\归档图纸";
+            DefaultVersionArchivePath =
+                @"Z:\归档图纸";
 
 
         /// <summary>

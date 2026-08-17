@@ -753,21 +753,6 @@ namespace Correct_test1.Readers
         }
         /// <summary>
         /// 解析完整非标件号。
-        ///
-        /// 例如：
-        ///
-        /// NS333H1
-        ///
-        /// ↓
-        ///
-        /// drawingNumber = NS333H
-        /// partSuffix = 1
-        ///
-        /// 也支持：
-        ///
-        /// NS333H12
-        /// ↓
-        /// NS333H + 12
         /// </summary>
         /// 
         private static bool TryReadCombinedPartNumber(
@@ -904,18 +889,6 @@ namespace Correct_test1.Readers
 
         /// <summary>
         /// 判断是否为基础归档图号。
-        ///
-        /// 支持：
-        ///
-        /// NS333T
-        /// NS333D_
-        ///
-        /// 不支持：
-        ///
-        /// NS333H1
-        ///
-        /// 因为NS333H1是
-        /// “图号+件号”组合形式。
         /// </summary>
         private static bool IsBaseDrawingNumber(
             string value)

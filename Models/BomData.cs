@@ -34,6 +34,13 @@ namespace Correct_test1.Models
         }
         =
         "";
+        public bool ProjectNumberAmbiguous
+        {
+            get;
+            set;
+        }
+        =
+        false;
 
         public Point3d DrawingNumberPosition { get; set; }
 /// <summary>

@@ -120,7 +120,8 @@ namespace Correct_test1.Readers
             {
                 return "";
             }
-
+            bom.ProjectNumberAmbiguous =
+    false;
 
             if (string.IsNullOrWhiteSpace(
                     bom.SourceLayoutName))
@@ -318,7 +319,11 @@ namespace Correct_test1.Readers
             // 也不能错误地进入另一个项目的归档。
             //==================================================
 
-            AppLogger.Info(
+            bom.ProjectNumberAmbiguous =
+    true;
+
+
+            AppLogger.Warn(
                 "BOM右侧发现多个不同项目号，"
                 + "Layout="
                 + bom.SourceLayoutName
