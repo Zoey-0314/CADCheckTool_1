@@ -682,7 +682,7 @@ namespace Correct_test1.Batch
         /// 如果用户关闭了最后一张图纸，
         /// 自动建立一个空白图作为稳定宿主。
         /// </summary>
-        private static Document EnsureHostDocument()
+        internal static Document EnsureHostDocument()
         {
             try
             {
