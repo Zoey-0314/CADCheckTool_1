@@ -275,6 +275,15 @@ namespace Correct_test1
                         .CreateNonStandardArchiveMarkers(
                             doc.Database,
                             report.NonStandardArchiveResults);
+
+                    //--------------------------------
+                    // 新增：非标件号检查标记
+                    //--------------------------------
+
+                    markerManager
+                        .CreateNonStandardPartNumberMarkers(
+                            doc.Database,
+                            report.NonStandardPartNumberResults);
                     //--------------------------------
                     // 新增：版本号最新版本提示
                     //--------------------------------

@@ -159,9 +159,9 @@ namespace Correct_test1.Markers
         }
 
         public void CreateMissingCalloutMarkers(
-            Database database,
-            HashSet<int> missingCallouts,
-            List<BomData> boms)
+    Database database,
+    HashSet<int> missingCallouts,
+    List<BomData> boms)
         {
             if (database == null ||
                 missingCallouts == null ||
@@ -172,43 +172,167 @@ namespace Correct_test1.Markers
                 return;
             }
 
+
             try
             {
-                using (Transaction transaction =
-                    database.TransactionManager.StartTransaction())
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
                 {
-                    ObjectId layerId = EnsureLayer(
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
+
+
+                    RegisterXDataApp(
                         database,
-                        transaction,
-                        LayerName,
-                        Color.FromRgb(255, 0, 0));
-                    RegisterXDataApp(database, transaction);
-                    BomCalloutMarker marker = new BomCalloutMarker();
+                        transaction);
 
-                    foreach (int missingNumber in missingCallouts)
+
+                    BomCalloutMarker marker =
+                        new BomCalloutMarker();
+
+
+                    foreach (
+                        int missingNumber
+                        in missingCallouts)
                     {
-                        BomItem matchedItem = FindBomItemByNumber(
-                            boms,
-                            missingNumber);
+                        BomItem matchedItem =
+                            null;
 
-                        if (matchedItem == null)
-                            continue;
 
-                        BomCalloutIssue issue = new BomCalloutIssue
+                        BomData matchedBom =
+                            null;
+
+
+                        //==================================================
+                        // 找到这个序号真正属于哪个BOM、哪个Layout
+                        //==================================================
+
+                        foreach (
+                            BomData bom
+                            in boms)
                         {
-                            Number = missingNumber,
-                            Position = matchedItem.NoCellPosition,
-                            SpaceId = database.CurrentSpaceId,
-                            Message = "图中缺少序号：" + missingNumber
-                        };
+                            if (bom == null ||
+                                bom.Items == null)
+                            {
+                                continue;
+                            }
+
+
+                            foreach (
+                                BomItem item
+                                in bom.Items)
+                            {
+                                if (item == null)
+                                    continue;
+
+
+                                int itemNumber;
+
+
+                                string cleaned =
+                                    CadTextCleaner.Clean(
+                                        item.No);
+
+
+                                if (!int.TryParse(
+                                        cleaned,
+                                        NumberStyles.None,
+                                        CultureInfo.InvariantCulture,
+                                        out itemNumber))
+                                {
+                                    continue;
+                                }
+
+
+                                if (itemNumber !=
+                                    missingNumber)
+                                {
+                                    continue;
+                                }
+
+
+                                matchedItem =
+                                    item;
+
+
+                                matchedBom =
+                                    bom;
+
+
+                                break;
+                            }
+
+
+                            if (matchedItem != null)
+                            {
+                                break;
+                            }
+                        }
+
+
+                        if (matchedItem == null ||
+                            matchedBom == null)
+                        {
+                            continue;
+                        }
+
+
+                        //==================================================
+                        // 关键修正：
+                        //
+                        // 不再使用database.CurrentSpaceId。
+                        //
+                        // 使用这个BOM真正所属的Layout。
+                        //==================================================
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                matchedBom.SourceLayoutName);
+
+
+                        BomCalloutIssue issue =
+                            new BomCalloutIssue
+                            {
+                                Number =
+                                    missingNumber,
+
+                                Position =
+                                    matchedItem
+                                        .NoCellPosition,
+
+                                SpaceId =
+                                    spaceId,
+
+                                LayoutName =
+                                    matchedBom
+                                        .SourceLayoutName,
+
+                                Message =
+                                    "图中缺少序号："
+                                    + missingNumber
+                            };
+
 
                         marker.Create(
                             database,
                             transaction,
-                            database.CurrentSpaceId,
+                            spaceId,
                             layerId,
                             issue);
                     }
+
 
                     transaction.Commit();
                 }
@@ -240,7 +364,20 @@ namespace Correct_test1.Markers
                     {
                         if (!string.Equals(location.ProjectNumber, currentProject, System.StringComparison.OrdinalIgnoreCase))
                             continue;
-                        marker.Create(database, transaction, database.CurrentSpaceId, layerId, location, expectedProject);
+                        ObjectId spaceId =
+    GetLayoutSpaceId(
+        database,
+        transaction,
+        location.LayoutName);
+
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            location,
+                            expectedProject);
                     }
 
                     transaction.Commit();
@@ -252,75 +389,186 @@ namespace Correct_test1.Markers
             }
         }
 
-        public void CreateTextHeightMarkers(Database database, List<TextHeightIssue> issues)
+        public void CreateTextHeightMarkers(
+    Database database,
+    List<TextHeightIssue> issues)
         {
-            if (database == null || issues == null || issues.Count == 0)
+            if (database == null ||
+                issues == null ||
+                issues.Count == 0)
+            {
                 return;
+            }
+
 
             try
             {
-                using (Transaction transaction = database.TransactionManager.StartTransaction())
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
                 {
-                    ObjectId layerId = EnsureLayer(database, transaction, LayerName, Color.FromRgb(255, 0, 0));
-                    RegisterXDataApp(database, transaction);
-                    BlockTableRecord space = transaction.GetObject(
-                        database.CurrentSpaceId,
-                        OpenMode.ForWrite) as BlockTableRecord;
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
 
-                    if (space == null)
-                        return;
 
-                    foreach (TextHeightIssue issue in issues)
+                    RegisterXDataApp(
+                        database,
+                        transaction);
+
+
+                    foreach (
+                        TextHeightIssue issue
+                        in issues)
                     {
                         if (issue == null)
                             continue;
 
-                        Point3d markerPosition = issue.Position;
-                        int markerIndex = 0;
+
+                        //==================================================
+                        // 关键：
+                        //
+                        // 每一个错误都找到它真正所属Layout
+                        //==================================================
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                issue.LayoutName);
+
+
+                        BlockTableRecord space =
+                            transaction.GetObject(
+                                spaceId,
+                                OpenMode.ForWrite)
+                            as BlockTableRecord;
+
+
+                        if (space == null)
+                            continue;
+
+
+                        Point3d markerPosition =
+                            issue.Position;
+
+
+                        int markerIndex =
+                            0;
+
+
                         bool isDrawingNumberIssue =
                             issue.Message != null &&
                             issue.Message.StartsWith(
                                 "图号文字高度错误",
                                 System.StringComparison.Ordinal);
 
+
                         if (isDrawingNumberIssue)
                         {
                             string markerKey =
-                                (issue.LayoutName ?? "") + "|DrawingNumber";
-                            markerIndex = RegisterTextHeightMarker(markerKey);
+                                (issue.LayoutName ?? "")
+                                + "|DrawingNumber";
+
+
+                            markerIndex =
+                                RegisterTextHeightMarker(
+                                    markerKey);
                         }
+
+
+                        //--------------------------------
+                        // 保留你原来的错位处理
+                        //--------------------------------
 
                         if (isDrawingNumberIssue &&
                             markerIndex >= 2)
                         {
-                            markerPosition = new Autodesk.AutoCAD.Geometry.Point3d(
-                                issue.Position.X,
-                                issue.Position.Y + 10,
-                                issue.Position.Z);
+                            markerPosition =
+                                new Point3d(
+                                    issue.Position.X,
+                                    issue.Position.Y + 10,
+                                    issue.Position.Z);
                         }
 
-                        DBText text = new DBText();
 
-                        text.SetDatabaseDefaults(database);
+                        DBText text =
+                            new DBText();
 
-                        text.Position = markerPosition;
-                        text.Height = MarkerConfig.TextHeight;
-                        text.TextString = issue.Message ?? "";
-                        text.LayerId = layerId;
-                        text.Color = Color.FromRgb(255, 0, 0);
-                        space.AppendEntity(text);
-                        transaction.AddNewlyCreatedDBObject(text, true);
-                        text.XData = new ResultBuffer(
-                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, XDataAppName),
-                            new TypedValue((int)DxfCode.ExtendedDataAsciiString, "TextHeight"));
+
+                        text.SetDatabaseDefaults(
+                            database);
+
+
+                        text.Position =
+                            markerPosition;
+
+
+                        text.Height =
+                            MarkerConfig.TextHeight;
+
+
+                        text.TextString =
+                            issue.Message ?? "";
+
+
+                        text.LayerId =
+                            layerId;
+
+
+                        text.Color =
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0);
+
+
+                        //==================================================
+                        // 写进这个issue自己的Layout
+                        //==================================================
+
+                        space.AppendEntity(
+                            text);
+
+
+                        transaction
+                            .AddNewlyCreatedDBObject(
+                                text,
+                                true);
+
+
+                        text.XData =
+                            new ResultBuffer(
+                                new TypedValue(
+                                    (int)
+                                        DxfCode
+                                            .ExtendedDataRegAppName,
+                                    XDataAppName),
+
+                                new TypedValue(
+                                    (int)
+                                        DxfCode
+                                            .ExtendedDataAsciiString,
+                                    "TextHeight"));
                     }
+
 
                     transaction.Commit();
                 }
             }
             catch (System.Exception ex)
             {
-                AppLogger.Error(ex, "MarkerManager.CreateTextHeightMarkers");
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateTextHeightMarkers");
             }
         }
 
@@ -506,6 +754,122 @@ namespace Correct_test1.Markers
                 AppLogger.Error(
                     ex,
                     "MarkerManager.CreateNonStandardArchiveMarkers");
+            }
+        }
+
+        /// <summary>
+        /// 为“非标件号不存在”创建检查标记。
+        ///
+        /// 例如BOM：
+        /// NS333T1
+        ///
+        /// 归档图纸中没有：
+        /// NS333T + _1
+        ///
+        /// 则在当前BOM的NS333T1旁边提示。
+        ///
+        /// 继续使用CADCHECK_MARKER，
+        /// 所以原有清除检查标记功能可以一起清除。
+        /// </summary>
+        public void CreateNonStandardPartNumberMarkers(
+            Database database,
+            List<NonStandardPartNumberCheckResult> results)
+        {
+            if (database == null ||
+                results == null ||
+                results.Count == 0)
+            {
+                return;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
+
+
+                    RegisterXDataApp(
+                        database,
+                        transaction);
+
+
+                    StandardPartMarker marker =
+                        new StandardPartMarker();
+
+
+                    foreach (
+                        NonStandardPartNumberCheckResult result
+                        in results)
+                    {
+                        if (result == null ||
+                            result.BomItem == null)
+                        {
+                            continue;
+                        }
+
+
+                        //--------------------------------
+                        // 提示放在当前BOM件号旁边
+                        //--------------------------------
+
+                        MarkerInfo info =
+                             new MarkerInfo
+                            {
+                                Text =
+                                result.Message,
+
+                                Position =
+                                result.MarkerPosition
+                             };
+
+
+                        //--------------------------------
+                        // 写到当前BOM真正所在Layout
+                        //--------------------------------
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                result.SourceLayoutName);
+
+
+                        //--------------------------------
+                        // 继续复用现有红色MText标记
+                        //--------------------------------
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            info,
+                            "NonStandardPartNumber");
+                    }
+
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateNonStandardPartNumberMarkers");
             }
         }
 

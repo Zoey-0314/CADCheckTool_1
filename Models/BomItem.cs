@@ -20,6 +20,29 @@
         /// </summary>
         public string PartNumber { get; set; }
 
+        /// <summary>
+        /// BOM中的P/N列。
+        ///
+        /// 例如：
+        /// _999
+        /// _998
+        /// </summary>
+        public string PartNumberSuffix
+        {
+            get;
+            set;
+        }
+        =
+        "";
+
+        public int PartNumberSuffixColumn
+        {
+            get;
+            set;
+        }
+=
+-1;
+
 
 
         /// <summary>
@@ -47,6 +70,14 @@
         public Point3d PartNumberCellPosition { get; set; }
 
         public Point3d NameCellPosition { get; set; }
+
+        public Point3d PartNumberSuffixCellPosition
+        {
+            get;
+            set;
+        }
+=
+Point3d.Origin;
 
     }
 
