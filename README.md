@@ -1,344 +1,265 @@
-﻿# CADCheckTool_1
+﻿# CADCheckTool
 
-AutoCAD engineering drawing automatic inspection plugin.
+![AutoCAD](https://img.shields.io/badge/AutoCAD-2024-0696D7?logo=autodesk&logoColor=white)
+![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.8-512BD4?logo=dotnet&logoColor=white)
+![C%23](https://img.shields.io/badge/C%23-7.3-239120?logo=csharp&logoColor=white)
+[![Release](https://img.shields.io/badge/release-v2.0.0-2ea44f)](https://github.com/Zoey-0314/CADCheckTool_1/releases/tag/v2.0.0)
+![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D6?logo=windows&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-![AutoCAD](https://img.shields.io/badge/AutoCAD-.NET%20API-blue)
-![CSharp](https://img.shields.io/badge/C%23-.NET-purple)
-![Version](https://img.shields.io/badge/version-v1.6.5-green)
-------------------------------------------------------------------------
+CADCheckTool 是一套面向机械工程图审核场景的 AutoCAD 2024 二次开发工具。项目基于 C#、.NET Framework 4.8、AutoCAD .NET API 和 WinForms 开发，围绕标题栏、明细表、修订栏、标准件、非标件、版本号及图纸引出序号等内容建立自动检查流程，并提供单张检查、批量检查、图面标记、CSV 报告、项目及版本信息写入和快速划改等能力。
 
-## Project Introduction
+项目的目标不是替代设计人员完成最终审图，而是将规则明确、重复频繁、容易遗漏的检查工作交由程序处理，使设计人员能够更快地定位问题、完成修改并形成可追溯的检查结果。
 
-CADCheckTool_1 is a mechanical engineering drawing inspection plugin
-developed based on the AutoCAD .NET API.
+## 目录
 
-The goal is to automatically read drawing information, execute
-engineering rules, and provide traceable CAD visual feedback.
+- [项目简介](#项目简介)
+- [当前状态](#当前状态)
+- [主要功能](#主要功能)
+- [命令与使用入口](#命令与使用入口)
+- [典型使用流程](#典型使用流程)
+- [运行环境](#运行环境)
+- [构建与加载](#构建与加载)
+- [外部数据与路径配置](#外部数据与路径配置)
+- [项目结构](#项目结构)
+- [实现思路](#实现思路)
+- [数据安全与使用限制](#数据安全与使用限制)
+- [版本说明](#版本说明)
+- [相关文档](#相关文档)
+- [许可证](#许可证)
 
-Core workflow:
+## 项目简介
 
-    Read Data → Analyze Rules → Generate Results → CAD Visualization
+机械工程图通常包含标题栏、修订栏、明细表、技术要求、图号、项目号、版本号和明细引出序号等大量结构化或半结构化信息。传统人工审图需要在多个布局、视口、表格和外部归档文件之间反复核对，不仅耗时，而且容易因模板差异、命名不规范、归档缺失或版本混用产生遗漏。
 
-## Current Version
+CADCheckTool 直接运行在 AutoCAD 环境中，从当前 DWG 或指定目录内的 DWG 文件读取图纸数据，将读取结果交给独立的检查模块进行规则判断，再把问题以红色标记写回对应布局，同时生成可供复查和汇总的结果。项目采用“读取数据、分析数据、生成结果、修改 CAD”的分层方式组织代码，尽量将 AutoCAD 数据访问、业务规则和图面写入解耦，以便后续继续扩展检查规则或适配新的图框模板。
 
-v1.6.5 Release
+## 当前状态
 
-## Implemented Features
+仓库最新正式发布版本为 `v2.0.0`，该版本重点加入快速划改和非标件归档校验。当前 `master` 分支在 `v2.0.0` 基础上继续增加了外部数据路径配置、项目及版本信息写入、图纸版本归档比对、非标件编号校验，并修正了跨布局标记写入问题。因此，直接从 `master` 分支构建得到的功能范围会多于 `v2.0.0` Release 页面所描述的范围。
 
-### Drawing Inspection
+项目目前处于持续开发和规则完善阶段，已形成可以运行的插件主体、检查入口、批量处理流程和安全保存机制，但部分规则仍依赖既有图框模板、命名约定和企业归档目录。将项目用于新的图纸体系前，应先根据实际模板和数据源完成配置与验证。
 
-Supports:
+## 主要功能
 
--   Drawing number consistency checking
--   Title block inspection
--   Revision inspection
--   Basic project number checking
--   Page number checking
--   Technical requirements checking
--   Title block text-height checking
+### 标题栏与图纸基础信息检查
 
-### BOM Inspection
+工具能够识别横向和纵向标题栏，并对标题栏中的关键字段进行读取和校验。现有检查包括文件名图号与标题栏图号的一致性、标题栏图号与明细表关联图号的一致性、标题栏必填内容、页码与总页数、标题栏文字高度以及技术要求文字高度等。检查结果保留问题所在布局和位置，便于后续在正确的图纸空间中生成标记。
 
-Supports:
+### 修订栏检查
 
--   CAD BOM table reading
--   BOM data parsing
--   Part information extraction
+工具能够读取横向或纵向图纸中的修订栏内容，对修订记录中的必填字段和缺失信息进行检查，并将问题映射到对应修订栏区域。该模块与普通文字扫描分离，避免将修订栏作为无结构文本处理。
 
-Workflow:
+### 明细表识别与数据提取
 
-    DWG
-     ↓
-    CadTableReader
-     ↓
-    BomTableRecognizer
-     ↓
-    BomData
+工具基于 AutoCAD 表格对象识别明细表表头，读取序号、图号或代号、名称、数量等字段，并记录单元格位置、所属布局和关联图号。明细表识别结果是标准件检查、非标件检查、引出序号检查和批量报告的重要数据基础。对于同一图纸中与当前图框无关的表格，程序会结合布局及位置关系进行过滤，减少误识别。
 
-### Standard Part Inspection
+### 标准件数据库校验
 
-Supports:
+标准件检查以外部 Excel 数据库为依据，对明细表中的标准件名称和编号进行匹配。程序先进行候选项检索，再执行严格格式和对应关系校验，可识别名称不一致、未登记、存在多个候选项等情况，并兼容国标和出口标准件的编号匹配。以 `NS` 标识的非标件不会被当作普通标准件处理。标准件数据通过缓存和索引加载，降低重复读取 Excel 对批量检查性能的影响。
 
--   StandardParts.xlsx database
--   Standard part cache
--   Part number indexing
--   Loose part number matching
--   Strict format validation
--   Name validation
--   Missing standard detection
--   Multiple match detection
--   NS non-standard filtering
+### 明细表与图面引出序号一致性检查
 
-### Marker System
+工具能够通过布局视口读取模型空间中可见的数字引出序号，并与当前明细表序号集合进行比对。若明细表项目没有对应的图面引出序号，或图面存在未在明细表中登记的多余序号，程序会分别生成检查结果。标记按问题实际所属布局写入，便于在多布局图纸中准确定位。
 
-Supports:
+### 非标件归档校验
 
--   Error location markers
--   Dedicated marker layer: `CADCHECK_MARKER`
--   XData association
--   Safe marker removal
--   Text-height error markers
--   Drawing-number marker position adjustment for repeated errors
+工具识别明细表中的 `NS` 非标件编号，对编号进行规范化后，在配置的非标归档目录中递归查询对应图纸。规范化过程仅移除编号末尾用于区分明细项的数字和下划线，保留编号内部有意义的下划线。未找到归档图纸时生成错误；已存在的归档不重复标记。当网络盘或归档目录不可访问时，程序将该规则报告为不可用，避免把资源访问故障误判为全部非标件缺失。归档索引会在插件初始化时预加载，以提高连续检查和批量检查效率。
 
-### Batch Inspection
+### 非标件编号有效性检查
 
-Supports:
+在基础归档校验之外，当前 `master` 分支还会检查非标件编号所指向的明细零件是否真实存在于归档图纸中。程序根据非标件基础图号、当前项目号和归档版本筛选候选 DWG，并读取候选图纸全部布局，核对期望的明细后缀。存在项目号时优先选择同项目归档，并在多个候选版本中取最高 `L` 版本；无项目号时按无项目归档处理。若基础归档本身缺失，结果由非标归档模块统一报告，避免重复产生同类问题。
 
--   Batch drawing inspection
--   Per-drawing result collection
--   Batch marker generation
--   Safe drawing saving
+### 图纸版本检查
 
-------------------------------------------------------------------------
+工具根据当前 DWG 文件名中是否包含形如 `N0000AA000` 的项目号判断版本体系：包含项目号的非标图纸使用 `L0`、`L1` 等版本，标准图纸使用 `V0`、`V1` 等版本。程序检查当前图纸是否填写版本号，并在配置的版本归档目录中检索同图号的 DWG 或 PDF 归档，比较当前版本与最新归档版本。非标图纸的归档查询同时考虑图号和项目号，标准图纸按图号比较最高 `V` 版本。
 
-# v1.6.0 Intelligent Correction and Knowledge Base
+### 项目号与版本号写入
 
-## Intelligent Correction System
+主界面提供当前图纸和批量图纸的项目及版本信息输入功能。当前图纸写入会遍历符合条件的纸空间布局，根据横向或纵向标题栏模板定位字段，并跳过没有标题栏文字的布局。批量写入会递归处理指定目录内的 DWG，仅在内容确实发生变化时保存文件，并通过安全保存机制保留备份。
 
-Added intelligent correction workflow based on inspection results.
+### 快速划改
 
-Supports:
+快速划改用于在不破坏原始实体的前提下记录临时修改意见。执行命令后可以连续点选对象，按 `Esc` 退出。功能支持纸空间和模型空间对象、视口内可见文字、明细表单元格、`DBText`、`MText` 及尺寸标注等常见对象。程序根据可见文字宽度生成红色水平划线和替换文字，并将划改内容写入独立图层 `CADCHECK_REVISION`，通过 XData 标识为 `CADCHECK_QUICK_REVISION`。当修改非标件明细表图号时，工具还可以在该行关联位置写入当前项目号。
 
--   Inspection result classification
--   Error information analysis
--   Correction suggestion generation
--   Correction workflow integration
--   Traceable correction records
+快速划改拥有独立的清理命令，清除划改内容不会删除普通检查标记。
 
-Workflow:
+### 图面标记管理
 
-    Inspection Result
-            ↓
-    Error Classification
-            ↓
-    Correction Suggestion
-            ↓
-    User Confirmation
-            ↓
-    CAD Update
+检查问题默认写入独立图层 `CADCHECK_MARKER`，并通过 XData 记录标记来源。标记管理模块根据检查结果中的布局、坐标和问题类型创建标记，也支持清除当前图纸或批量清除目录内图纸的检查标记。当前 `master` 分支已修正跨布局问题标记写入错误布局的情况。
 
-## Knowledge Base System
+### 批量检查与 CSV 报告
 
-Added engineering knowledge management capability.
+批量检查会递归遍历用户选择目录中的 `*.dwg` 文件，在后台数据库中逐张打开和处理图纸，并复用单张检查的主要规则。单个文件发生异常时不会中断整个任务，程序会继续处理后续图纸并记录问题。批量界面提供进度反馈、结果报告打开入口以及当前图纸或全部图纸标记清理功能。
 
-Supports:
+检查完成后，工具在目标目录生成带时间戳的 UTF-8 CSV 文件。报告包含文件名、图纸打开链接、所属图号、当前图号、零件名称、正确内容、布局、标记、检查类型、缺失项和问题描述等字段，可直接用于问题汇总和复查。
 
--   Rule knowledge storage
--   Inspection experience accumulation
--   Correction suggestion association
--   Engineering rule expansion support
+### 安全保存与异常隔离
 
-------------------------------------------------------------------------
+需要修改 DWG 时，工具不会直接覆盖原文件，而是先保存为临时文件，检查临时文件是否存在且大小有效，再创建 `.bak` 备份并替换原文件。若保存或验证失败，原文件不会被失败的临时结果覆盖。批量处理还会恢复 AutoCAD 工作数据库状态，并对单文件异常进行隔离，降低连续处理对当前会话的影响。
 
-# v1.6.1 Installer Deployment Release
+## 命令与使用入口
 
-## Installer System
+| 命令 | 功能 |
+| --- | --- |
+| `CHECKDRAWING` | 打开“CAD检查助手”主界面，可进入单张检查、批量检查、项目及版本号输入和路径设置 |
+| `QREV` | 启动快速划改，连续选择需要标注的对象，按 `Esc` 结束 |
+| `QREVMODE` | 切换或设置快速划改工作模式 |
+| `QREVCLEAR` | 清除快速划改生成的划线和替换文字，不影响普通检查标记 |
 
-Added complete deployment system for end users.
+主界面包含“单张检查”“批量检查”“当前图纸版本号输入”“批量版本号输入”和“路径设置”等入口。单张检查界面可以检查当前图纸、清除检查标记、执行快速划改或清除划改；批量检查界面可以执行目录检查、打开批量报告以及清除当前或全部图纸的修改注释。
 
-Supports:
+## 典型使用流程
 
--   Automatic installation package generation
--   Program file deployment
--   Resource file deployment
--   Configuration initialization
--   AutoCAD plugin registration
--   Automatic loading configuration
+### 单张图纸检查
 
-Installation package:
+1. 在 AutoCAD 2024 中打开需要检查的 DWG。
+2. 输入 `CHECKDRAWING` 打开主界面。
+3. 进入“单张检查”，点击“检查当前图纸”。
+4. 查看检查结果，并切换到对应布局检查红色图面标记。
+5. 完成修改后再次检查；如需重新生成标记，可先执行“清除检查标记”。
 
-    CADCheckTool_1_Setup_v1.6.1.exe
+### 批量图纸检查
 
-Default installation directory:
+1. 进入“批量检查”，选择包含 DWG 的根目录。
+2. 执行批量检查，程序会递归处理子目录中的图纸。
+3. 等待进度完成并打开生成的 CSV 报告。
+4. 通过报告中的图纸链接和布局字段定位问题，必要时使用批量清理功能移除旧标记。
 
-    C:\Program Files\CADCheckTool_1
+批量处理会读取和写入多个文件，首次用于正式图纸前建议先复制一份测试目录，确认模板识别、归档路径和检查规则均符合当前项目要求。
 
-Deployment workflow:
+### 快速划改
 
-    Setup.exe
-        ↓
-    InstallerLauncher
-        ↓
-    CADCheckToolInstaller
-        ↓
-    Registry Registration
-        ↓
-    AutoCAD Plugin Loading
+1. 在单张检查界面点击“快速划改”，或直接输入 `QREV`。
+2. 点选文字、尺寸、明细表单元格或视口内对象。
+3. 输入替换内容，程序生成红色划线和新文字，原实体保持不变。
+4. 继续选择其他对象，完成后按 `Esc`。
+5. 需要撤销全部快速划改内容时执行 `QREVCLEAR`。
 
-## Release Files
+### 项目号与版本号输入
 
-Release package includes:
+1. 在主界面选择当前图纸或批量输入入口。
+2. 输入符合项目规则的项目号和版本号。
+3. 确认写入范围后执行操作。
+4. 批量写入完成后抽查生成的 `.bak` 文件及各布局标题栏内容。
 
-    CADCheckTool_1_Setup_v1.6.1.exe
+## 运行环境
 
-Users only need to run the installer to complete deployment.
+| 项目 | 要求 |
+| --- | --- |
+| 操作系统 | Windows x64 |
+| AutoCAD | AutoCAD 2024 |
+| 运行时 | .NET Framework 4.8 |
+| 开发语言 | C# 7.3 |
+| UI | Windows Forms |
+| CAD 接口 | AutoCAD .NET API |
+| Excel 读取 | EPPlus 5.8.0 |
+| 推荐开发环境 | Visual Studio 2022，安装“.NET 桌面开发”工作负载 |
 
-------------------------------------------------------------------------
+## 构建与加载
 
-## Version Roadmap
+### 获取源码
 
-v1.4.0
+```powershell
+git clone https://github.com/Zoey-0314/CADCheckTool_1.git
+cd CADCheckTool_1
+```
 
-BOM Extraction and Recognition System
+使用 Visual Studio 打开 `Correct_test1.sln`，恢复 NuGet 包后进行构建。
 
-v1.5.0
+### 配置 AutoCAD 引用
 
-Standard Part Checking System
+项目文件中的 AutoCAD 托管程序集引用指向开发机上的 AutoCAD 2024 安装目录。若本机安装位置不同，需要在 Visual Studio 中重新指定 `AcCoreMgd.dll`、`AcDbMgd.dll`、`AcMgd.dll` 等引用路径，并确认这些 AutoCAD 程序集不被复制到插件输出目录。
 
-v1.6.0
+### 编译项目
 
-Intelligent Correction and Knowledge Base
+1. 将解决方案平台设置为 `x64`。
+2. 选择 `Release` 配置。
+3. 恢复 `packages.config` 中声明的 NuGet 依赖。
+4. 编译解决方案，确认主插件 DLL 及依赖文件完整生成。
 
-v1.6.1
+### 在 AutoCAD 中加载
 
-Installer Deployment Release
+1. 启动 AutoCAD 2024。
+2. 输入 `NETLOAD`。
+3. 选择编译生成的主插件 DLL。
+4. 输入 `CHECKDRAWING` 验证主界面是否正常打开。
 
-------------------------------------------------------------------------
+仓库包含 `Installer` 和 `InstallerLauncher` 工程，可用于制作自动注册和加载插件的安装程序。由于当前正式 Release 与 `master` 分支功能范围不同，若需要分发最新版功能，应先用当前源码重新编译主插件及安装包，不应直接将历史安装包视为当前 `master` 构建。
 
-# 项目简介
+## 外部数据与路径配置
 
-CADCheckTool_1 是基于 AutoCAD .NET API 开发的机械工程图智能审核插件。
+项目依赖三个可配置的外部数据位置：非标件归档目录、标准件 Excel 数据库和版本检查归档目录。可以在 `CHECKDRAWING` 主界面的“路径设置”中修改这些位置。配置保存在：
 
-目标：
+```text
+%APPDATA%\Correct_test1\AppPathSettings.json
+```
 
-自动读取工程图数据，执行工程规则检查，并在 CAD 中生成可追踪的错误标记。
+首次运行时程序会创建默认配置。源码中的默认位置为企业网络盘示例路径，其他环境通常无法直接使用，因此首次正式检查前应完成路径设置。路径或网络资源暂时不可用时，相关规则可能返回不可用状态；这类状态不应被解释为图纸内容错误。
 
-核心流程：
+标准件 Excel 的字段组织、图纸文件命名、项目号格式和归档目录层级都会影响检查结果。接入新的企业数据时，应先准备少量已知正确和已知错误的样例图纸，对匹配规则进行回归验证后再执行批量任务。
 
-    读取数据 → 分析规则 → 生成结果 → CAD可视化反馈
+## 项目结构
 
-## 当前版本
+```text
+CADCheckTool_1/
+├─ Command/             AutoCAD 命令入口
+├─ Forms/               主界面、单张检查、批量检查、路径和版本输入界面
+├─ Readers/             标题栏、布局、明细表、文字、线段和视口数据读取
+├─ Checks/              标题栏、修订栏、标准件、非标件和引出序号规则
+├─ Markers/             检查标记创建、定位与清理
+├─ Batch/               批量检查、批量清理和图纸处理调度
+├─ QuickRevision/       快速划改的选择、解析、写入和命令实现
+├─ VersionCheck/        图纸版本读取、归档索引与版本比较
+├─ ProjectVersion/      当前及批量项目号、版本号写入
+├─ Configs/             图框、明细表、标记、路径和外部资源配置
+├─ Core/                初始化、日志、缓存、图号处理和安全保存
+├─ Models/              检查结果及领域数据模型
+├─ Export/              批量 CSV 报告导出
+├─ Installer/           安装程序工程及安装说明
+├─ InstallerLauncher/   安装启动器
+├─ ARCHITECTURE.md      架构说明
+├─ CONFIGURATION_GUIDE.md
+├─ DEVELOPMENT_WORKFLOW.md
+└─ Correct_test1.sln
+```
 
-v1.6.5
+## 实现思路
 
-## 已实现功能
+项目将检查流程划分为四个主要阶段。`Readers` 只负责从 AutoCAD 数据库中读取实体和字段，`Checks` 根据读取结果执行领域规则，`Models` 保存结构化检查结果，`Markers` 和写入服务负责把结果反映到图面或文件中。批量模块在此基础上负责文件遍历、后台数据库生命周期、异常隔离、结果汇总和安全保存。
 
-### 工程图检查
+外部标准件、非标归档和版本归档使用缓存或索引避免重复扫描。插件初始化阶段会提前加载路径配置并预热相关索引，单张和批量检查共享同一套核心规则。快速划改使用独立图层和 XData，与自动检查标记分离，保证两类注释可以分别管理。
 
-支持：
+## 数据安全与使用限制
 
--   图号一致性检查
--   标题栏图号与文件名图号比较
--   标题栏图号与BOM表上方图号比较
--   标题栏检查
--   修改记录检查
--   项目号检查基础逻辑
--   页码检查
--   技术要求检查
--   标题栏文字高度检查
+- 批量检查、批量写入和批量清理可能修改 DWG 文件。程序已提供临时文件验证和 `.bak` 备份，但仍建议先对测试副本运行。
+- 当前规则与既有标题栏块名、字段位置、明细表表头、文件命名和企业归档结构存在关联，不保证对所有第三方图框直接适用。
+- 网络盘不可访问、Excel 被占用、文件只读、DWG 损坏或 AutoCAD 版本不匹配都可能导致部分规则不可用。
+- 图面标记用于辅助定位问题，不代表完成了设计正确性、尺寸合理性、工艺可制造性或标准符合性的全部审查。
+- 版本检查依赖文件名中的项目号和版本号约定。若企业规则不同，应先修改相应正则表达式和归档匹配逻辑。
+- 在生产环境部署前，应使用覆盖横向图框、纵向图框、多布局、多个视口、标准件、非标件和异常归档状态的样例集进行验证。
 
-### BOM检查
+## 版本说明
 
-支持：
+### v2.0.0
 
--   CAD BOM表读取
--   BOM数据解析
--   零件信息提取
--   BOM表头附近图号识别
--   BOM图号参与图号一致性检查
+正式加入快速划改和非标件归档校验，支持多种文字及表格对象、独立划改图层与清理机制，并通过归档索引改善非标件查询效率。
 
-### 标准件检查
+### master 分支后续功能
 
-支持：
+在 `v2.0.0` 之后，`master` 分支继续加入可配置外部数据路径、当前及批量项目版本写入、图纸版本归档比对、非标件编号有效性检查和跨布局标记修复。这些功能在新的正式版本发布前，应以源码构建和实际测试结果为准。
 
--   StandardParts.xlsx标准件库
--   标准件缓存
--   图号索引
--   图号宽松匹配
--   严格格式检查
--   名称检查
--   未收录检测
--   多匹配检测
--   NS非标件过滤
+完整历史请查看 [Releases](https://github.com/Zoey-0314/CADCheckTool_1/releases) 和仓库提交记录。
 
-### Marker系统
+## 相关文档
 
-支持：
+- [架构说明](ARCHITECTURE.md)
+- [配置指南](CONFIGURATION_GUIDE.md)
+- [开发工作流](DEVELOPMENT_WORKFLOW.md)
+- [安装指南](Installer/INSTALLATION_GUIDE.md)
 
--   错误位置标记
--   统一Marker图层：`CADCHECK_MARKER`
--   XData关联
--   安全清除
--   字高错误Marker
--   同一布局图号区域重复Marker位置调整
+## 许可证
 
-### 批量检查
+本项目采用 [MIT License](LICENSE)。
 
-支持：
-
--   多张DWG批量检查
--   批量结果汇总
--   批量Marker生成
--   安全保存图纸
-
-------------------------------------------------------------------------
-
-# v1.6.0 智能修正与知识库
-
-新增：
-
--   审核结果分类
--   错误信息分析
--   修正建议生成
--   修正流程管理
--   修正记录追踪
--   工程知识库存储
-
-------------------------------------------------------------------------
-
-# v1.6.1 安装部署版本
-
-新增完整软件部署体系。
-
-支持：
-
--   自动生成安装包
--   程序文件部署
--   资源文件部署
--   配置初始化
--   AutoCAD插件注册
--   自动加载配置
-
-安装包：
-
-    CADCheckTool_1_Setup_v1.6.1.exe
-
-默认安装目录：
-
-    C:\Program Files\CADCheckTool_1
-
-部署流程：
-
-    安装程序
-        ↓
-    InstallerLauncher
-        ↓
-    CADCheckToolInstaller
-        ↓
-    注册表注册
-        ↓
-    AutoCAD插件加载
-
-Release包含：
-
-    CADCheckTool_1_Setup_v1.6.1.exe
-
-------------------------------------------------------------------------
-
-## 版本规划
-
-v1.4.0
-
-BOM Extraction and Recognition System
-
-v1.5.0
-
-Standard Part Checking System
-
-v1.6.0
-
-Intelligent Correction and Knowledge Base
-
-v1.6.1
-
-Installer Deployment Release
+如需在新的图框、企业标准或归档体系中使用，建议先通过 Issue 说明图纸模板、字段约定、AutoCAD 版本和预期规则，并附上经过脱敏的最小示例，以便准确复现和扩展。

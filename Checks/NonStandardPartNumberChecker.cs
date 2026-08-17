@@ -67,42 +67,28 @@ namespace Correct_test1.Checks
             }
 
 
+
             //==================================================
-            // 读取当前被检查DWG的项目号
+            // 新规则：
             //
-            // 有项目号：
-            // 只检查同项目归档DWG。
+            // 是否限制项目号，
+            // 不再看当前DWG文件名。
             //
-            // 没项目号：
-            // 仍然检查件号，
-            // 但只检查同样没有项目号的归档DWG。
+            // 只看当前这个BOM右侧
+            // 有没有实际显示项目号。
             //==================================================
 
-            FileNameProjectReader projectReader =
-                new FileNameProjectReader();
-
-
-            FileNameProjectReader.ProjectInfo
-                currentProjectInfo =
-                    projectReader
-                        .ReadProjectNumber(
-                            currentFilePath);
-
-
-            bool currentHasProject =
-                currentProjectInfo != null &&
+            bool bomHasProject =
                 !string.IsNullOrWhiteSpace(
-                    currentProjectInfo.ProjectNumber);
+                    bom.ProjectNumber);
 
 
-            string currentProjectNumber =
-                currentHasProject
-                    ? currentProjectInfo
-                        .ProjectNumber
+            string bomProjectNumber =
+                bomHasProject
+                    ? bom.ProjectNumber
                         .Trim()
+                        .ToUpperInvariant()
                     : "";
-
-
             //==================================================
             // 检查BOM中的每一个NS件
             //==================================================
@@ -281,24 +267,88 @@ namespace Correct_test1.Checks
 
 
                 //==================================================
-                // 根据当前文件类型锁定归档DWG
+                // 归档DWG选择规则
                 //
-                // 当前有项目号：
+                // BOM有项目号：
+                // 1. 优先同项目专用归档
+                // 2. 没有时退回通用无项目号归档
                 //
-                // 图号 + 当前项目号
-                //
-                // 当前无项目号：
-                //
-                // 图号 + 候选文件同样无项目号
+                // BOM无项目号：
+                // 只允许通用无项目号归档
                 //==================================================
 
-                List<string> candidateFiles =
-                    FindCandidateDwgs(
-                        archiveIndex,
-                        archiveDrawingNumber,
-                        currentHasProject,
-                        currentProjectNumber);
+                List<string> candidateFiles;
 
+
+                //--------------------------------
+                // 最终选中的归档类型：
+                //
+                // true  = 项目专用版 → 取最高L
+                // false = 通用版     → 取最高V
+                //--------------------------------
+
+                bool selectedProjectSpecific =
+                    false;
+
+
+                if (bomHasProject)
+                {
+                    //==================================================
+                    // 第一优先级：
+                    //
+                    // NS386DY
+                    // +
+                    // N2607US004
+                    //==================================================
+
+                    candidateFiles =
+                        FindCandidateDwgs(
+                            archiveIndex,
+                            archiveDrawingNumber,
+                            true,
+                            bomProjectNumber);
+
+
+                    if (candidateFiles.Count > 0)
+                    {
+                        selectedProjectSpecific =
+                            true;
+                    }
+                    else
+                    {
+                        //==================================================
+                        // 没有当前项目专用版：
+                        //
+                        // 再找通用版：
+                        //
+                        // NS386DY
+                        // +
+                        // 文件名无项目号
+                        //==================================================
+
+                        candidateFiles =
+                            FindCandidateDwgs(
+                                archiveIndex,
+                                archiveDrawingNumber,
+                                false,
+                                "");
+                    }
+                }
+                else
+                {
+                    //==================================================
+                    // BOM右侧没有项目号：
+                    //
+                    // 只允许通用无项目号归档。
+                    //==================================================
+
+                    candidateFiles =
+                        FindCandidateDwgs(
+                            archiveIndex,
+                            archiveDrawingNumber,
+                            false,
+                            "");
+                }
 
                 //==================================================
                 // 没有找到符合条件的归档DWG
@@ -309,15 +359,17 @@ namespace Correct_test1.Checks
                     string message;
 
 
-                    if (currentHasProject)
+                    if (bomHasProject)
                     {
                         message =
                             "非标件号检查失败："
-                            + "未找到同时包含图号 "
+                            + "未找到图号 "
                             + archiveDrawingNumber
-                            + " 和当前项目号 "
-                            + currentProjectNumber
-                            + " 的归档DWG。";
+                            + " 的可用归档DWG；"
+                            + "既未找到项目 "
+                            + bomProjectNumber
+                            + " 的专用归档，"
+                            + "也未找到无项目号的通用归档。";
                     }
                     else
                     {
@@ -325,7 +377,7 @@ namespace Correct_test1.Checks
                             "非标件号检查失败："
                             + "未找到图号 "
                             + archiveDrawingNumber
-                            + " 且文件名中不包含项目号的归档DWG。";
+                            + " 的无项目号通用归档DWG。";
                     }
 
 
@@ -333,16 +385,10 @@ namespace Correct_test1.Checks
                         CreateResult(
                             bom,
                             item,
-
-                            //==============================
-                            // 使用统一完整件号
-                            //==============================
-
                             effectivePartNumber,
-
                             archiveDrawingNumber,
                             partSuffix,
-                            currentProjectNumber,
+                            bomProjectNumber,
                             "",
                             true,
                             message));
@@ -350,7 +396,6 @@ namespace Correct_test1.Checks
 
                     continue;
                 }
-
 
                 //==================================================
                 // 多个归档DWG：
@@ -365,7 +410,7 @@ namespace Correct_test1.Checks
                 string archiveFile =
                     SelectLatestFile(
                         candidateFiles,
-                        currentHasProject);
+                        selectedProjectSpecific);
 
 
                 if (string.IsNullOrWhiteSpace(
@@ -414,7 +459,7 @@ namespace Correct_test1.Checks
 
                             archiveDrawingNumber,
                             partSuffix,
-                            currentProjectNumber,
+                            bomProjectNumber,
                             archiveFile,
                             true,
                             "非标件号检查失败："
@@ -454,7 +499,7 @@ namespace Correct_test1.Checks
 
                         archiveDrawingNumber,
                         partSuffix,
-                        currentProjectNumber,
+                        bomProjectNumber,
                         archiveFile,
                         false,
 

@@ -229,6 +229,7 @@
     <Compile Include="QuickRevision\Writers\ReplacementTextWriter.cs" />
     <Compile Include="QuickRevision\Writers\RevisionEntityHelper.cs" />
     <Compile Include="QuickRevision\Writers\StrikeLineWriter.cs" />
+    <Compile Include="Readers\BomProjectNumberReader.cs" />
     <Compile Include="Readers\CadTableReader.cs" />
     <Compile Include="Readers\DrawingFrameReader.cs" />
     <Compile Include="Readers\FileNameDrawingNumberReader.cs" />

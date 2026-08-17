@@ -173,6 +173,9 @@ namespace Correct_test1.Checks
 
                 BomTableRecognizer recognizer =
                     new BomTableRecognizer();
+                BomProjectNumberReader
+    bomProjectNumberReader =
+        new BomProjectNumberReader();
 
 
                 BomStandardPartChecker checker =
@@ -238,7 +241,18 @@ namespace Correct_test1.Checks
                         continue;
                     }
 
+                    //==================================================
+                    // 读取当前BOM自己右侧的项目号
+                    //
+                    // 注意：
+                    // 不再使用当前DWG文件名决定这个BOM属于哪个项目。
+                    //==================================================
 
+                    bom.ProjectNumber =
+                        bomProjectNumberReader.Read(
+                            database,
+                            table,
+                            bom);
                     //--------------------------------
                     // 保存BOM
                     //--------------------------------

@@ -24,6 +24,18 @@ namespace Correct_test1.Models
         /// 例如 Layout1、Layout6
         /// </summary>
         public string SourceLayoutName { get; set; }
+        /// <summary>
+        /// Table在Layout实际坐标系中的边界。
+        ///
+        /// 用于判断BOM右侧是否存在项目号。
+        /// </summary>
+        public double TableMinX { get; set; }
+
+        public double TableMaxX { get; set; }
+
+        public double TableMinY { get; set; }
+
+        public double TableMaxY { get; set; }
 
         /// <summary>
         /// 表格行数
