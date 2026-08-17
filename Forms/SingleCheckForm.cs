@@ -275,6 +275,14 @@ namespace Correct_test1
                         .CreateNonStandardArchiveMarkers(
                             doc.Database,
                             report.NonStandardArchiveResults);
+                    //--------------------------------
+                    // 新增：版本号最新版本提示
+                    //--------------------------------
+
+                    markerManager
+                        .CreateVersionMarkers(
+                            doc.Database,
+                            report.VersionCheckResults);
 
 
                     //--------------------------------
@@ -334,6 +342,25 @@ namespace Correct_test1
                         completeMessage +=
                             "\n"
                             + report.NonStandardArchiveError;
+                    }
+                }
+                //--------------------------------
+                // 版本归档不可用提示
+                //--------------------------------
+
+                if (report != null &&
+                    !report.VersionArchiveAvailable)
+                {
+                    completeMessage +=
+                        "\n\n注意：版本号最新版本检查未执行。";
+
+
+                    if (!string.IsNullOrWhiteSpace(
+                            report.VersionArchiveError))
+                    {
+                        completeMessage +=
+                            "\n"
+                            + report.VersionArchiveError;
                     }
                 }
 

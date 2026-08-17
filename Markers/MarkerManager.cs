@@ -7,6 +7,7 @@ using Correct_test1.Models;
 using Correct_test1.Readers;
 using System.Collections.Generic;
 using System.Globalization;
+using Correct_test1.VersionCheck.Models;
 
 namespace Correct_test1.Markers
 {
@@ -505,6 +506,110 @@ namespace Correct_test1.Markers
                 AppLogger.Error(
                     ex,
                     "MarkerManager.CreateNonStandardArchiveMarkers");
+            }
+        }
+
+        /// <summary>
+        /// 创建版本号检查提示。
+        ///
+        /// 继续使用：
+        /// CADCHECK_MARKER
+        ///
+        /// 所以原有“清除检查标记”
+        /// 可以直接清除。
+        /// </summary>
+        public void CreateVersionMarkers(
+            Database database,
+            List<VersionCheckResult> results)
+        {
+            if (database == null ||
+                results == null ||
+                results.Count == 0)
+            {
+                return;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction transaction =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    ObjectId layerId =
+                        EnsureLayer(
+                            database,
+                            transaction,
+                            LayerName,
+                            Color.FromRgb(
+                                255,
+                                0,
+                                0));
+
+
+                    RegisterXDataApp(
+                        database,
+                        transaction);
+
+
+                    //--------------------------------
+                    // 直接复用现有MText提示绘制器
+                    //--------------------------------
+
+                    StandardPartMarker marker =
+                        new StandardPartMarker();
+
+
+                    foreach (
+                        VersionCheckResult result
+                        in results)
+                    {
+                        if (result == null)
+                            continue;
+
+
+                        MarkerInfo info =
+                            new MarkerInfo
+                            {
+                                Text =
+                                    result.Message,
+
+                                Position =
+                                    result.Position
+                            };
+
+
+                        //--------------------------------
+                        // 必须写到版本号所在Layout
+                        //--------------------------------
+
+                        ObjectId spaceId =
+                            GetLayoutSpaceId(
+                                database,
+                                transaction,
+                                result.LayoutName);
+
+
+                        marker.Create(
+                            database,
+                            transaction,
+                            spaceId,
+                            layerId,
+                            info,
+                            "VersionCheck");
+                    }
+
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "MarkerManager.CreateVersionMarkers");
             }
         }
         private static void RegisterXDataApp(Database database, Transaction transaction)

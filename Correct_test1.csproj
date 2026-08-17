@@ -112,11 +112,18 @@
     <Compile Include="Configs\TitleBlockVerticalConfig.cs" />
     <Compile Include="Core\NonStandardArchiveCache.cs" />
     <Compile Include="Core\NonStandardArchiveIndex.cs" />
+    <Compile Include="Core\TitleBlockOrientationDetector.cs" />
     <Compile Include="Forms\PathSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\PathSettingsForm.Designer.cs">
       <DependentUpon>PathSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ProjectVersionInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ProjectVersionInputForm.Designer.cs">
+      <DependentUpon>ProjectVersionInputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Installer\CADCheckToolInstaller.cs" />
     <Compile Include="Installer\CADPluginRegistryManager.cs" />
@@ -182,6 +189,12 @@
     <Compile Include="Models\TextHeightIssue.cs" />
     <Compile Include="Models\TitleFieldRegion.cs" />
     <Compile Include="Models\TitleText.cs" />
+    <Compile Include="ProjectVersion\Configs\ProjectVersionConfig.cs" />
+    <Compile Include="ProjectVersion\Models\BatchProjectVersionResult.cs" />
+    <Compile Include="ProjectVersion\Models\ProjectVersionLayoutResult.cs" />
+    <Compile Include="ProjectVersion\Services\BatchProjectVersionService.cs" />
+    <Compile Include="ProjectVersion\Services\ProjectVersionWriteService.cs" />
+    <Compile Include="ProjectVersion\Writers\ProjectVersionWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\DrawingCheckManager.cs" />
     <Compile Include="Models\CheckResult.cs" />
@@ -232,6 +245,12 @@
     <Compile Include="Readers\TitleBlockRegionParser.cs" />
     <Compile Include="Readers\ViewportLineReader.cs" />
     <Compile Include="Readers\ViewportTextReader.cs" />
+    <Compile Include="VersionCheck\Core\VersionArchiveCache.cs" />
+    <Compile Include="VersionCheck\Core\VersionArchiveIndex.cs" />
+    <Compile Include="VersionCheck\Models\DrawingVersionInfo.cs" />
+    <Compile Include="VersionCheck\Models\VersionCheckResult.cs" />
+    <Compile Include="VersionCheck\Readers\DrawingVersionReader.cs" />
+    <Compile Include="VersionCheck\Services\VersionCheckService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\BatchProgressForm.resx">

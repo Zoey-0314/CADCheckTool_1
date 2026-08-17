@@ -111,23 +111,10 @@ namespace Correct_test1.Checks
             // 保持原有逻辑
             //--------------------------------
 
-            int markCount = 0;
-
-
-            foreach (TitleText t in texts)
-            {
-
-                if (t.Text.Contains("标记"))
-                {
-                    markCount++;
-                }
-
-            }
-
-
-
             bool isHorizontal =
-                markCount >= 2;
+                TitleBlockOrientationDetector
+                    .IsHorizontal(
+                        texts);
 
 
 

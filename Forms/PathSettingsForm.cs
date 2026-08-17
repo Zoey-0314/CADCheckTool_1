@@ -1,9 +1,11 @@
 ﻿using Correct_test1.Configs;
 using Correct_test1.Core;
+using Correct_test1.VersionCheck.Core;
 
 using System;
 using System.IO;
 using System.Windows.Forms;
+
 
 namespace Correct_test1
 {
@@ -13,7 +15,6 @@ namespace Correct_test1
         public PathSettingsForm()
         {
             InitializeComponent();
-
 
             LoadCurrentSettings();
         }
@@ -33,8 +34,17 @@ namespace Correct_test1
             txtStandardPartPath.Text =
                 settings
                     .StandardPartDatabasePath;
+
+
+            txtVersionArchivePath.Text =
+                settings
+                    .VersionArchivePath;
         }
 
+
+        //==================================================
+        // 非标归档路径
+        //==================================================
 
         private void btnBrowseArchive_Click(
             object sender,
@@ -56,8 +66,7 @@ namespace Correct_test1
                 }
 
 
-                if (dialog.ShowDialog(
-                        this)
+                if (dialog.ShowDialog(this)
                     != DialogResult.OK)
                 {
                     return;
@@ -69,6 +78,10 @@ namespace Correct_test1
             }
         }
 
+
+        //==================================================
+        // 标准件Excel
+        //==================================================
 
         private void btnBrowseStandardPart_Click(
             object sender,
@@ -104,8 +117,7 @@ namespace Correct_test1
                 }
 
 
-                if (dialog.ShowDialog(
-                        this)
+                if (dialog.ShowDialog(this)
                     != DialogResult.OK)
                 {
                     return;
@@ -117,6 +129,47 @@ namespace Correct_test1
             }
         }
 
+
+        //==================================================
+        // 版本归档路径
+        //==================================================
+
+        private void btnBrowseVersionArchive_Click(
+            object sender,
+            EventArgs e)
+        {
+            using (
+                FolderBrowserDialog dialog =
+                    new FolderBrowserDialog())
+            {
+                dialog.Description =
+                    "请选择版本号检查归档图纸目录";
+
+
+                if (Directory.Exists(
+                        txtVersionArchivePath.Text))
+                {
+                    dialog.SelectedPath =
+                        txtVersionArchivePath.Text;
+                }
+
+
+                if (dialog.ShowDialog(this)
+                    != DialogResult.OK)
+                {
+                    return;
+                }
+
+
+                txtVersionArchivePath.Text =
+                    dialog.SelectedPath;
+            }
+        }
+
+
+        //==================================================
+        // 保存
+        //==================================================
 
         private void btnSave_Click(
             object sender,
@@ -134,8 +187,14 @@ namespace Correct_test1
                     .Trim();
 
 
+            string versionArchivePath =
+                txtVersionArchivePath
+                    .Text
+                    .Trim();
+
+
             //--------------------------------
-            // 保存前验证
+            // 非标归档
             //--------------------------------
 
             if (!Directory.Exists(
@@ -149,6 +208,10 @@ namespace Correct_test1
                 return;
             }
 
+
+            //--------------------------------
+            // 标准件数据库
+            //--------------------------------
 
             if (!File.Exists(
                     standardPartPath))
@@ -177,6 +240,22 @@ namespace Correct_test1
             }
 
 
+            //--------------------------------
+            // 版本归档
+            //--------------------------------
+
+            if (!Directory.Exists(
+                    versionArchivePath))
+            {
+                MessageBox.Show(
+                    "版本检查归档目录不存在或当前无法访问：\n"
+                    + versionArchivePath,
+                    "路径设置");
+
+                return;
+            }
+
+
             try
             {
                 AppPathConfig.Save(
@@ -186,14 +265,15 @@ namespace Correct_test1
                             archivePath,
 
                         StandardPartDatabasePath =
-                            standardPartPath
+                            standardPartPath,
+
+                        VersionArchivePath =
+                            versionArchivePath
                     });
 
 
                 //--------------------------------
-                // 用户保存以后立即后台刷新。
-                //
-                // 不需要重启AutoCAD。
+                // 三套外部数据立即后台刷新
                 //--------------------------------
 
                 NonStandardArchiveCache
@@ -204,10 +284,14 @@ namespace Correct_test1
                     .RefreshAsync();
 
 
+                VersionArchiveCache
+                    .RefreshAsync();
+
+
                 MessageBox.Show(
                     "路径设置已保存。\n\n"
-                    + "非标归档索引和标准件数据库"
-                    + "正在后台重新加载。",
+                    + "非标归档索引、版本归档索引"
+                    + "和标准件数据库正在后台重新加载。",
                     "路径设置");
 
 
@@ -227,6 +311,10 @@ namespace Correct_test1
         }
 
 
+        //==================================================
+        // 默认
+        //==================================================
+
         private void btnDefault_Click(
             object sender,
             EventArgs e)
@@ -239,6 +327,11 @@ namespace Correct_test1
             txtStandardPartPath.Text =
                 AppPathConfig
                     .DefaultStandardPartDatabasePath;
+
+
+            txtVersionArchivePath.Text =
+                AppPathConfig
+                    .DefaultVersionArchivePath;
         }
 
 

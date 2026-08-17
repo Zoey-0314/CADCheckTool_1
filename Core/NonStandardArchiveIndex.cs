@@ -20,7 +20,17 @@ namespace Correct_test1.Core
         private readonly Dictionary<string, string>
             _matchCache;
 
-
+        /// <summary>
+        /// 返回当前归档文件列表的副本。
+        ///
+        /// 供版本号归档索引复用。
+        /// 不允许外部修改原索引。
+        /// </summary>
+        public List<string> GetFilePathsSnapshot()
+        {
+            return new List<string>(
+                _filePaths);
+        }
         public string RootPath
         {
             get;
