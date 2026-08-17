@@ -38,7 +38,8 @@ namespace Correct_test1.Readers
                                 X = text.Position.X,
                                 Y = text.Position.Y,
                                 Height = text.Height,
-                                LayoutName = layout.LayoutName
+                                LayoutName = layout.LayoutName,
+                                ObjectId = text.ObjectId
                             });
                         }
                         // 多行文字
@@ -50,7 +51,8 @@ namespace Correct_test1.Readers
                                 X = mtext.Location.X,
                                 Y = mtext.Location.Y,
                                 Height = mtext.TextHeight,
-                                LayoutName = layout.LayoutName
+                                LayoutName = layout.LayoutName,
+                                ObjectId = mtext.ObjectId
                             });
                         }
                         // 属性块
@@ -67,7 +69,8 @@ namespace Correct_test1.Readers
                                     Text = Clean(att.TextString),
                                     X = att.Position.X,
                                     Y = att.Position.Y,
-                                    LayoutName = layout.LayoutName
+                                    LayoutName = layout.LayoutName,
+                                    ObjectId = att.ObjectId
                                 });
                             }
                         }

@@ -628,6 +628,40 @@ namespace Correct_test1.Readers
             data.Columns =
                 table.Columns.Count;
 
+            //==================================================
+            // 保存Table实际边界
+            //
+            // 如果Table位于Block内部，
+            // 使用同一个transform转换为Layout实际坐标。
+            //==================================================
+
+            try
+            {
+                Extents3d tableExtents =
+                    TransformExtents(
+                        table.GeometricExtents,
+                        transform);
+
+
+                data.TableMinX =
+                    tableExtents.MinPoint.X;
+
+                data.TableMaxX =
+                    tableExtents.MaxPoint.X;
+
+                data.TableMinY =
+                    tableExtents.MinPoint.Y;
+
+                data.TableMaxY =
+                    tableExtents.MaxPoint.Y;
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "CadTableReader.ReadTableExtents");
+            }
+
 
             //==================================================
             // 所有单元格

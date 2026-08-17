@@ -30,5 +30,13 @@
         /// 所属布局
         /// </summary>
         public string LayoutName { get; set; }
+
+        /// <summary>
+        /// 对应的原始CAD文字实体。
+        ///
+        /// 页码检查发现错误后，
+        /// 用它直接修改原文字内容。
+        /// </summary>
+        public Autodesk.AutoCAD.DatabaseServices.ObjectId ObjectId { get; set; }
     }
 }

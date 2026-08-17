@@ -175,18 +175,70 @@ namespace Correct_test1.Checks
 
             if (!string.IsNullOrEmpty(pageMessage))
             {
-                results.Add(new CheckResult
+                string originalPage =
+                    info.PageNumber ?? "";
+
+
+                string expectedPageText =
+                    expectedPage
+                    + "/"
+                    + expectedPageCount;
+
+
+                bool corrected =
+                    TryCorrectPageNumber(
+                        db,
+                        texts,
+                        isHorizontal,
+                        expectedPageText);
+
+
+                if (corrected)
                 {
-                    FilePath = filePath,
-                    FileName = fileName,
-                    LayoutName = info.LayoutName,
-                    Type = "页码检查",
-                    ObjectName = "页码",
-                    CurrentValue = info.PageNumber ?? "",
-                    ExpectedValue = expectedPage + "/" + expectedPageCount,
-                    Message = pageMessage,
-                    IsError = true
-                });
+                    pageMessage =
+                        "原页码："
+                        + (string.IsNullOrWhiteSpace(
+                                originalPage)
+                            ? "空"
+                            : originalPage)
+                        + "，已修正为："
+                        + expectedPageText;
+
+
+                    info.PageNumber =
+                        expectedPageText;
+
+
+                    results.Add(
+                        new CheckResult
+                        {
+                            FilePath = filePath,
+                            FileName = fileName,
+                            LayoutName = info.LayoutName,
+                            Type = "页码自动修正",
+                            ObjectName = "页码",
+                            CurrentValue = originalPage,
+                            ExpectedValue = expectedPageText,
+                            Message = pageMessage,
+                            IsError = false
+                        });
+                }
+                else
+                {
+                    results.Add(
+                        new CheckResult
+                        {
+                            FilePath = filePath,
+                            FileName = fileName,
+                            LayoutName = info.LayoutName,
+                            Type = "页码检查",
+                            ObjectName = "页码",
+                            CurrentValue = originalPage,
+                            ExpectedValue = expectedPageText,
+                            Message = pageMessage,
+                            IsError = true
+                        });
+                }
             }
 
             if (drawMarker)
@@ -372,6 +424,571 @@ namespace Correct_test1.Checks
             return results;
 
         }
+        /// <summary>
+        /// 页码错误时直接修改原来的文字实体。
+        ///
+        /// 只改变内容：
+        /// 位置、样式、字高、颜色、图层、旋转全部不动。
+        /// </summary>
+        /// <summary>
+        /// 页码错误时直接修改原来的文字实体。
+        ///
+        /// 只改变文字内容：
+        /// 位置、样式、字高、颜色、图层、旋转全部不动。
+        ///
+        /// 支持：
+        /// 1. 一个对象：1/3
+        /// 2. 一个对象：页码 1/3
+        /// 3. 两个对象：1 和 3
+        /// 4. 带文字：第1页 共3页
+        /// </summary>
+        private bool TryCorrectPageNumber(
+            Autodesk.AutoCAD.DatabaseServices.Database db,
+            List<TitleText> texts,
+            bool isHorizontal,
+            string expectedPageText)
+        {
+            if (db == null ||
+                texts == null ||
+                texts.Count == 0 ||
+                string.IsNullOrWhiteSpace(
+                    expectedPageText))
+            {
+                return false;
+            }
+
+
+            MatchCollection expectedMatches =
+                Regex.Matches(
+                    expectedPageText,
+                    @"\d+");
+
+
+            if (expectedMatches.Count < 2)
+            {
+                return false;
+            }
+
+
+            string expectedPage =
+                expectedMatches[0].Value;
+
+
+            string expectedCount =
+                expectedMatches[1].Value;
+
+
+            List<TitleFieldRegion> regions =
+                isHorizontal
+                    ? TitleBlockHorizontalConfig.Regions
+                    : TitleBlockVerticalConfig.Regions;
+
+
+            TitleFieldRegion pageRegion =
+                regions.Find(
+                    x =>
+                        x.FieldName ==
+                        "PageNumber");
+
+
+            if (pageRegion == null)
+            {
+                return false;
+            }
+
+
+            //==================================================
+            // 找出PageNumber区域中真正带数字的原文字。
+            //
+            // 注意：
+            // 这里不再排除包含“页码”的文字。
+            //
+            // 因为实际图纸很可能是：
+            //
+            // "页码 1/3"
+            //
+            // 整体就是同一个文字对象。
+            //==================================================
+
+            List<TitleText> candidates =
+                texts
+                    .Where(
+                        item =>
+                            item != null &&
+                            !item.ObjectId.IsNull &&
+                            item.ObjectId.IsValid &&
+                            pageRegion.Contains(
+                                item.X,
+                                item.Y) &&
+                            Regex.IsMatch(
+                                item.Text ?? "",
+                                @"\d+"))
+                    .OrderByDescending(
+                        item => item.Y)
+                    .ThenBy(
+                        item => item.X)
+                    .ToList();
+
+
+            if (candidates.Count == 0)
+            {
+                AppLogger.Info(
+                    "页码自动修正失败：PageNumber区域未找到可修改的数字文字。",
+                    "TitleBlockCheckManager.TryCorrectPageNumber");
+
+                return false;
+            }
+
+
+            //==================================================
+            // 优先寻找：
+            // 单个文字对象中同时存在两个数字。
+            //
+            // 例如：
+            // 1/3
+            // 页码 1/3
+            // 第1页 共3页
+            //==================================================
+
+            TitleText combinedCandidate =
+                candidates.Find(
+                    item =>
+                        Regex.Matches(
+                            item.Text ?? "",
+                            @"\d+")
+                        .Count >= 2);
+
+
+            try
+            {
+                using (
+                    Autodesk.AutoCAD.DatabaseServices.Transaction
+                        transaction =
+                            db.TransactionManager
+                                .StartTransaction())
+                {
+                    if (combinedCandidate != null)
+                    {
+                        Autodesk.AutoCAD.DatabaseServices.DBObject obj =
+                            transaction.GetObject(
+                                combinedCandidate.ObjectId,
+                                Autodesk.AutoCAD.DatabaseServices
+                                    .OpenMode.ForWrite);
+
+
+                        string currentText =
+                            GetEditableText(
+                                obj);
+
+
+                        if (string.IsNullOrWhiteSpace(
+                                currentText))
+                        {
+                            return false;
+                        }
+
+
+                        string correctedText =
+                            ReplaceFirstTwoNumbers(
+                                currentText,
+                                expectedPage,
+                                expectedCount);
+
+
+                        if (string.IsNullOrWhiteSpace(
+                                correctedText))
+                        {
+                            return false;
+                        }
+
+
+                        if (!SetEditableText(
+                                obj,
+                                correctedText))
+                        {
+                            return false;
+                        }
+
+
+                        transaction.Commit();
+
+
+                        combinedCandidate.Text =
+                            correctedText;
+
+
+                        return true;
+                    }
+
+
+                    //==================================================
+                    // 没有单个对象包含两个数字。
+                    //
+                    // 那么按与TitleBlockRegionParser相同的顺序，
+                    // 取前两个数字文字：
+                    //
+                    // 第一个 = 当前页
+                    // 第二个 = 总页数
+                    //==================================================
+
+                    if (candidates.Count < 2)
+                    {
+                        //==================================================
+                        // 只有一个数字对象，但原字段缺少总页数。
+                        //
+                        // 例如：
+                        // "页码 2"
+                        //
+                        // 直接在这个原对象中改成：
+                        // "页码 2/3"
+                        //==================================================
+
+                        TitleText only =
+                            candidates[0];
+
+
+                        Autodesk.AutoCAD.DatabaseServices.DBObject obj =
+                            transaction.GetObject(
+                                only.ObjectId,
+                                Autodesk.AutoCAD.DatabaseServices
+                                    .OpenMode.ForWrite);
+
+
+                        string currentText =
+                            GetEditableText(
+                                obj);
+
+
+                        string correctedText =
+                            ReplaceSingleNumberWithPageText(
+                                currentText,
+                                expectedPageText);
+
+
+                        if (string.IsNullOrWhiteSpace(
+                                correctedText) ||
+                            !SetEditableText(
+                                obj,
+                                correctedText))
+                        {
+                            return false;
+                        }
+
+
+                        transaction.Commit();
+
+
+                        only.Text =
+                            correctedText;
+
+
+                        return true;
+                    }
+
+
+                    TitleText pageText =
+                        candidates[0];
+
+
+                    TitleText countText =
+                        candidates[1];
+
+
+                    Autodesk.AutoCAD.DatabaseServices.DBObject pageObject =
+                        transaction.GetObject(
+                            pageText.ObjectId,
+                            Autodesk.AutoCAD.DatabaseServices
+                                .OpenMode.ForWrite);
+
+
+                    Autodesk.AutoCAD.DatabaseServices.DBObject countObject =
+                        transaction.GetObject(
+                            countText.ObjectId,
+                            Autodesk.AutoCAD.DatabaseServices
+                                .OpenMode.ForWrite);
+
+
+                    string pageCurrentText =
+                        GetEditableText(
+                            pageObject);
+
+
+                    string countCurrentText =
+                        GetEditableText(
+                            countObject);
+
+
+                    string correctedPageText =
+                        ReplaceFirstNumber(
+                            pageCurrentText,
+                            expectedPage);
+
+
+                    string correctedCountText =
+                        ReplaceFirstNumber(
+                            countCurrentText,
+                            expectedCount);
+
+
+                    if (string.IsNullOrWhiteSpace(
+                            correctedPageText) ||
+                        string.IsNullOrWhiteSpace(
+                            correctedCountText))
+                    {
+                        return false;
+                    }
+
+
+                    if (!SetEditableText(
+                            pageObject,
+                            correctedPageText) ||
+                        !SetEditableText(
+                            countObject,
+                            correctedCountText))
+                    {
+                        return false;
+                    }
+
+
+                    transaction.Commit();
+
+
+                    pageText.Text =
+                        correctedPageText;
+
+
+                    countText.Text =
+                        correctedCountText;
+
+
+                    return true;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "TitleBlockCheckManager.TryCorrectPageNumber");
+
+
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// 读取可编辑文字内容。
+        /// </summary>
+        private static string GetEditableText(
+            Autodesk.AutoCAD.DatabaseServices.DBObject obj)
+        {
+            Autodesk.AutoCAD.DatabaseServices.DBText dbText =
+                obj as Autodesk.AutoCAD.DatabaseServices.DBText;
+
+
+            if (dbText != null)
+            {
+                return
+                    dbText.TextString ?? "";
+            }
+
+
+            Autodesk.AutoCAD.DatabaseServices.MText mtext =
+                obj as Autodesk.AutoCAD.DatabaseServices.MText;
+
+
+            if (mtext != null)
+            {
+                // 使用显示文字。
+                //
+                // 修改Contents只影响这个MText的内容，
+                // TextStyleId/TextHeight/Location等对象属性不变。
+                return
+                    mtext.Text ?? "";
+            }
+
+
+            Autodesk.AutoCAD.DatabaseServices.AttributeReference attribute =
+                obj as Autodesk.AutoCAD.DatabaseServices.AttributeReference;
+
+
+            if (attribute != null)
+            {
+                return
+                    attribute.TextString ?? "";
+            }
+
+
+            return "";
+        }
+
+
+        /// <summary>
+        /// 只回写内容，不改对象其他属性。
+        /// </summary>
+        private static bool SetEditableText(
+            Autodesk.AutoCAD.DatabaseServices.DBObject obj,
+            string value)
+        {
+            Autodesk.AutoCAD.DatabaseServices.DBText dbText =
+                obj as Autodesk.AutoCAD.DatabaseServices.DBText;
+
+
+            if (dbText != null)
+            {
+                dbText.TextString =
+                    value;
+
+                return true;
+            }
+
+
+            Autodesk.AutoCAD.DatabaseServices.MText mtext =
+                obj as Autodesk.AutoCAD.DatabaseServices.MText;
+
+
+            if (mtext != null)
+            {
+                mtext.Contents =
+                    value;
+
+                return true;
+            }
+
+
+            Autodesk.AutoCAD.DatabaseServices.AttributeReference attribute =
+                obj as Autodesk.AutoCAD.DatabaseServices.AttributeReference;
+
+
+            if (attribute != null)
+            {
+                attribute.TextString =
+                    value;
+
+                return true;
+            }
+
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// 把文字中的前两个数字替换为正确页码。
+        ///
+        /// 例如：
+        /// 页码 4/9
+        /// ->
+        /// 页码 2/3
+        /// </summary>
+        private static string ReplaceFirstTwoNumbers(
+            string source,
+            string firstValue,
+            string secondValue)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    source))
+            {
+                return "";
+            }
+
+
+            int index =
+                0;
+
+
+            return Regex.Replace(
+                source,
+                @"\d+",
+                match =>
+                {
+                    index++;
+
+
+                    if (index == 1)
+                    {
+                        return firstValue;
+                    }
+
+
+                    if (index == 2)
+                    {
+                        return secondValue;
+                    }
+
+
+                    return match.Value;
+                });
+        }
+
+
+        /// <summary>
+        /// 替换第一个数字，其他文字保持原样。
+        /// </summary>
+        private static string ReplaceFirstNumber(
+    string source,
+    string value)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    source))
+            {
+                return "";
+            }
+
+
+            Regex regex =
+                new Regex(
+                    @"\d+");
+
+
+            return regex.Replace(
+                source,
+                value,
+                1);
+        }
+
+
+        /// <summary>
+        /// 原字段只有一个数字时，
+        /// 把该数字替换成完整的 2/3。
+        ///
+        /// 例如：
+        /// 页码 4
+        /// ->
+        /// 页码 2/3
+        /// </summary>
+        private static string ReplaceSingleNumberWithPageText(
+    string source,
+    string pageText)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    source))
+            {
+                return pageText;
+            }
+
+
+            if (!Regex.IsMatch(
+                    source,
+                    @"\d+"))
+            {
+                return
+                    source
+                    + pageText;
+            }
+
+
+            Regex regex =
+                new Regex(
+                    @"\d+");
+
+
+            return regex.Replace(
+                source,
+                pageText,
+                1);
+        }
+
         private static bool IsCompatibleBomDrawingNumber(
     string baseDrawingNumber,
     string bomDrawingNumber)

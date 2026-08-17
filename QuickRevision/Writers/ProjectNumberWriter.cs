@@ -195,11 +195,16 @@ namespace Correct_test1.QuickRevision.Writers
 
 
                 //--------------------------------
-                // 与原BOM文字一样高
+                // 项目号统一字高：3.5
+                //
+                // 注意：
+                // 上面的 textHeight 仍然保留，
+                // 继续用于原有 gap 计算，
+                // 因此位置逻辑不变。
                 //--------------------------------
 
                 text.TextHeight =
-                    textHeight;
+                    3.5;
 
 
                 //--------------------------------
@@ -225,12 +230,27 @@ namespace Correct_test1.QuickRevision.Writers
 
 
                 //--------------------------------
-                // 尽量继承原BOM文字样式
+                // 项目号统一使用 CONN。
+                //
+                // 已存在：直接使用。
+                // 不存在：自动创建。
                 //--------------------------------
 
-                ApplyTextStyle(
-                    text,
-                    target);
+                ObjectId connStyleId =
+                    EnsureConnTextStyleId(
+                        database,
+                        transaction);
+
+
+                if (connStyleId.IsNull ||
+                    !connStyleId.IsValid)
+                {
+                    return ObjectId.Null;
+                }
+
+
+                text.TextStyleId =
+                    connStyleId;
 
 
                 //--------------------------------
@@ -316,6 +336,119 @@ namespace Correct_test1.QuickRevision.Writers
             //--------------------------------
 
             return 2.5;
+        }
+
+
+        /// <summary>
+        /// 获取或创建 CONN 文字样式。
+        ///
+        /// 与项目号/版本号写入功能保持一致：
+        /// Arial、粗体、宽度因子0.8、非倾斜。
+        /// </summary>
+        private static ObjectId EnsureConnTextStyleId(
+            Database database,
+            Transaction transaction)
+        {
+            if (database == null ||
+                transaction == null)
+            {
+                return ObjectId.Null;
+            }
+
+
+            const string styleName =
+                "CONN";
+
+
+            TextStyleTable table =
+                transaction.GetObject(
+                    database.TextStyleTableId,
+                    OpenMode.ForRead)
+                as TextStyleTable;
+
+
+            if (table == null)
+            {
+                return ObjectId.Null;
+            }
+
+
+            //--------------------------------
+            // 已存在：直接使用
+            //--------------------------------
+
+            if (table.Has(
+                    styleName))
+            {
+                return
+                    table[styleName];
+            }
+
+
+            //--------------------------------
+            // 不存在：自动创建
+            //--------------------------------
+
+            table.UpgradeOpen();
+
+
+            TextStyleTableRecord newStyle =
+                new TextStyleTableRecord();
+
+
+            newStyle.Name =
+                styleName;
+
+
+            Autodesk.AutoCAD
+                .GraphicsInterface
+                .FontDescriptor font =
+                    new Autodesk.AutoCAD
+                        .GraphicsInterface
+                        .FontDescriptor(
+                            "Arial",
+                            true,
+                            false,
+                            0,
+                            0);
+
+
+            newStyle.Font =
+                font;
+
+
+            newStyle.TextSize =
+                0.0;
+
+
+            newStyle.XScale =
+                0.8;
+
+
+            newStyle.ObliquingAngle =
+                0.0;
+
+
+            newStyle.IsVertical =
+                false;
+
+
+            newStyle.FlagBits =
+                0;
+
+
+            ObjectId styleId =
+                table.Add(
+                    newStyle);
+
+
+            transaction
+                .AddNewlyCreatedDBObject(
+                    newStyle,
+                    true);
+
+
+            return styleId;
         }
 
 
