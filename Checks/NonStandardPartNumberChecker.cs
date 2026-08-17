@@ -302,11 +302,10 @@ namespace Correct_test1.Checks
                     //==================================================
 
                     candidateFiles =
-                        FindCandidateDwgs(
-                            archiveIndex,
-                            archiveDrawingNumber,
-                            true,
-                            bomProjectNumber);
+                        archiveIndex
+                            .GetProjectDwgs(
+                                archiveDrawingNumber,
+                                bomProjectNumber);
 
 
                     if (candidateFiles.Count > 0)
@@ -327,11 +326,9 @@ namespace Correct_test1.Checks
                         //==================================================
 
                         candidateFiles =
-                            FindCandidateDwgs(
-                                archiveIndex,
-                                archiveDrawingNumber,
-                                false,
-                                "");
+                            archiveIndex
+                                .GetGenericDwgs(
+                                    archiveDrawingNumber);
                     }
                 }
                 else
@@ -343,11 +340,9 @@ namespace Correct_test1.Checks
                     //==================================================
 
                     candidateFiles =
-                        FindCandidateDwgs(
-                            archiveIndex,
-                            archiveDrawingNumber,
-                            false,
-                            "");
+                        archiveIndex
+                            .GetGenericDwgs(
+                                archiveDrawingNumber);
                 }
 
                 //==================================================
@@ -672,252 +667,6 @@ namespace Correct_test1.Checks
 
 
             return suffix;
-        }
-
-
-        //==================================================
-        // 根据当前图纸类型锁定正确归档DWG
-        //==================================================
-
-        private static List<string> FindCandidateDwgs(
-            NonStandardArchiveIndex archiveIndex,
-            string drawingNumber,
-            bool currentHasProject,
-            string currentProjectNumber)
-        {
-            List<string> result =
-                new List<string>();
-
-
-            if (archiveIndex == null)
-            {
-                return result;
-            }
-
-
-            List<string> files =
-                archiveIndex
-                    .GetFilePathsSnapshot();
-
-
-            if (files == null)
-            {
-                return result;
-            }
-
-
-            FileNameProjectReader projectReader =
-                new FileNameProjectReader();
-
-
-            foreach (
-                string file
-                in files)
-            {
-                if (string.IsNullOrWhiteSpace(
-                        file))
-                {
-                    continue;
-                }
-
-
-                //==================================================
-                // 件号存在性必须读取DWG内部Layout。
-                //
-                // PDF不能用于这一步。
-                //==================================================
-
-                if (!string.Equals(
-                        Path.GetExtension(
-                            file),
-                        ".dwg",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-
-                string fileName;
-
-
-                try
-                {
-                    fileName =
-                        Path.GetFileNameWithoutExtension(
-                            file);
-                }
-                catch
-                {
-                    continue;
-                }
-
-
-                if (string.IsNullOrWhiteSpace(
-                        fileName))
-                {
-                    continue;
-                }
-
-
-                //==================================================
-                // 必须属于目标图号
-                //
-                // 防止：
-                //
-                // NS333T
-                //
-                // 错误匹配：
-                //
-                // NS333TA
-                // NS333TABC
-                //==================================================
-
-                if (!MatchesDrawingNumber(
-                        fileName,
-                        drawingNumber))
-                {
-                    continue;
-                }
-
-
-                //==================================================
-                // 判断候选归档DWG自己的项目号
-                //==================================================
-
-                FileNameProjectReader.ProjectInfo
-                    candidateProject =
-                        projectReader
-                            .ReadProjectNumber(
-                                file);
-
-
-                bool candidateHasProject =
-                    candidateProject != null &&
-                    !string.IsNullOrWhiteSpace(
-                        candidateProject.ProjectNumber);
-
-
-                //==================================================
-                // 当前图纸有项目号
-                //==================================================
-
-                if (currentHasProject)
-                {
-                    //--------------------------------
-                    // 候选图纸也必须有项目号
-                    //--------------------------------
-
-                    if (!candidateHasProject)
-                    {
-                        continue;
-                    }
-
-
-                    //--------------------------------
-                    // 必须属于相同项目
-                    //--------------------------------
-
-                    if (!string.Equals(
-                            candidateProject.ProjectNumber,
-                            currentProjectNumber,
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-
-                    result.Add(
-                        file);
-
-
-                    continue;
-                }
-
-
-                //==================================================
-                // 当前图纸没有项目号
-                //
-                // 候选归档DWG也必须没有项目号。
-                //==================================================
-
-                if (candidateHasProject)
-                {
-                    continue;
-                }
-
-
-                result.Add(
-                    file);
-            }
-
-
-            return result;
-        }
-
-
-        //==================================================
-        // 精确判断归档文件是否属于目标图号
-        //==================================================
-
-        private static bool MatchesDrawingNumber(
-            string fileName,
-            string drawingNumber)
-        {
-            if (string.IsNullOrWhiteSpace(
-                    fileName) ||
-                string.IsNullOrWhiteSpace(
-                    drawingNumber))
-            {
-                return false;
-            }
-
-
-            string name =
-                fileName.Trim();
-
-
-            string drawing =
-                drawingNumber.Trim();
-
-
-            if (!name.StartsWith(
-                    drawing,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-
-            //--------------------------------
-            // 文件名刚好等于图号
-            //--------------------------------
-
-            if (name.Length ==
-                drawing.Length)
-            {
-                return true;
-            }
-
-
-            //--------------------------------
-            // 图号后面允许：
-            //
-            // 空格
-            // -
-            // _
-            //--------------------------------
-
-            char next =
-                name[drawing.Length];
-
-
-            return
-                char.IsWhiteSpace(
-                    next)
-                ||
-                next == '-'
-                ||
-                next == '_';
         }
 
 

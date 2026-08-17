@@ -3,34 +3,143 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
+
 
 namespace Correct_test1.Core
 {
     /// <summary>
     /// 非标归档文件索引。
     ///
-    /// 一次递归扫描归档目录，
-    /// 后续所有NS图号均在内存中查询。
+    /// Z盘只递归扫描一次。
+    ///
+    /// 建立三套内存索引：
+    ///
+    /// 1.
+    /// DrawingNumber
+    /// ->
+    /// 所有归档文件
+    ///
+    /// 用于判断基础归档是否存在。
+    ///
+    ///
+    /// 2.
+    /// DrawingNumber
+    /// ->
+    /// 无项目号DWG
+    ///
+    /// 用于通用V版本。
+    ///
+    ///
+    /// 3.
+    /// DrawingNumber + ProjectNumber
+    /// ->
+    /// 项目专用DWG
+    ///
+    /// 用于项目L版本。
     /// </summary>
     public class NonStandardArchiveIndex
     {
-        private readonly List<string>
-            _filePaths;
+        //==================================================
+        // 原始完整文件列表
+        //
+        // 仍然保留。
+        //
+        // VersionArchiveIndex目前会复用它，
+        // 所以不能删除。
+        //==================================================
 
-        private readonly Dictionary<string, string>
-            _matchCache;
+        private readonly
+            List<string> _filePaths;
 
-        /// <summary>
-        /// 返回当前归档文件列表的副本。
-        ///
-        /// 供版本号归档索引复用。
-        /// 不允许外部修改原索引。
-        /// </summary>
-        public List<string> GetFilePathsSnapshot()
-        {
-            return new List<string>(
-                _filePaths);
-        }
+
+        //==================================================
+        // 图号 -> 所有文件
+        //
+        // 包含：
+        // DWG / PDF / 其他文件。
+        //
+        // 用于原有“归档图是否存在”检查。
+        //==================================================
+
+        private readonly
+            Dictionary<string, List<string>>
+            _filesByDrawingNumber;
+
+
+        //==================================================
+        // 图号 -> 无项目号DWG
+        //
+        // 例如：
+        //
+        // NS386DY
+        // ->
+        // NS386DY-V1.dwg
+        // NS386DY-V3.dwg
+        //==================================================
+
+        private readonly
+            Dictionary<string, List<string>>
+            _genericDwgsByDrawingNumber;
+
+
+        //==================================================
+        // 图号|项目号 -> 项目专用DWG
+        //
+        // 例如：
+        //
+        // NS386DY|N2607US004
+        // ->
+        // NS386DY-N2607US004-L0.dwg
+        // NS386DY-N2607US004-L2.dwg
+        //==================================================
+
+        private readonly
+            Dictionary<string, List<string>>
+            _projectDwgsByKey;
+
+
+        //==================================================
+        // 文件名开头的NS归档图号
+        //
+        // 支持：
+        //
+        // NS386DY
+        // NS386DY-V2
+        // NS386DY_N2607US004-L0
+        // NS386DY N2607US004-L0
+        //
+        // 图号后面必须：
+        //
+        // 文件结束
+        // 空格
+        // -
+        // _
+        //
+        // 防止：
+        //
+        // 查询NS386DY
+        // 错误匹配NS386DYA
+        //==================================================
+
+        private static readonly Regex
+            DrawingNumberRegex =
+                new Regex(
+                    @"^\s*(?<drawing>NS[0-9A-Z]+)(?=$|[-_\s])",
+                    RegexOptions.IgnoreCase);
+
+
+        //==================================================
+        // 项目号
+        //==================================================
+
+        private static readonly Regex
+            ProjectNumberRegex =
+                new Regex(
+                    @"N\d{4}[A-Z]{2}\d{3}",
+                    RegexOptions.IgnoreCase);
+
+
         public string RootPath
         {
             get;
@@ -56,7 +165,8 @@ namespace Correct_test1.Core
         {
             get
             {
-                return _filePaths.Count;
+                return
+                    _filePaths.Count;
             }
         }
 
@@ -74,35 +184,63 @@ namespace Correct_test1.Core
                 new List<string>();
 
 
-            _matchCache =
-                new Dictionary<string, string>(
+            _filesByDrawingNumber =
+                new Dictionary<string, List<string>>(
                     StringComparer.OrdinalIgnoreCase);
 
 
-            RootPath = "";
-            ErrorMessage = "";
+            _genericDwgsByDrawingNumber =
+                new Dictionary<string, List<string>>(
+                    StringComparer.OrdinalIgnoreCase);
+
+
+            _projectDwgsByKey =
+                new Dictionary<string, List<string>>(
+                    StringComparer.OrdinalIgnoreCase);
+
+
+            RootPath =
+                "";
+
+
+            ErrorMessage =
+                "";
         }
 
 
-        /// <summary>
-        /// 使用默认归档目录建立索引。
-        /// </summary>
+        //==================================================
+        // 供VersionArchiveIndex继续复用文件列表
+        //==================================================
+
+        public List<string> GetFilePathsSnapshot()
+        {
+            return
+                new List<string>(
+                    _filePaths);
+        }
+
+
+        //==================================================
+        // 默认路径建立索引
+        //==================================================
+
         public static NonStandardArchiveIndex Build()
         {
             AppPathSettings settings =
                 AppPathConfig.Current;
 
 
-            return Build(
-                settings.NonStandardArchivePath);
+            return
+                Build(
+                    settings
+                        .NonStandardArchivePath);
         }
 
 
-        /// <summary>
-        /// 建立归档文件索引。
-        ///
-        /// 会递归进入所有子文件夹。
-        /// </summary>
+        //==================================================
+        // 正式建立索引
+        //==================================================
+
         public static NonStandardArchiveIndex Build(
             string rootPath)
         {
@@ -114,14 +252,9 @@ namespace Correct_test1.Core
                 rootPath ?? "";
 
 
-            //--------------------------------
-            // 根目录本身不可访问：
-            //
-            // 整个归档检查不可用。
-            //
-            // 注意：
-            // 这种情况绝不能把所有NS判成不存在。
-            //--------------------------------
+            //==================================================
+            // 根目录不可访问
+            //==================================================
 
             if (string.IsNullOrWhiteSpace(
                     rootPath))
@@ -129,8 +262,10 @@ namespace Correct_test1.Core
                 index.IsAvailable =
                     false;
 
+
                 index.ErrorMessage =
                     "非标归档目录为空。";
+
 
                 return index;
             }
@@ -142,31 +277,21 @@ namespace Correct_test1.Core
                 index.IsAvailable =
                     false;
 
+
                 index.ErrorMessage =
                     "无法访问非标归档目录："
                     + rootPath;
+
 
                 return index;
             }
 
 
-            //--------------------------------
-            // 手动递归。
+            //==================================================
+            // 手动递归
             //
-            // 不直接使用：
-            //
-            // Directory.GetFiles(
-            //     root,
-            //     "*",
-            //     SearchOption.AllDirectories)
-            //
-            // 原因：
-            // 只要某个深层目录没有权限，
-            // 整个递归就可能直接抛异常终止。
-            //
-            // 这里按目录逐层处理，
-            // 某个子目录失败只跳过该目录。
-            //--------------------------------
+            // 单个子目录失败不会导致整个Z盘索引失败。
+            //==================================================
 
             Stack<string> directories =
                 new Stack<string>();
@@ -182,9 +307,9 @@ namespace Correct_test1.Core
                     directories.Pop();
 
 
-                //--------------------------------
-                // 当前目录下的文件
-                //--------------------------------
+                //==================================================
+                // 当前目录文件
+                //==================================================
 
                 try
                 {
@@ -192,10 +317,13 @@ namespace Correct_test1.Core
                         Directory.GetFiles(
                             currentDirectory,
                             "*",
-                            SearchOption.TopDirectoryOnly);
+                            SearchOption
+                                .TopDirectoryOnly);
 
 
-                    foreach (string file in files)
+                    foreach (
+                        string file
+                        in files)
                     {
                         if (string.IsNullOrWhiteSpace(
                                 file))
@@ -204,13 +332,26 @@ namespace Correct_test1.Core
                         }
 
 
+                        //--------------------------------
+                        // 原始文件列表
+                        //--------------------------------
+
                         index._filePaths.Add(
+                            file);
+
+
+                        //--------------------------------
+                        // 同时建立Dictionary索引
+                        //--------------------------------
+
+                        index.IndexFile(
                             file);
                     }
                 }
                 catch (Exception ex)
                 {
-                    index.SkippedDirectoryCount++;
+                    index
+                        .SkippedDirectoryCount++;
 
 
                     AppLogger.Warn(
@@ -222,9 +363,9 @@ namespace Correct_test1.Core
                 }
 
 
-                //--------------------------------
-                // 当前目录下的子文件夹
-                //--------------------------------
+                //==================================================
+                // 子目录
+                //==================================================
 
                 try
                 {
@@ -232,7 +373,8 @@ namespace Correct_test1.Core
                         Directory.GetDirectories(
                             currentDirectory,
                             "*",
-                            SearchOption.TopDirectoryOnly);
+                            SearchOption
+                                .TopDirectoryOnly);
 
 
                     foreach (
@@ -252,7 +394,8 @@ namespace Correct_test1.Core
                 }
                 catch (Exception ex)
                 {
-                    index.SkippedDirectoryCount++;
+                    index
+                        .SkippedDirectoryCount++;
 
 
                     AppLogger.Warn(
@@ -265,11 +408,6 @@ namespace Correct_test1.Core
             }
 
 
-            //--------------------------------
-            // 根目录能正常进入，
-            // 就认为归档索引可用。
-            //--------------------------------
-
             index.IsAvailable =
                 true;
 
@@ -280,8 +418,21 @@ namespace Correct_test1.Core
                 + rootPath
                 + " Files="
                 + index.FileCount
+                + " DrawingKeys="
+                + index
+                    ._filesByDrawingNumber
+                    .Count
+                + " GenericDwgKeys="
+                + index
+                    ._genericDwgsByDrawingNumber
+                    .Count
+                + " ProjectDwgKeys="
+                + index
+                    ._projectDwgsByKey
+                    .Count
                 + " SkippedDirectories="
-                + index.SkippedDirectoryCount,
+                + index
+                    .SkippedDirectoryCount,
                 "NonStandardArchiveIndex");
 
 
@@ -289,14 +440,212 @@ namespace Correct_test1.Core
         }
 
 
-        /// <summary>
-        /// 查询归档文件名中是否包含指定图号。
-        ///
-        /// 只比较文件名，
-        /// 不比较完整目录路径。
-        ///
-        /// 忽略大小写。
-        /// </summary>
+        //==================================================
+        // 建立单个文件的索引
+        //==================================================
+
+        private void IndexFile(
+            string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    filePath))
+            {
+                return;
+            }
+
+
+            string fileName;
+
+
+            try
+            {
+                fileName =
+                    Path.GetFileNameWithoutExtension(
+                        filePath);
+            }
+            catch
+            {
+                return;
+            }
+
+
+            if (string.IsNullOrWhiteSpace(
+                    fileName))
+            {
+                return;
+            }
+
+
+            //==================================================
+            // 从文件名开头读取基础图号
+            //==================================================
+
+            Match drawingMatch =
+                DrawingNumberRegex.Match(
+                    fileName);
+
+
+            if (!drawingMatch.Success)
+            {
+                return;
+            }
+
+
+            string drawingNumber =
+                drawingMatch
+                    .Groups["drawing"]
+                    .Value
+                    .Trim()
+                    .ToUpperInvariant();
+
+
+            if (string.IsNullOrWhiteSpace(
+                    drawingNumber))
+            {
+                return;
+            }
+
+
+            //==================================================
+            // 所有文件：
+            //
+            // DrawingNumber -> file
+            //==================================================
+
+            AddToIndex(
+                _filesByDrawingNumber,
+                drawingNumber,
+                filePath);
+
+
+            //==================================================
+            // 后面两个索引只处理DWG
+            //==================================================
+
+            string extension;
+
+
+            try
+            {
+                extension =
+                    Path.GetExtension(
+                        filePath);
+            }
+            catch
+            {
+                return;
+            }
+
+
+            if (!string.Equals(
+                    extension,
+                    ".dwg",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+
+            //==================================================
+            // 判断候选DWG自己的项目号
+            //==================================================
+
+            Match projectMatch =
+                ProjectNumberRegex.Match(
+                    fileName);
+
+
+            if (!projectMatch.Success)
+            {
+                //==================================================
+                // 无项目号：
+                //
+                // 通用DWG
+                //==================================================
+
+                AddToIndex(
+                    _genericDwgsByDrawingNumber,
+                    drawingNumber,
+                    filePath);
+
+
+                return;
+            }
+
+
+            //==================================================
+            // 项目专用DWG
+            //==================================================
+
+            string projectNumber =
+                projectMatch
+                    .Value
+                    .Trim()
+                    .ToUpperInvariant();
+
+
+            string projectKey =
+                BuildProjectKey(
+                    drawingNumber,
+                    projectNumber);
+
+
+            AddToIndex(
+                _projectDwgsByKey,
+                projectKey,
+                filePath);
+        }
+
+
+        //==================================================
+        // Dictionary<string,List<string>> 添加
+        //==================================================
+
+        private static void AddToIndex(
+            Dictionary<string, List<string>> dictionary,
+            string key,
+            string filePath)
+        {
+            if (dictionary == null ||
+                string.IsNullOrWhiteSpace(
+                    key) ||
+                string.IsNullOrWhiteSpace(
+                    filePath))
+            {
+                return;
+            }
+
+
+            List<string> list;
+
+
+            if (!dictionary.TryGetValue(
+                    key,
+                    out list))
+            {
+                list =
+                    new List<string>();
+
+
+                dictionary.Add(
+                    key,
+                    list);
+            }
+
+
+            list.Add(
+                filePath);
+        }
+
+
+        //==================================================
+        // 基础归档是否存在
+        //
+        // 现在是Dictionary O(1)查询。
+        //
+        // 不再扫描整个_filePaths。
+        //==================================================
+
         public bool Contains(
             string searchKey,
             out string matchedFilePath)
@@ -305,11 +654,8 @@ namespace Correct_test1.Core
                 "";
 
 
-            if (!IsAvailable)
-                return false;
-
-
-            if (string.IsNullOrWhiteSpace(
+            if (!IsAvailable ||
+                string.IsNullOrWhiteSpace(
                     searchKey))
             {
                 return false;
@@ -317,99 +663,202 @@ namespace Correct_test1.Core
 
 
             string key =
-                searchKey.Trim();
+                NormalizeDrawingNumber(
+                    searchKey);
 
 
-            //--------------------------------
-            // 优先查缓存。
-            //
-            // 相同NS图号在多张图中反复出现时，
-            // 不需要重新遍历整个文件列表。
-            //--------------------------------
-
-            string cachedResult;
-
-
-            if (_matchCache.TryGetValue(
-                    key,
-                    out cachedResult))
+            if (string.IsNullOrWhiteSpace(
+                    key))
             {
-                matchedFilePath =
-                    cachedResult ?? "";
-
-
-                return
-                    !string.IsNullOrEmpty(
-                        matchedFilePath);
+                return false;
             }
 
 
-            //--------------------------------
-            // 文件名Contains匹配
-            //--------------------------------
-
-            foreach (
-                string filePath
-                in _filePaths)
-            {
-                string fileName;
+            List<string> files;
 
 
-                try
-                {
-                    fileName =
-                        Path.GetFileName(
-                            filePath);
-                }
-                catch
-                {
-                    continue;
-                }
-
-
-                if (string.IsNullOrWhiteSpace(
-                        fileName))
-                {
-                    continue;
-                }
-
-
-                if (fileName.IndexOf(
+            if (!_filesByDrawingNumber
+                    .TryGetValue(
                         key,
-                        StringComparison.OrdinalIgnoreCase)
-                    < 0)
-                {
-                    continue;
-                }
+                        out files) ||
+                files == null ||
+                files.Count == 0)
+            {
+                return false;
+            }
 
 
-                //--------------------------------
-                // 找到
-                //--------------------------------
-
-                matchedFilePath =
-                    filePath;
+            matchedFilePath =
+                files[0];
 
 
-                _matchCache[key] =
-                    filePath;
+            return true;
+        }
 
 
-                return true;
+        //==================================================
+        // 获取通用无项目号DWG
+        //
+        // DrawingNumber
+        // ->
+        // List<DWG>
+        //==================================================
+
+        public List<string> GetGenericDwgs(
+            string drawingNumber)
+        {
+            string key =
+                NormalizeDrawingNumber(
+                    drawingNumber);
+
+
+            if (!IsAvailable ||
+                string.IsNullOrWhiteSpace(
+                    key))
+            {
+                return
+                    new List<string>();
+            }
+
+
+            List<string> files;
+
+
+            if (!_genericDwgsByDrawingNumber
+                    .TryGetValue(
+                        key,
+                        out files) ||
+                files == null)
+            {
+                return
+                    new List<string>();
             }
 
 
             //--------------------------------
-            // 没找到也缓存。
-            //
-            // 用空字符串表示未匹配。
+            // 返回副本，
+            // 防止调用方修改内部索引。
             //--------------------------------
 
-            _matchCache[key] =
-                "";
+            return
+                new List<string>(
+                    files);
+        }
 
 
-            return false;
+        //==================================================
+        // 获取项目专用DWG
+        //
+        // DrawingNumber + ProjectNumber
+        // ->
+        // List<DWG>
+        //==================================================
+
+        public List<string> GetProjectDwgs(
+            string drawingNumber,
+            string projectNumber)
+        {
+            string drawingKey =
+                NormalizeDrawingNumber(
+                    drawingNumber);
+
+
+            string projectKey =
+                NormalizeProjectNumber(
+                    projectNumber);
+
+
+            if (!IsAvailable ||
+                string.IsNullOrWhiteSpace(
+                    drawingKey) ||
+                string.IsNullOrWhiteSpace(
+                    projectKey))
+            {
+                return
+                    new List<string>();
+            }
+
+
+            string key =
+                BuildProjectKey(
+                    drawingKey,
+                    projectKey);
+
+
+            List<string> files;
+
+
+            if (!_projectDwgsByKey
+                    .TryGetValue(
+                        key,
+                        out files) ||
+                files == null)
+            {
+                return
+                    new List<string>();
+            }
+
+
+            return
+                new List<string>(
+                    files);
+        }
+
+
+        //==================================================
+        // Key
+        //==================================================
+
+        private static string BuildProjectKey(
+            string drawingNumber,
+            string projectNumber)
+        {
+            return
+                NormalizeDrawingNumber(
+                    drawingNumber)
+                + "|"
+                + NormalizeProjectNumber(
+                    projectNumber);
+        }
+
+
+        private static string NormalizeDrawingNumber(
+            string value)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    value))
+            {
+                return "";
+            }
+
+
+            return
+                value
+                    .Trim()
+                    .TrimEnd('_')
+                    .ToUpperInvariant();
+        }
+
+
+        private static string NormalizeProjectNumber(
+            string value)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    value))
+            {
+                return "";
+            }
+
+
+            Match match =
+                ProjectNumberRegex.Match(
+                    value);
+
+
+            return match.Success
+                ? match.Value
+                    .ToUpperInvariant()
+                : "";
         }
     }
 }
