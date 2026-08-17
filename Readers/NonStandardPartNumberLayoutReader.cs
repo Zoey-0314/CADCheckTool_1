@@ -307,42 +307,246 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
-            // 兼容老式小表：
-            //
-            // NS333T    _1
-            // 重量
-            // 备注
-            //
-            // 有些老图文字基点不完全在同一Y，
-            // 所以保留原来的宽松识别。
-            //==================================================
-
-            bool hasWeight =
-                ContainsExact(
-                    texts,
-                    "重量");
 
 
-            bool hasRemark =
-                ContainsExact(
-                    texts,
-                    "备注");
+            ReadLegacySmallTables(
+                texts,
+                result);
+        }
 
 
-            if (!hasWeight ||
-                !hasRemark)
+        private static void ReadLegacySmallTables(
+    List<TitleText> texts,
+    HashSet<string> result)
+        {
+            if (texts == null ||
+                result == null ||
+                texts.Count == 0)
             {
                 return;
             }
 
 
-            List<string> drawingNumbers =
-                new List<string>();
+            foreach (
+                TitleText drawingText
+                in texts)
+            {
+                if (drawingText == null ||
+                    string.IsNullOrWhiteSpace(
+                        drawingText.Text))
+                {
+                    continue;
+                }
 
 
-            List<string> partSuffixes =
-                new List<string>();
+                string drawingValue =
+                    Clean(
+                        drawingText.Text);
+
+
+                //==================================================
+                // 必须是真正的基础图号：
+                //
+                // NS333T
+                // NS333D_
+                //
+                // 不能是：
+                //
+                // NS333T1
+                //==================================================
+
+                if (!IsBaseDrawingNumber(
+                        drawingValue))
+                {
+                    continue;
+                }
+
+
+                //==================================================
+                // 老式小表必须在当前图号附近
+                // 同时存在：
+                //
+                // 重量
+                // 备注
+                //
+                // 不再使用整个Layout全局判断。
+                //==================================================
+
+                if (!HasNearbyLegacyLabels(
+                        texts,
+                        drawingText))
+                {
+                    continue;
+                }
+
+
+                string drawingNumber =
+                    NormalizeDrawingNumber(
+                        drawingValue);
+
+
+                if (string.IsNullOrWhiteSpace(
+                        drawingNumber))
+                {
+                    continue;
+                }
+
+
+                //==================================================
+                // 找当前图号附近的件号
+                //==================================================
+
+                foreach (
+                    TitleText suffixText
+                    in texts)
+                {
+                    if (suffixText == null ||
+                        string.IsNullOrWhiteSpace(
+                            suffixText.Text))
+                    {
+                        continue;
+                    }
+
+
+                    if (object.ReferenceEquals(
+                            drawingText,
+                            suffixText))
+                    {
+                        continue;
+                    }
+
+
+                    string suffix;
+
+
+                    if (!TryReadPartSuffix(
+                            Clean(
+                                suffixText.Text),
+                            out suffix))
+                    {
+                        continue;
+                    }
+
+
+                    //==================================================
+                    // 必须在当前图号右侧。
+                    //==================================================
+
+                    double rightDistance =
+                        suffixText.X -
+                        drawingText.X;
+
+
+                    if (rightDistance <= 0)
+                    {
+                        continue;
+                    }
+
+
+                    //==================================================
+                    // 防止把很远的另一个表里的_1
+                    // 误配给当前图号。
+                    //==================================================
+
+                    const double maxRightDistance =
+                        150.0;
+
+
+                    if (rightDistance >
+                        maxRightDistance)
+                    {
+                        continue;
+                    }
+
+
+                    //==================================================
+                    // 老图允许比新版矩阵更大的Y误差。
+                    //
+                    // 新版：
+                    // 2.5
+                    //
+                    // 老式兼容：
+                    // 12
+                    //==================================================
+
+                    const double legacyYTolerance =
+                        12.0;
+
+
+                    if (Math.Abs(
+                            suffixText.Y -
+                            drawingText.Y)
+                        > legacyYTolerance)
+                    {
+                        continue;
+                    }
+
+
+                    //==================================================
+                    // 如果附近还有其他基础图号，
+                    //
+                    // 这个suffix只能归给距离它最近的那个图号。
+                    //
+                    // 防止：
+                    //
+                    // NS333D_  _999
+                    //
+                    // NS386E_  _1
+                    //
+                    // 被交叉组合。
+                    //==================================================
+
+                    if (!IsNearestDrawingForSuffix(
+                            texts,
+                            drawingText,
+                            suffixText,
+                            legacyYTolerance,
+                            maxRightDistance))
+                    {
+                        continue;
+                    }
+
+
+                    result.Add(
+                        BuildKey(
+                            drawingNumber,
+                            suffix));
+                }
+            }
+        }
+        private static bool HasNearbyLegacyLabels(
+    List<TitleText> texts,
+    TitleText drawingText)
+        {
+            if (texts == null ||
+                drawingText == null)
+            {
+                return false;
+            }
+
+
+            bool hasWeight =
+                false;
+
+
+            bool hasRemark =
+                false;
+
+
+            //==================================================
+            // 老式小表不会特别大。
+            //
+            // 这里不是精确表框，
+            // 只是限定“附近区域”，
+            // 防止使用整个Layout的重量/备注。
+            //==================================================
+
+            const double maxHorizontalDistance =
+                150.0;
+
+
+            const double maxVerticalDistance =
+                80.0;
 
 
             foreach (
@@ -357,72 +561,196 @@ namespace Correct_test1.Readers
                 }
 
 
+                double dx =
+                    Math.Abs(
+                        text.X -
+                        drawingText.X);
+
+
+                double dy =
+                    Math.Abs(
+                        text.Y -
+                        drawingText.Y);
+
+
+                if (dx >
+                        maxHorizontalDistance ||
+                    dy >
+                        maxVerticalDistance)
+                {
+                    continue;
+                }
+
+
                 string value =
                     Clean(
                         text.Text);
 
 
-                //--------------------------------
-                // 图号
-                //--------------------------------
-
-                if (IsBaseDrawingNumber(
-                        value))
+                if (string.Equals(
+                        value,
+                        "重量",
+                        StringComparison.OrdinalIgnoreCase))
                 {
-                    string normalized =
-                        NormalizeDrawingNumber(
-                            value);
+                    hasWeight =
+                        true;
+                }
 
 
-                    if (!drawingNumbers.Contains(
-                            normalized))
-                    {
-                        drawingNumbers.Add(
-                            normalized);
-                    }
+                if (string.Equals(
+                        value,
+                        "备注",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    hasRemark =
+                        true;
+                }
 
 
+                if (hasWeight &&
+                    hasRemark)
+                {
+                    return true;
+                }
+            }
+
+
+            return false;
+        }
+        private static bool IsNearestDrawingForSuffix(
+    List<TitleText> texts,
+    TitleText currentDrawing,
+    TitleText suffixText,
+    double yTolerance,
+    double maxRightDistance)
+        {
+            if (texts == null ||
+                currentDrawing == null ||
+                suffixText == null)
+            {
+                return false;
+            }
+
+
+            double currentDistance =
+                GetDrawingSuffixDistance(
+                    currentDrawing,
+                    suffixText);
+
+
+            foreach (
+                TitleText otherDrawing
+                in texts)
+            {
+                if (otherDrawing == null ||
+                    object.ReferenceEquals(
+                        otherDrawing,
+                        currentDrawing) ||
+                    string.IsNullOrWhiteSpace(
+                        otherDrawing.Text))
+                {
                     continue;
                 }
 
 
-                //--------------------------------
-                // 件号
-                //--------------------------------
-
-                string suffix;
+                string value =
+                    Clean(
+                        otherDrawing.Text);
 
 
-                if (TryReadPartSuffix(
-                        value,
-                        out suffix))
+                if (!IsBaseDrawingNumber(
+                        value))
                 {
-                    if (!partSuffixes.Contains(
-                            suffix))
-                    {
-                        partSuffixes.Add(
-                            suffix);
-                    }
+                    continue;
+                }
+
+
+                //==================================================
+                // suffix也必须位于另一个候选图号右侧。
+                //==================================================
+
+                double rightDistance =
+                    suffixText.X -
+                    otherDrawing.X;
+
+
+                if (rightDistance <= 0 ||
+                    rightDistance >
+                        maxRightDistance)
+                {
+                    continue;
+                }
+
+
+                if (Math.Abs(
+                        suffixText.Y -
+                        otherDrawing.Y)
+                    > yTolerance)
+                {
+                    continue;
+                }
+
+
+                double otherDistance =
+                    GetDrawingSuffixDistance(
+                        otherDrawing,
+                        suffixText);
+
+
+                //==================================================
+                // 找到明显更近的基础图号：
+                //
+                // 当前drawing不是这个suffix的归属。
+                //==================================================
+
+                if (otherDistance <
+                    currentDistance)
+                {
+                    return false;
                 }
             }
 
 
-            foreach (
-                string drawingNumber
-                in drawingNumbers)
-            {
-                foreach (
-                    string suffix
-                    in partSuffixes)
-                {
-                    result.Add(
-                        BuildKey(
-                            drawingNumber,
-                            suffix));
-                }
-            }
+            return true;
         }
+        private static double GetDrawingSuffixDistance(
+    TitleText drawingText,
+    TitleText suffixText)
+        {
+            if (drawingText == null ||
+                suffixText == null)
+            {
+                return
+                    double.MaxValue;
+            }
 
+
+            double dx =
+                suffixText.X -
+                drawingText.X;
+
+
+            double dy =
+                suffixText.Y -
+                drawingText.Y;
+
+
+            //==================================================
+            // Y方向权重稍微放大。
+            //
+            // 原因：
+            //
+            // 对件号归属来说，
+            // “是不是同一行”
+            // 比纯X距离更重要。
+            //==================================================
+
+            return
+                Math.Abs(dx)
+                +
+                Math.Abs(dy)
+                * 5.0;
+        }
         /// <summary>
         /// 解析完整非标件号。
         ///
@@ -441,6 +769,7 @@ namespace Correct_test1.Readers
         /// ↓
         /// NS333H + 12
         /// </summary>
+        /// 
         private static bool TryReadCombinedPartNumber(
             string value,
             out string drawingNumber,
@@ -571,36 +900,7 @@ namespace Correct_test1.Readers
 
             return true;
         }
-        private static bool ContainsExact(
-            List<TitleText> texts,
-            string expected)
-        {
-            foreach (
-                TitleText text
-                in texts)
-            {
-                if (text == null)
-                    continue;
-
-
-                string value =
-                    Clean(
-                        text.Text);
-
-
-                if (string.Equals(
-                        value,
-                        expected,
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-
-            return false;
-        }
-
+        
 
         /// <summary>
         /// 判断是否为基础归档图号。
