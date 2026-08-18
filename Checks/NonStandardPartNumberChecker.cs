@@ -765,6 +765,12 @@ namespace Correct_test1.Checks
                 return "";
             }
 
+
+            if (files.Count == 1)
+            {
+                return files[0];
+            }
+
             string bestFile = "";
             int bestVersion = -1;
 
@@ -783,8 +789,12 @@ namespace Correct_test1.Checks
                 if (string.IsNullOrEmpty(bestFile) ||
                     version > bestVersion)
                 {
-                    bestVersion = version;
-                    bestFile = file;
+                    bestVersion =
+                        version;
+
+
+                    bestFile =
+                        file;
                 }
             }
 

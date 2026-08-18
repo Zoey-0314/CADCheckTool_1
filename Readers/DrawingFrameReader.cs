@@ -28,96 +28,101 @@ namespace Correct_test1.Readers
 
 
         public Extents3d? Read(
-            Database db)
+    Database db)
         {
+            if (db == null)
+                return null;
+
+            return Read(
+                db,
+                db.CurrentSpaceId);
+        }
+
+
+        public Extents3d? Read(
+            Database db,
+            ObjectId layoutSpaceId)
+        {
+            if (db == null ||
+                layoutSpaceId.IsNull ||
+                !layoutSpaceId.IsValid)
+            {
+                return null;
+            }
 
             try
             {
-
                 using (Transaction tr =
                     db.TransactionManager.StartTransaction())
                 {
-
-
-                    BlockTable bt =
-                        tr.GetObject(
-                            db.BlockTableId,
-                            OpenMode.ForRead)
-                        as BlockTable;
-
-
-
-                    // 当前Layout
-
                     BlockTableRecord layoutBtr =
                         tr.GetObject(
-                            db.CurrentSpaceId,
+                            layoutSpaceId,
                             OpenMode.ForRead)
                         as BlockTableRecord;
 
-
-
                     if (layoutBtr == null)
-                    {
                         return null;
-                    }
-
-
 
                     List<Line> lines =
                         new List<Line>();
 
-
-
                     foreach (ObjectId id in layoutBtr)
                     {
-
                         Entity ent =
                             tr.GetObject(
                                 id,
                                 OpenMode.ForRead)
                             as Entity;
 
-
-
                         Line line =
                             ent as Line;
 
+                        if (line == null)
+                            continue;
 
+                        double angle =
+                            Math.Abs(
+                                line.Angle *
+                                180 /
+                                Math.PI);
 
-                        if (line != null)
+                        bool horizontal =
+                            angle < 1 ||
+                            Math.Abs(angle - 180) < 1;
+
+                        bool vertical =
+                            Math.Abs(angle - 90) < 1 ||
+                            Math.Abs(angle - 270) < 1;
+
+                        if (horizontal &&
+                            line.Length >= 300)
                         {
-
                             lines.Add(line);
-
                         }
-
+                        else if (vertical &&
+                                 line.Length >= 200)
+                        {
+                            lines.Add(line);
+                        }
                     }
 
-
+                    Extents3d? frame =
+                        FindRectangle(lines);
 
                     tr.Commit();
 
-
-
-                    return FindRectangle(lines);
-
+                    return frame;
                 }
-
             }
             catch (Exception ex)
             {
-
                 AppLogger.Error(
                     ex,
-                    "DrawingFrameReader.Read"
-                );
-
+                    "DrawingFrameReader.Read");
 
                 return null;
-
             }
-
         }
 
 
@@ -127,243 +132,164 @@ namespace Correct_test1.Readers
         /// 从Line集合寻找最大矩形
         /// </summary>
         private Extents3d? FindRectangle(
-            List<Line> lines)
+    List<Line> lines)
         {
-
+            if (lines == null ||
+                lines.Count == 0)
+            {
+                return null;
+            }
 
             List<Line> horizontal =
                 new List<Line>();
 
-
             List<Line> vertical =
                 new List<Line>();
 
-
-
             foreach (Line line in lines)
             {
+                if (line == null)
+                    continue;
 
-                double angle =
+                double dx =
                     Math.Abs(
-                        line.Angle *
-                        180 /
-                        Math.PI);
+                        line.EndPoint.X -
+                        line.StartPoint.X);
 
+                double dy =
+                    Math.Abs(
+                        line.EndPoint.Y -
+                        line.StartPoint.Y);
 
-
-                // 水平
-
-                if (angle < 1 ||
-                   Math.Abs(angle - 180) < 1)
+                if (dy <= 1 &&
+                    line.Length >= 300)
                 {
                     horizontal.Add(line);
                 }
-
-
-
-                // 垂直
-
-                else if (Math.Abs(angle - 90) < 1 ||
-                        Math.Abs(angle - 270) < 1)
+                else if (dx <= 1 &&
+                         line.Length >= 200)
                 {
                     vertical.Add(line);
                 }
-
             }
 
-
-
-            double maxArea = 0;
-
-
-            Extents3d? result = null;
-
-
-
-            foreach (Line top in horizontal)
+            if (horizontal.Count < 2 ||
+                vertical.Count < 2)
             {
-
-                foreach (Line bottom in horizontal)
-                {
-
-
-                    if (top == bottom)
-                        continue;
-
-
-
-                    double y1 =
-                        top.StartPoint.Y;
-
-
-                    double y2 =
-                        bottom.StartPoint.Y;
-
-
-
-                    if (Math.Abs(y1 - y2) < 1)
-                        continue;
-
-
-
-                    foreach (Line left in vertical)
-                    {
-
-                        foreach (Line right in vertical)
-                        {
-
-
-                            if (left == right)
-                                continue;
-
-
-
-                            double x1 =
-                                left.StartPoint.X;
-
-
-                            double x2 =
-                                right.StartPoint.X;
-
-
-
-                            if (Math.Abs(x1 - x2) < 1)
-                                continue;
-
-
-
-                            double width =
-                                Math.Abs(
-                                    x1 - x2);
-
-
-
-                            double height =
-                                Math.Abs(
-                                    y1 - y2);
-
-
-
-                            // 排除小矩形
-
-                            if (width < 300 ||
-                               height < 200)
-                            {
-                                continue;
-                            }
-
-
-
-                            double area =
-                                width *
-                                height;
-
-
-
-                            if (area <= maxArea)
-                                continue;
-
-
-
-                            if (IsRectangle(
-                                top,
-                                bottom,
-                                left,
-                                right))
-                            {
-
-                                maxArea = area;
-
-
-
-                                result =
-                                    new Extents3d(
-                                        new Point3d(
-                                            Math.Min(x1, x2),
-                                            Math.Min(y1, y2),
-                                            0),
-
-                                        new Point3d(
-                                            Math.Max(x1, x2),
-                                            Math.Max(y1, y2),
-                                            0)
-                                    );
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
+                return null;
             }
 
+            Line left =
+                vertical[0];
 
+            Line right =
+                vertical[0];
 
-            return result;
+            foreach (Line line in vertical)
+            {
+                double x =
+                    (
+                        line.StartPoint.X +
+                        line.EndPoint.X
+                    ) / 2.0;
 
-        }
+                double leftX =
+                    (
+                        left.StartPoint.X +
+                        left.EndPoint.X
+                    ) / 2.0;
 
+                double rightX =
+                    (
+                        right.StartPoint.X +
+                        right.EndPoint.X
+                    ) / 2.0;
 
+                if (x < leftX)
+                    left = line;
 
+                if (x > rightX)
+                    right = line;
+            }
 
+            Line bottom =
+                horizontal[0];
 
-        /// <summary>
-        /// 判断四条Line是否真的连接成矩形
-        /// </summary>
-        private bool IsRectangle(
-            Line top,
-            Line bottom,
-            Line left,
-            Line right)
-        {
+            Line top =
+                horizontal[0];
 
+            foreach (Line line in horizontal)
+            {
+                double y =
+                    (
+                        line.StartPoint.Y +
+                        line.EndPoint.Y
+                    ) / 2.0;
+
+                double bottomY =
+                    (
+                        bottom.StartPoint.Y +
+                        bottom.EndPoint.Y
+                    ) / 2.0;
+
+                double topY =
+                    (
+                        top.StartPoint.Y +
+                        top.EndPoint.Y
+                    ) / 2.0;
+
+                if (y < bottomY)
+                    bottom = line;
+
+                if (y > topY)
+                    top = line;
+            }
 
             double minX =
-                Math.Min(
-                    left.StartPoint.X,
-                    left.EndPoint.X);
-
+                (
+                    left.StartPoint.X +
+                    left.EndPoint.X
+                ) / 2.0;
 
             double maxX =
-                Math.Max(
-                    right.StartPoint.X,
-                    right.EndPoint.X);
-
-
+                (
+                    right.StartPoint.X +
+                    right.EndPoint.X
+                ) / 2.0;
 
             double minY =
-                Math.Min(
-                    bottom.StartPoint.Y,
-                    bottom.EndPoint.Y);
-
-
+                (
+                    bottom.StartPoint.Y +
+                    bottom.EndPoint.Y
+                ) / 2.0;
 
             double maxY =
-                Math.Max(
-                    top.StartPoint.Y,
-                    top.EndPoint.Y);
+                (
+                    top.StartPoint.Y +
+                    top.EndPoint.Y
+                ) / 2.0;
 
-
-
-            // 判断四条边长度
-
-            if (
-                top.Length < 300 ||
-                bottom.Length < 300 ||
-                left.Length < 200 ||
-                right.Length < 200
-              )
+            if (maxX - minX < 300 ||
+                maxY - minY < 200)
             {
-                return false;
+                return null;
             }
 
+            return new Extents3d(
+                new Point3d(
+                    minX,
+                    minY,
+                    0),
 
-
-            return true;
-
+                new Point3d(
+                    maxX,
+                    maxY,
+                    0));
         }
+
+
+
+
 
 
     }

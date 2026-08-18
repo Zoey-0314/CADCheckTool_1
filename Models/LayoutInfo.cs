@@ -65,6 +65,8 @@ namespace Correct_test1.Models
         public Point3d EndPoint { get; set; }
 
         public string LayoutName { get; set; }
+
+        public bool IsBlue { get; set; }
     }
 
 }

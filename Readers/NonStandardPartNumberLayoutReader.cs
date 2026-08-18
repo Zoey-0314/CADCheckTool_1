@@ -224,7 +224,11 @@ namespace Correct_test1.Readers
                 //--------------------------------
 
                 const double yTolerance =
-                    2.5;
+                    12.0;
+
+
+                const double maxRightDistance =
+                    250.0;
 
 
                 foreach (
@@ -268,8 +272,14 @@ namespace Correct_test1.Readers
                     // 件号必须位于图号右侧
                     //--------------------------------
 
-                    if (suffixText.X <=
-                        drawingText.X)
+                    double rightDistance =
+                        suffixText.X -
+                        drawingText.X;
+
+
+                    if (rightDistance <= 0 ||
+                        rightDistance >
+                            maxRightDistance)
                     {
                         continue;
                     }
@@ -286,6 +296,17 @@ namespace Correct_test1.Readers
                     if (!TryReadPartSuffix(
                             suffixValue,
                             out suffix))
+                    {
+                        continue;
+                    }
+
+
+                    if (!IsNearestDrawingForSuffix(
+                            texts,
+                            drawingText,
+                            suffixText,
+                            yTolerance,
+                            maxRightDistance))
                     {
                         continue;
                     }

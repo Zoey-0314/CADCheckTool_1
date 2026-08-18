@@ -217,6 +217,7 @@ namespace Correct_test1.Readers
          line.EndPoint.X) <= 0.5;
 
                 if (!hasLeftLine &&
+                    line.IsBlue &&
                     isVertical &&
                     text.X - maxX > 0 &&
                     text.X - maxX <= 20 &&

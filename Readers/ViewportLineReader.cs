@@ -112,7 +112,10 @@ namespace Correct_test1.Readers
                                         line.EndPoint,
 
                                     LayoutName =
-                                        layout.LayoutName
+                                        layout.LayoutName,
+
+                                    IsBlue =
+                                        line.IsBlue
                                 });
                         }
                     }
@@ -153,6 +156,7 @@ namespace Correct_test1.Readers
                 AddModelLine(
                     line.StartPoint.TransformBy(transform),
                     line.EndPoint.TransformBy(transform),
+                    IsBlue(tr, line),
                     output);
 
                 return;
@@ -181,6 +185,8 @@ namespace Correct_test1.Readers
                         polyline.GetPoint3dAt(i + 1)
                             .TransformBy(transform),
 
+                        IsBlue(tr, polyline),
+
                         output);
                 }
 
@@ -200,6 +206,8 @@ namespace Correct_test1.Readers
 
                             polyline.GetPoint3dAt(0)
                                 .TransformBy(transform),
+
+                            IsBlue(tr, polyline),
 
                             output);
                     }
@@ -269,14 +277,45 @@ namespace Correct_test1.Readers
         private static void AddModelLine(
     Point3d start,
     Point3d end,
+    bool isBlue,
     List<CadLineInfo> output)
         {
             output.Add(
                 new CadLineInfo
                 {
                     StartPoint = start,
-                    EndPoint = end
+                    EndPoint = end,
+                    IsBlue = isBlue
                 });
+        }
+
+        private static bool IsBlue(
+    Transaction tr,
+    Entity entity)
+        {
+            if (entity == null)
+                return false;
+
+            if (entity.ColorIndex == 5)
+                return true;
+
+            if (entity.ColorIndex == 256)
+            {
+                LayerTableRecord layer =
+                    tr.GetObject(
+                        entity.LayerId,
+                        OpenMode.ForRead)
+                    as LayerTableRecord;
+
+                if (layer != null &&
+                    layer.Color != null &&
+                    layer.Color.ColorIndex == 5)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         private struct ModelWindow
         {

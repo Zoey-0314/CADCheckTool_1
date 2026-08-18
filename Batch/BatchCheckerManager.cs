@@ -529,9 +529,47 @@ namespace Correct_test1.Batch
                             });
 
                         AppLogger.Info(
-                            "检测到空图纸，跳过："
-                            + Path.GetFileName(file),
-                            "BatchCheckerManager");
+    "检测到空图纸，跳过："
+    + Path.GetFileName(file),
+    "BatchCheckerManager");
+
+                        double emptyWeight;
+
+                        if (!weights.TryGetValue(
+                                file,
+                                out emptyWeight))
+                        {
+                            emptyWeight = 1;
+                        }
+
+                        finishedWeight +=
+                            emptyWeight;
+
+                        int emptyPercent =
+                            (int)(
+                                finishedWeight /
+                                totalWeight *
+                                100);
+
+                        if (emptyPercent > 100)
+                        {
+                            emptyPercent = 100;
+                        }
+
+                        try
+                        {
+                            progress?.Invoke(
+                                emptyPercent,
+                                files.Length,
+                                Path.GetFileName(file));
+                        }
+                        catch (Exception ex)
+                        {
+                            AppLogger.Error(
+                                ex,
+                                "BatchCheckerManager.Progress",
+                                file);
+                        }
 
                         continue;
                     }
@@ -1455,50 +1493,85 @@ namespace Correct_test1.Batch
                 using (Transaction tr =
                     database.TransactionManager.StartTransaction())
                 {
+                    BlockTable blockTable =
+                        tr.GetObject(
+                            database.BlockTableId,
+                            OpenMode.ForRead)
+                        as BlockTable;
+
+                    if (blockTable == null)
+                        return false;
+
+                    BlockTableRecord modelSpace =
+                        tr.GetObject(
+                            blockTable[BlockTableRecord.ModelSpace],
+                            OpenMode.ForRead)
+                        as BlockTableRecord;
+
+                    if (modelSpace == null)
+                        return false;
+
+                    foreach (ObjectId id in modelSpace)
+                    {
+                        Entity entity =
+                            tr.GetObject(
+                                id,
+                                OpenMode.ForRead)
+                            as Entity;
+
+                        if (entity == null ||
+                            entity.IsErased)
+                        {
+                            continue;
+                        }
+
+                        return false;
+                    }
+
                     DBDictionary layouts =
                         tr.GetObject(
                             database.LayoutDictionaryId,
                             OpenMode.ForRead)
                         as DBDictionary;
 
-                    if (layouts == null)
-                        return false;
-
-                    foreach (DBDictionaryEntry entry in layouts)
+                    if (layouts != null)
                     {
-                        Layout layout =
-                            tr.GetObject(
-                                entry.Value,
-                                OpenMode.ForRead)
-                            as Layout;
-
-                        if (layout == null)
-                            continue;
-
-                        BlockTableRecord space =
-                            tr.GetObject(
-                                layout.BlockTableRecordId,
-                                OpenMode.ForRead)
-                            as BlockTableRecord;
-
-                        if (space == null)
-                            continue;
-
-                        foreach (ObjectId id in space)
+                        foreach (DBDictionaryEntry entry in layouts)
                         {
-                            Entity entity =
+                            Layout layout =
                                 tr.GetObject(
-                                    id,
+                                    entry.Value,
                                     OpenMode.ForRead)
-                                as Entity;
+                                as Layout;
 
-                            if (entity == null)
+                            if (layout == null ||
+                                layout.ModelType)
+                            {
+                                continue;
+                            }
+
+                            BlockTableRecord space =
+                                tr.GetObject(
+                                    layout.BlockTableRecordId,
+                                    OpenMode.ForRead)
+                                as BlockTableRecord;
+
+                            if (space == null)
                                 continue;
 
-                            if (entity is Viewport)
-                                continue;
+                            foreach (ObjectId id in space)
+                            {
+                                Entity entity =
+                                    tr.GetObject(
+                                        id,
+                                        OpenMode.ForRead)
+                                    as Entity;
 
-                            return false;
+                                if (entity is Table)
+                                {
+                                    return false;
+                                }
+                            }
                         }
                     }
 

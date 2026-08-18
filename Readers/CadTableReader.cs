@@ -75,7 +75,8 @@ namespace Correct_test1.Readers
                     return tables;
                 }
 
-
+                DrawingFrameReader frameReader =
+    new DrawingFrameReader();
 
 
 
@@ -96,25 +97,24 @@ namespace Correct_test1.Readers
 
 
                     //==================================================
-                    // BOM读取不再依赖DrawingFrameReader。
-                    //
-                    // 原因：
-                    //
-                    // 1. DrawingFrameReader使用CurrentSpaceId，
-                    //    在多Layout图纸中可能读取错误Layout的图框。
-                    //
-                    // 2. 原图框算法需要大量Line组合，
-                    //    复杂图纸存在严重性能风险。
-                    //
-                    // 3. 后续BomTableRecognizer本身已经会
-                    //    根据BOM表头判断Table是不是BOM。
-                    //
-                    // 因此这里直接读取当前Layout中的所有Table，
+                    //这里直接读取当前Layout中的所有Table，
                     // 后续再由BomTableRecognizer过滤。
                     //==================================================
 
                     Extents3d? frame =
                         null;
+
+                    try
+                    {
+                        frame =
+                            frameReader.Read(
+                                db,
+                                layout.BlockTableRecordId);
+                    }
+                    catch
+                    {
+                        frame = null;
+                    }
 
                     using (
                         Transaction tr =
