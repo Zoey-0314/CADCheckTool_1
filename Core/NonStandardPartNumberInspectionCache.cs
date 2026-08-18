@@ -9,18 +9,7 @@ using System.IO;
 
 namespace Correct_test1.Core
 {
-    /// <summary>
-    /// 非标件号归档DWG读取缓存。
-    ///
-    /// 同一张归档DWG只解析一次，
-    /// 后续直接查询内存中的：
-    ///
-    /// NS333T|1
-    /// NS333T|2
-    /// ...
-    /// </summary>
-    public static class
-        NonStandardPartNumberInspectionCache
+    public static class NonStandardPartNumberInspectionCache
     {
         private static readonly object
             SyncRoot =
@@ -34,20 +23,11 @@ namespace Correct_test1.Core
                     StringComparer.OrdinalIgnoreCase);
 
 
-        /// <summary>
-        /// 查询归档DWG中是否存在指定件号。
-        ///
-        /// 返回值：
-        ///
-        /// true：
-        /// 检查过程正常完成。
-        ///
-        /// contains：
-        /// 是否真正找到。
-        ///
-        /// false：
-        /// 归档DWG读取失败。
-        /// </summary>
+        private static readonly TimeSpan
+            FailureCacheDuration =
+                TimeSpan.FromSeconds(30);
+
+
         public static bool TryContains(
             string filePath,
             string drawingNumber,
@@ -109,6 +89,7 @@ namespace Correct_test1.Core
                             return false;
                         }
 
+
                         Cache.Remove(
                             cacheKey);
                     }
@@ -120,9 +101,11 @@ namespace Correct_test1.Core
                                     drawingNumber,
                                     partSuffix);
 
+
                         contains =
                             entry.PartKeys.Contains(
                                 targetKey);
+
 
                         return true;
                     }
@@ -130,13 +113,10 @@ namespace Correct_test1.Core
             }
 
 
-            //--------------------------------
-            // 第一次读取这张归档DWG
-            //--------------------------------
-
             entry =
                 Load(
                     filePath);
+
 
             entry.CachedAtUtc =
                 DateTime.UtcNow;
@@ -181,11 +161,6 @@ namespace Correct_test1.Core
                 new CacheEntry();
 
 
-            Database previousDatabase =
-                HostApplicationServices
-                    .WorkingDatabase;
-
-
             Database database =
                 null;
 
@@ -206,18 +181,16 @@ namespace Correct_test1.Core
                     "");
 
 
-                HostApplicationServices
-                    .WorkingDatabase =
-                        database;
-
-
                 database.CloseInput(
                     true);
 
 
-                NonStandardPartNumberLayoutReader
-                    reader =
-                        new NonStandardPartNumberLayoutReader();
+                // 这里不再切换全局WorkingDatabase。
+                // NonStandardPartNumberLayoutReader及其下游读取器
+                // 都显式接收当前database/ObjectId，
+                // 因此没有必要在主图检查过程中反复改全局数据库状态。
+                NonStandardPartNumberLayoutReader reader =
+                    new NonStandardPartNumberLayoutReader();
 
 
                 result.PartKeys =
@@ -254,29 +227,6 @@ namespace Correct_test1.Core
             }
             finally
             {
-                //--------------------------------
-                // 必须先恢复WorkingDatabase
-                //--------------------------------
-
-                try
-                {
-                    if (previousDatabase != null &&
-                        !previousDatabase.IsDisposed)
-                    {
-                        HostApplicationServices
-                            .WorkingDatabase =
-                                previousDatabase;
-                    }
-                }
-                catch
-                {
-                }
-
-
-                //--------------------------------
-                // 再释放归档Database
-                //--------------------------------
-
                 if (database != null)
                 {
                     try
@@ -294,10 +244,6 @@ namespace Correct_test1.Core
         }
 
 
-        /// <summary>
-        /// 文件发生修改后自动形成新缓存Key，
-        /// 避免一直使用旧数据。
-        /// </summary>
         private static string BuildCacheKey(
             string filePath)
         {
@@ -323,9 +269,7 @@ namespace Correct_test1.Core
                 + ticks;
         }
 
-        private static readonly TimeSpan
-    FailureCacheDuration =
-        TimeSpan.FromSeconds(30);
+
         private class CacheEntry
         {
             public DateTime CachedAtUtc
@@ -333,6 +277,8 @@ namespace Correct_test1.Core
                 get;
                 set;
             }
+
+
             public bool Success
             {
                 get;

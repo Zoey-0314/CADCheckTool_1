@@ -306,22 +306,20 @@ namespace Correct_test1.Batch
                             true);
 
 
-                    // 关键：
-                    // 先让当前后台Database成为WorkingDatabase，
-                    // 再读取DWG。
-                    // 这样自定义对象在ReadDwgFile阶段就处于正确数据库上下文，
-                    // 同时整个批量流程不再打开/关闭真实Document。
-                    HostApplicationServices
-                        .WorkingDatabase =
-                            db;
-
-
+                    // 读取DWG时保持宿主WorkingDatabase不变。
+                    // 读取完成后再切换到当前后台Database，
+                    // 避免把尚未完成ReadDwgFile的Database设成全局WorkingDatabase。
                     db.ReadDwgFile(
                         file,
                         FileOpenMode
                             .OpenForReadAndAllShare,
                         false,
                         "");
+
+
+                    HostApplicationServices
+                        .WorkingDatabase =
+                            db;
 
 
                     db.CloseInput(
@@ -334,25 +332,34 @@ namespace Correct_test1.Batch
                         "BatchCheckerManager");
 
 
-                    if (IsEffectivelyEmptyDrawing(db))
+                    if (ContainsAmdtNote(db))
                     {
-                        results.Add(
-                            new CheckResult
-                            {
-                                FilePath = file,
-                                FileName = Path.GetFileName(file),
-                                Type = "空图纸",
-                                ObjectName = "DWG",
-                                CurrentValue = "无可检查实体",
-                                ExpectedValue = "完整工程图",
-                                Message = "图纸未完成或为空，已跳过检查。",
-                                IsError = true
-                            });
+                        // AMDTNOTE在后台Database中可能只是ProxyEntity。
+                        // 先彻底退出后台Database，再使用真正Document检查。
+                        HostApplicationServices
+                            .WorkingDatabase =
+                                hostDatabase;
 
-                        AppLogger.Info(
-                            "检测到空图纸，跳过："
-                            + Path.GetFileName(file),
-                            "BatchCheckerManager");
+
+                        db.Dispose();
+
+                        db =
+                            null;
+
+
+                        ProcessMechanicalDrawing(
+                            file,
+                            applyChanges,
+                            archiveIndex,
+                            versionArchiveIndex,
+                            results,
+                            hostDocument);
+                    }
+                    else if (IsEffectivelyEmptyDrawing(db))
+                    {
+                        AddEmptyDrawingResult(
+                            file,
+                            results);
                     }
                     else
                     {
@@ -508,7 +515,9 @@ namespace Correct_test1.Batch
             bool applyChanges,
             NonStandardArchiveIndex archiveIndex,
             VersionArchiveIndex versionArchiveIndex,
-            List<CheckResult> results)
+            List<CheckResult> results,
+            bool saveWithSafeDwgSaver = true,
+            bool suppressBomCalloutResults = false)
         {
             CheckService checkService =
                 new CheckService();
@@ -524,6 +533,13 @@ namespace Correct_test1.Batch
                 throw
                     new InvalidOperationException(
                         "CheckService返回空CheckReport");
+            }
+
+
+            if (suppressBomCalloutResults)
+            {
+                report.BomCalloutResult =
+                    new BomCalloutResult();
             }
 
 
@@ -580,7 +596,8 @@ namespace Correct_test1.Batch
                 results);
 
 
-            if (applyChanges)
+            if (applyChanges &&
+                saveWithSafeDwgSaver)
             {
                 bool saved =
                     SafeDwgSaver.Save(
@@ -977,6 +994,483 @@ namespace Correct_test1.Batch
                         });
                 }
             }
+        }
+
+
+        private static void ProcessMechanicalDrawing(
+            string file,
+            bool applyChanges,
+            NonStandardArchiveIndex archiveIndex,
+            VersionArchiveIndex versionArchiveIndex,
+            List<CheckResult> results,
+            Document hostDocument)
+        {
+            DocumentCollection documents =
+                Application.DocumentManager;
+
+            Document mechanicalDocument =
+                null;
+
+            DocumentLock documentLock =
+                null;
+
+            bool openedHere =
+                false;
+
+
+            try
+            {
+                Document alreadyOpen =
+                    FindOpenDocument(
+                        documents,
+                        file);
+
+
+                if (alreadyOpen != null)
+                {
+                    if (applyChanges)
+                    {
+                        throw
+                            new InvalidOperationException(
+                                "Mechanical图纸当前已在AutoCAD中打开。"
+                                + "为避免覆盖用户未保存内容，检查并修改模式下请先关闭："
+                                + Path.GetFileName(file));
+                    }
+
+                    mechanicalDocument =
+                        alreadyOpen;
+                }
+                else
+                {
+                    mechanicalDocument =
+                        documents.Open(
+                            file,
+                            !applyChanges);
+
+                    openedHere =
+                        true;
+                }
+
+
+                if (mechanicalDocument == null ||
+                    mechanicalDocument.Database == null ||
+                    mechanicalDocument.Database.IsDisposed)
+                {
+                    throw
+                        new InvalidOperationException(
+                            "无法打开Mechanical图纸："
+                            + Path.GetFileName(file));
+                }
+
+
+                // Session命令中按之前已验证有效的方式处理：
+                // 打开真实Document、锁定Document、切WorkingDatabase。
+                // 不额外强制激活/Regenerate，减少Document上下文切换。
+                documentLock =
+                    mechanicalDocument
+                        .LockDocument();
+
+
+                HostApplicationServices
+                    .WorkingDatabase =
+                        mechanicalDocument.Database;
+
+
+                int realCount;
+                int proxyCount;
+
+                GetAmdtNoteCounts(
+                    mechanicalDocument.Database,
+                    out realCount,
+                    out proxyCount);
+
+
+                AppLogger.Info(
+                    "Mechanical对象状态：真实AMDTNOTE="
+                    + realCount
+                    + " ProxyAMDTNOTE="
+                    + proxyCount,
+                    "BatchCheckerManager",
+                    file);
+
+
+                bool suppressBomCallout =
+                    realCount == 0 &&
+                    proxyCount > 0;
+
+
+                if (IsEffectivelyEmptyDrawing(
+                        mechanicalDocument.Database))
+                {
+                    AddEmptyDrawingResult(
+                        file,
+                        results);
+                }
+                else
+                {
+                    ProcessDrawing(
+                        mechanicalDocument.Database,
+                        file,
+                        applyChanges,
+                        archiveIndex,
+                        versionArchiveIndex,
+                        results,
+                        false,
+                        suppressBomCallout);
+                }
+
+
+                if (suppressBomCallout)
+                {
+                    results.Add(
+                        new CheckResult
+                        {
+                            FilePath = file,
+                            FileName = Path.GetFileName(file),
+                            Type = "BOM序号检查",
+                            ObjectName = "Mechanical序号",
+                            CurrentValue = "AMDTNOTE仍为ProxyEntity",
+                            ExpectedValue = "真实AMDTNOTE可读取",
+                            Message =
+                                "该图Mechanical序号无法可靠解析，"
+                                + "本次已跳过BOM序号比对，避免产生“图中缺少序号”的误报。",
+                            IsError = true
+                        });
+                }
+
+
+                documentLock.Dispose();
+
+                documentLock =
+                    null;
+
+
+                RestoreHostDocument(
+                    documents,
+                    hostDocument);
+
+
+                if (openedHere)
+                {
+                    if (applyChanges)
+                    {
+                        mechanicalDocument
+                            .CloseAndSave(
+                                file);
+                    }
+                    else
+                    {
+                        mechanicalDocument
+                            .CloseAndDiscard();
+                    }
+
+                    mechanicalDocument =
+                        null;
+
+                    openedHere =
+                        false;
+                }
+
+
+                RestoreHostDocument(
+                    documents,
+                    hostDocument);
+            }
+            finally
+            {
+                if (documentLock != null)
+                {
+                    try
+                    {
+                        documentLock.Dispose();
+                    }
+                    catch
+                    {
+                    }
+
+                    documentLock =
+                        null;
+                }
+
+
+                try
+                {
+                    RestoreHostDocument(
+                        documents,
+                        hostDocument);
+                }
+                catch
+                {
+                }
+
+
+                if (openedHere &&
+                    mechanicalDocument != null)
+                {
+                    try
+                    {
+                        mechanicalDocument
+                            .CloseAndDiscard();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+
+        private static bool ContainsAmdtNote(
+            Database database)
+        {
+            int realCount;
+            int proxyCount;
+
+            GetAmdtNoteCounts(
+                database,
+                out realCount,
+                out proxyCount);
+
+            return
+                realCount > 0 ||
+                proxyCount > 0;
+        }
+
+
+        private static void GetAmdtNoteCounts(
+            Database database,
+            out int realCount,
+            out int proxyCount)
+        {
+            realCount =
+                0;
+
+            proxyCount =
+                0;
+
+
+            if (database == null ||
+                database.IsDisposed)
+            {
+                return;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction tr =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    BlockTableRecord modelSpace =
+                        tr.GetObject(
+                            SymbolUtilityServices
+                                .GetBlockModelSpaceId(
+                                    database),
+                            OpenMode.ForRead)
+                        as BlockTableRecord;
+
+
+                    if (modelSpace == null)
+                    {
+                        return;
+                    }
+
+
+                    foreach (
+                        ObjectId id
+                        in modelSpace)
+                    {
+                        Entity entity;
+
+                        try
+                        {
+                            entity =
+                                tr.GetObject(
+                                    id,
+                                    OpenMode.ForRead)
+                                as Entity;
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+
+
+                        if (entity == null)
+                        {
+                            continue;
+                        }
+
+
+                        ProxyEntity proxy =
+                            entity as ProxyEntity;
+
+
+                        if (proxy != null)
+                        {
+                            try
+                            {
+                                if (string.Equals(
+                                        proxy.OriginalDxfName,
+                                        "AMDTNOTE",
+                                        StringComparison.OrdinalIgnoreCase))
+                                {
+                                    proxyCount++;
+                                }
+                            }
+                            catch
+                            {
+                            }
+
+                            continue;
+                        }
+
+
+                        try
+                        {
+                            Autodesk.AutoCAD.Runtime.RXClass rxClass =
+                                entity.GetRXClass();
+
+
+                            if (rxClass != null &&
+                                string.Equals(
+                                    rxClass.DxfName,
+                                    "AMDTNOTE",
+                                    StringComparison.OrdinalIgnoreCase))
+                            {
+                                realCount++;
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+
+                    tr.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "BatchCheckerManager.GetAmdtNoteCounts");
+            }
+        }
+
+
+        private static Document FindOpenDocument(
+            DocumentCollection documents,
+            string filePath)
+        {
+            if (documents == null ||
+                string.IsNullOrWhiteSpace(filePath))
+            {
+                return null;
+            }
+
+
+            foreach (
+                Document document
+                in documents)
+            {
+                if (document == null)
+                {
+                    continue;
+                }
+
+
+                if (SameFilePath(
+                        document.Name,
+                        filePath))
+                {
+                    return document;
+                }
+            }
+
+
+            return null;
+        }
+
+
+        private static bool SameFilePath(
+            string first,
+            string second)
+        {
+            if (string.IsNullOrWhiteSpace(first) ||
+                string.IsNullOrWhiteSpace(second))
+            {
+                return false;
+            }
+
+
+            try
+            {
+                return
+                    string.Equals(
+                        Path.GetFullPath(first),
+                        Path.GetFullPath(second),
+                        StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return
+                    string.Equals(
+                        first,
+                        second,
+                        StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+
+        private static void RestoreHostDocument(
+            DocumentCollection documents,
+            Document hostDocument)
+        {
+            if (documents == null ||
+                hostDocument == null ||
+                hostDocument.Database == null ||
+                hostDocument.Database.IsDisposed)
+            {
+                return;
+            }
+
+
+            documents.MdiActiveDocument =
+                hostDocument;
+
+
+            HostApplicationServices
+                .WorkingDatabase =
+                    hostDocument.Database;
+        }
+
+
+        private static void AddEmptyDrawingResult(
+            string file,
+            List<CheckResult> results)
+        {
+            results.Add(
+                new CheckResult
+                {
+                    FilePath = file,
+                    FileName = Path.GetFileName(file),
+                    Type = "空图纸",
+                    ObjectName = "DWG",
+                    CurrentValue = "无可检查实体",
+                    ExpectedValue = "完整工程图",
+                    Message = "图纸未完成或为空，已跳过检查。",
+                    IsError = true
+                });
+
+
+            AppLogger.Info(
+                "检测到空图纸，跳过："
+                + Path.GetFileName(file),
+                "BatchCheckerManager");
         }
 
 

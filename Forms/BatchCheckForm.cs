@@ -27,9 +27,6 @@ namespace Correct_test1
             object sender,
             EventArgs e)
         {
-            BatchProgressForm progressForm =
-                null;
-
             try
             {
                 DialogResult modeResult =
@@ -38,8 +35,7 @@ namespace Correct_test1
                         + "【是】检查并修改\n"
                         + "自动修正页码、写入检查标记并保存DWG。\n\n"
                         + "【否】只检查\n"
-                        + "只生成CSV报告，不修改任何DWG。\n"
-                        + "大量图纸测试推荐使用此模式。\n\n"
+                        + "只生成CSV报告，不修改任何DWG。\n\n"
                         + "【取消】退出",
                         "批量检查模式",
                         MessageBoxButtons.YesNoCancel,
@@ -57,11 +53,8 @@ namespace Correct_test1
                     modeResult ==
                     DialogResult.Yes
 
-                        ? BatchCheckMode
-                            .ApplyChanges
-
-                        : BatchCheckMode
-                            .ReportOnly;
+                        ? BatchCheckMode.ApplyChanges
+                        : BatchCheckMode.ReportOnly;
 
 
                 using (
@@ -79,121 +72,62 @@ namespace Correct_test1
                     }
 
 
-                    string folderPath =
-                        dialog.SelectedPath;
+                    Document doc =
+                        Autodesk.AutoCAD
+                            .ApplicationServices
+                            .Application
+                            .DocumentManager
+                            .MdiActiveDocument;
 
 
-                    btnRunBatch.Enabled =
-                        false;
-
-
-                    progressForm =
-                        new BatchProgressForm();
-
-
-                    Autodesk.AutoCAD
-                        .ApplicationServices
-                        .Application
-                        .ShowModelessDialog(
-                            progressForm);
-
-
-                    BatchCheckerManager manager =
-                        new BatchCheckerManager();
-
-
-                    List<CheckResult> results =
-                        manager.CheckFolder(
-                            folderPath,
-                            (percent, total, name) =>
-                            {
-                                if (progressForm == null ||
-                                    progressForm.IsDisposed)
-                                {
-                                    return;
-                                }
-
-                                progressForm.UpdateProgress(
-                                    percent,
-                                    name);
-                            },
-                            mode);
-
-
-                    if (progressForm != null &&
-                        !progressForm.IsDisposed)
+                    if (doc == null)
                     {
-                        progressForm.Close();
-
-                        progressForm =
-                            null;
-                    }
-
-
-                    BatchCsvExporter exporter =
-                        new BatchCsvExporter();
-
-
-                    string csvPath =
-                        exporter.Export(
-                            results,
-                            folderPath);
-
-
-                    BatchReportInfo.LastReportPath =
-                        csvPath;
-
-
-                    DialogResult dr =
                         MessageBox.Show(
-                            "批量检查完成\n\n"
-                            + "运行模式："
-                            + (
-                                mode ==
-                                BatchCheckMode.ApplyChanges
+                            "当前没有有效的AutoCAD宿主图纸。",
+                            "批量检查");
 
-                                    ? "检查并修改"
-                                    : "只检查（原DWG未修改）"
-                              )
-                            + "\n\n问题数量："
-                            + results.Count
-                            + "\n\n是否打开检查报告？",
-                            "批量检查",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Information);
-
-
-                    if (dr ==
-                        DialogResult.Yes)
-                    {
-                        Process.Start(
-                            csvPath);
+                        return;
                     }
+
+
+                    if (!CommandEntry.QueueBatchRun(
+                            dialog.SelectedPath,
+                            mode))
+                    {
+                        MessageBox.Show(
+                            "已有批量检查正在等待或运行，请勿重复启动。",
+                            "批量检查");
+
+                        return;
+                    }
+
+
+                    try
+                    {
+                        // Modeless按钮只负责排队。
+                        // 真正批量检查由Session命令执行，
+                        // 避免在modeless回调里直接切换/打开Document。
+                        doc.SendStringToExecute(
+                            "CADCHECKBATCHRUN ",
+                            true,
+                            false,
+                            false);
+                    }
+                    catch
+                    {
+                        CommandEntry.CancelQueuedBatchRun();
+                        throw;
+                    }
+
+
+                    this.Close();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
                     ex.Message,
-                    "批量检查失败");
-            }
-            finally
-            {
-                btnRunBatch.Enabled =
-                    true;
-
-
-                if (progressForm != null &&
-                    !progressForm.IsDisposed)
-                {
-                    try
-                    {
-                        progressForm.Close();
-                    }
-                    catch
-                    {
-                    }
-                }
+                    "批量检查启动失败");
             }
         }
 
