@@ -227,46 +227,95 @@ namespace Correct_test1.Core
         /// 验证DWG文件
         /// </summary>
         private static void ValidateFile(
-            string file
-        )
+    string file)
         {
-
-
             if (!File.Exists(file))
             {
-
                 throw new Exception(
-                    "临时DWG不存在:"
-                    +
-                    file
-                );
-
+                    "临时DWG不存在:" + file);
             }
-
-
 
             FileInfo info =
                 new FileInfo(file);
 
-
-
-            // 防止0KB文件
-
             if (info.Length < 1024)
             {
-
                 throw new Exception(
                     "DWG文件异常，大小过小:"
-                    +
-                    info.Length
-                    +
-                    " bytes"
-                );
-
+                    + info.Length
+                    + " bytes");
             }
 
+            Database verifyDatabase = null;
 
+            try
+            {
+                verifyDatabase =
+                    new Database(
+                        false,
+                        true);
 
+                verifyDatabase.ReadDwgFile(
+                    file,
+                    FileOpenMode.OpenForReadAndAllShare,
+                    false,
+                    "");
+
+                verifyDatabase.CloseInput(true);
+
+                using (
+                    Transaction tr =
+                        verifyDatabase
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    BlockTable blockTable =
+                        tr.GetObject(
+                            verifyDatabase.BlockTableId,
+                            OpenMode.ForRead)
+                        as BlockTable;
+
+                    if (blockTable == null)
+                    {
+                        throw new Exception(
+                            "无法读取DWG块表");
+                    }
+
+                    DBDictionary layouts =
+                        tr.GetObject(
+                            verifyDatabase.LayoutDictionaryId,
+                            OpenMode.ForRead)
+                        as DBDictionary;
+
+                    if (layouts == null)
+                    {
+                        throw new Exception(
+                            "无法读取DWG布局信息");
+                    }
+
+                    tr.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "临时DWG重新打开验证失败: "
+                    + ex.Message,
+                    ex);
+            }
+            finally
+            {
+                if (verifyDatabase != null)
+                {
+                    try
+                    {
+                        verifyDatabase.Dispose();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
 
 
