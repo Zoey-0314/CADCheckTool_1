@@ -458,14 +458,34 @@ namespace Correct_test1.Checks
                 //==================================================
 
                 string archiveFile =
-                    SelectLatestFile(
-                        candidateFiles,
-                        selectedProjectSpecific);
+    SelectLatestFile(
+        candidateFiles,
+        selectedProjectSpecific);
 
 
                 if (string.IsNullOrWhiteSpace(
                         archiveFile))
                 {
+                    string versionType =
+                        selectedProjectSpecific
+                            ? "L"
+                            : "V";
+
+                    results.Add(
+                        CreateResult(
+                            bom,
+                            item,
+                            effectivePartNumber,
+                            archiveDrawingNumber,
+                            partSuffix,
+                            bomProjectNumber,
+                            "",
+                            true,
+                            "非标件号检查未执行："
+                            + "找到归档候选文件，但无法从文件名解析"
+                            + versionType
+                            + "版本号。"));
+
                     continue;
                 }
 
@@ -736,8 +756,8 @@ namespace Correct_test1.Checks
         //==================================================
 
         private static string SelectLatestFile(
-            List<string> files,
-            bool currentHasProject)
+    List<string> files,
+    bool currentHasProject)
         {
             if (files == null ||
                 files.Count == 0)
@@ -745,47 +765,31 @@ namespace Correct_test1.Checks
                 return "";
             }
 
+            string bestFile = "";
+            int bestVersion = -1;
 
-            string bestFile =
-                files[0];
-
-
-            int bestVersion =
-                currentHasProject
-                    ? ReadLVersion(
-                        bestFile)
-                    : ReadVVersion(
-                        bestFile);
-
-
-            foreach (
-                string file
-                in files)
+            foreach (string file in files)
             {
                 int version =
                     currentHasProject
-                        ? ReadLVersion(
-                            file)
-                        : ReadVVersion(
-                            file);
+                        ? ReadLVersion(file)
+                        : ReadVVersion(file);
 
-
-                if (version >
-                    bestVersion)
+                if (version < 0)
                 {
-                    bestVersion =
-                        version;
+                    continue;
+                }
 
-
-                    bestFile =
-                        file;
+                if (string.IsNullOrEmpty(bestFile) ||
+                    version > bestVersion)
+                {
+                    bestVersion = version;
+                    bestFile = file;
                 }
             }
 
-
             return bestFile;
         }
-
 
         //==================================================
         // L版本
