@@ -74,18 +74,62 @@ namespace Correct_test1.Readers
                     if (layout == null || layout.ModelType)
                         continue;
 
-                    ObjectIdCollection viewportIds =
-                        layout.GetViewports();
+                    BlockTableRecord paperSpace =
+    tr.GetObject(
+        layout.BlockTableRecordId,
+        OpenMode.ForRead)
+    as BlockTableRecord;
 
-                    for (int i = 1; i < viewportIds.Count; i++)
+                    if (paperSpace == null)
+                        continue;
+
+                    ObjectId paperViewportId =
+                        ObjectId.Null;
+
+                    try
+                    {
+                        ObjectIdCollection knownViewports =
+                            layout.GetViewports();
+
+                        if (knownViewports != null &&
+                            knownViewports.Count > 0)
+                        {
+                            paperViewportId =
+                                knownViewports[0];
+                        }
+                    }
+                    catch
+                    {
+                    }
+
+                    bool skippedFallbackPaperViewport =
+                        false;
+
+                    foreach (ObjectId entityId in paperSpace)
                     {
                         Viewport viewport =
                             tr.GetObject(
-                                viewportIds[i],
-                                OpenMode.ForRead) as Viewport;
+                                entityId,
+                                OpenMode.ForRead)
+                            as Viewport;
 
-                        if (viewport == null ||
-                            !viewport.On ||
+                        if (viewport == null)
+                            continue;
+
+                        if (!paperViewportId.IsNull &&
+                            entityId == paperViewportId)
+                        {
+                            continue;
+                        }
+
+                        if (paperViewportId.IsNull &&
+                            !skippedFallbackPaperViewport)
+                        {
+                            skippedFallbackPaperViewport = true;
+                            continue;
+                        }
+
+                        if (!viewport.On ||
                             viewport.CustomScale <= 0)
                         {
                             continue;
@@ -111,8 +155,12 @@ namespace Correct_test1.Readers
                                     X = text.X,
                                     Y = text.Y,
                                     Height = text.Height,
+
                                     LayoutName =
-                                        layout.LayoutName
+                                        layout.LayoutName,
+
+                                    ViewportId =
+                                        viewport.ObjectId
                                 });
                         }
                     }

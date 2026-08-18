@@ -31,6 +31,12 @@
         /// </summary>
         public string LayoutName { get; set; }
 
+        public Autodesk.AutoCAD.DatabaseServices.ObjectId ViewportId
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// 对应的原始CAD文字实体。
         ///

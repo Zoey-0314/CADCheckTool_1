@@ -67,6 +67,12 @@ namespace Correct_test1.Models
         public string LayoutName { get; set; }
 
         public bool IsBlue { get; set; }
+
+        public ObjectId ViewportId
+        {
+            get;
+            set;
+        }
     }
 
 }
