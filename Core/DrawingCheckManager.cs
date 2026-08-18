@@ -4,6 +4,7 @@ using Correct_test1.Models;
 using Correct_test1.Checks;
 using Correct_test1.Readers;
 using Correct_test1.Markers;
+using System;
 
 namespace Correct_test1.Core
 {
@@ -32,61 +33,217 @@ namespace Correct_test1.Core
 
             //--------------------------------------
             // 1. 项目号检查
+            //
+            // 不再使用 projects[0]。
+            //
+            // 每一个项目号都绑定它真正所属的Layout。
             //--------------------------------------
-            ProjectReader projectReader = new ProjectReader();
-            List<string> projects = projectReader.ReadProjects(db);
 
-            if (projects.Count == 0)
+            ProjectReader projectReader =
+                new ProjectReader();
+
+
+            List<ProjectNumberLocation> projectLocations =
+                projectReader.ReadProjectLocations(
+                    db);
+
+
+            if (projectLocations == null ||
+                projectLocations.Count == 0)
             {
-                results.Add(new CheckResult
-                {
-                    FilePath = filePath,
-                    FileName = fileName,
-                    LayoutName = "",
-                    Mark = "",
-                    Type = "项目号检查",
-                    ObjectName = "项目号",
-                    CurrentValue = "",
-                    ExpectedValue = "",
-                    Message = "未找到项目号",
-                    IsError = true
-                });
+                results.Add(
+                    new CheckResult
+                    {
+                        FilePath =
+                            filePath,
+
+                        FileName =
+                            fileName,
+
+                        LayoutName =
+                            "",
+
+                        Mark =
+                            "",
+
+                        Type =
+                            "项目号检查",
+
+                        ObjectName =
+                            "项目号",
+
+                        CurrentValue =
+                            "",
+
+                        ExpectedValue =
+                            "",
+
+                        Message =
+                            "未找到项目号",
+
+                        IsError =
+                            true
+                    });
             }
             else
             {
                 FileNameProjectReader fileProjectReader =
                     new FileNameProjectReader();
+
+
                 FileNameProjectReader.ProjectInfo expectedProject =
-                    fileProjectReader.ReadProjectNumber(filePath);
+                    fileProjectReader.ReadProjectNumber(
+                        filePath);
+
+
+                //==================================================
+                // 文件名本身没有可识别项目号时，
+                // 保持原有行为：
+                //
+                // 不进行项目号一致性比较。
+                //==================================================
 
                 if (expectedProject != null &&
-                    !string.Equals(
-                        projects[0],
-                        expectedProject.ProjectNumber,
-                        System.StringComparison.OrdinalIgnoreCase))
+                    !string.IsNullOrWhiteSpace(
+                        expectedProject.ProjectNumber))
                 {
-                    results.Add(new CheckResult
-                    {
-                        FilePath = filePath,
-                        FileName = fileName,
-                        Type = "项目号检查",
-                        ObjectName = "项目号",
-                        CurrentValue = projects[0],
-                        ExpectedValue = expectedProject.ProjectNumber,
-                        Message = "当前项目号与要求项目号不一致",
-                        IsError = true
-                    });
+                    //==================================================
+                    // 防止：
+                    //
+                    // 同一个Layout里同一个项目号出现多次，
+                    // CSV重复报完全一样的错误。
+                    //
+                    // Key：
+                    //
+                    // Layout1|N2607US004
+                    //==================================================
 
-                    if (drawMarker)
+                    HashSet<string> reportedIssues =
+                        new HashSet<string>(
+                            StringComparer.OrdinalIgnoreCase);
+
+
+                    //==================================================
+                    // Marker也不能同一个错误项目号重复创建。
+                    //
+                    // CreateProjectMarkers本身会重新扫描所有位置，
+                    // 所以一个错误项目号调用一次即可。
+                    //==================================================
+
+                    HashSet<string> markedProjects =
+                        new HashSet<string>(
+                            StringComparer.OrdinalIgnoreCase);
+
+
+                    foreach (
+                        ProjectNumberLocation location
+                        in projectLocations)
                     {
-                        new MarkerManager().CreateProjectMarkers(
-                            db,
-                            projects[0],
-                            expectedProject.ProjectNumber);
+                        if (location == null ||
+                            string.IsNullOrWhiteSpace(
+                                location.ProjectNumber))
+                        {
+                            continue;
+                        }
+
+
+                        //==================================================
+                        // 当前项目号正确
+                        //==================================================
+
+                        if (string.Equals(
+                                location.ProjectNumber,
+                                expectedProject.ProjectNumber,
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+
+                        string layoutName =
+                            location.LayoutName
+                            ?? "";
+
+
+                        string issueKey =
+                            layoutName
+                            + "|"
+                            + location.ProjectNumber;
+
+
+                        //==================================================
+                        // 同Layout同项目号只报告一次
+                        //==================================================
+
+                        if (!reportedIssues.Add(
+                                issueKey))
+                        {
+                            continue;
+                        }
+
+
+                        results.Add(
+                            new CheckResult
+                            {
+                                FilePath =
+                                    filePath,
+
+                                FileName =
+                                    fileName,
+
+                                LayoutName =
+                                    layoutName,
+
+                                Type =
+                                    "项目号检查",
+
+                                ObjectName =
+                                    "项目号",
+
+                                CurrentValue =
+                                    location.ProjectNumber,
+
+                                ExpectedValue =
+                                    expectedProject.ProjectNumber,
+
+                                Message =
+                                    string.IsNullOrWhiteSpace(
+                                        layoutName)
+
+                                        ? "当前项目号与要求项目号不一致"
+
+                                        : "布局 "
+                                          + layoutName
+                                          + " 的项目号与要求项目号不一致",
+
+                                IsError =
+                                    true
+                            });
+
+
+                        //==================================================
+                        // Marker
+                        //
+                        // 同一个错误项目号只调用一次。
+                        //
+                        // MarkerManager内部已经会根据
+                        // ProjectNumberLocation.LayoutName
+                        // 把Marker放到真实Layout。
+                        //==================================================
+
+                        if (drawMarker &&
+                            markedProjects.Add(
+                                location.ProjectNumber))
+                        {
+                            new MarkerManager()
+                                .CreateProjectMarkers(
+                                    db,
+                                    location.ProjectNumber,
+                                    expectedProject.ProjectNumber);
+                        }
                     }
                 }
             }
-
             //--------------------------------------
             // 2. 修改记录检查
             //--------------------------------------
