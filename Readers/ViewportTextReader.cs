@@ -9,11 +9,12 @@ namespace Correct_test1.Readers
     public class ViewportTextReader
     {
         public List<TitleText> Read(
-            Database db,
-            bool includeNestedBlocks = true,
-            bool useViewportFilter = true)
+    Database db,
+    bool includeNestedBlocks = true,
+    bool useViewportFilter = true)
         {
-            List<TitleText> result = new List<TitleText>();
+            List<TitleText> result =
+                new List<TitleText>();
 
             if (db == null)
                 return result;
@@ -29,16 +30,39 @@ namespace Correct_test1.Readers
                 if (layoutDict == null)
                     return result;
 
-                ObjectId modelSpaceId =
-                    SymbolUtilityServices.GetBlockModelSpaceId(db);
-
                 BlockTableRecord modelSpace =
                     tr.GetObject(
-                        modelSpaceId,
+                        SymbolUtilityServices
+                            .GetBlockModelSpaceId(db),
                         OpenMode.ForRead) as BlockTableRecord;
 
                 if (modelSpace == null)
                     return result;
+
+                List<TitleText> modelTexts =
+                    new List<TitleText>();
+
+                HashSet<ObjectId> activeBlocks =
+                    new HashSet<ObjectId>();
+
+                foreach (ObjectId id in modelSpace)
+                {
+                    Entity entity =
+                        tr.GetObject(
+                            id,
+                            OpenMode.ForRead) as Entity;
+
+                    if (entity == null)
+                        continue;
+
+                    CollectEntityText(
+                        tr,
+                        entity,
+                        Matrix3d.Identity,
+                        includeNestedBlocks,
+                        activeBlocks,
+                        modelTexts);
+                }
 
                 foreach (DBDictionaryEntry entry in layoutDict)
                 {
@@ -53,8 +77,6 @@ namespace Correct_test1.Readers
                     ObjectIdCollection viewportIds =
                         layout.GetViewports();
 
-                    // 第0个是PaperSpace自身Viewport，
-                    // 从第1个开始处理真正的浮动Viewport。
                     for (int i = 1; i < viewportIds.Count; i++)
                     {
                         Viewport viewport =
@@ -72,25 +94,26 @@ namespace Correct_test1.Readers
                         ModelWindow window =
                             CreateWindow(viewport);
 
-                        foreach (ObjectId modelEntityId in modelSpace)
+                        foreach (TitleText text in modelTexts)
                         {
-                            Entity entity =
-                                tr.GetObject(
-                                    modelEntityId,
-                                    OpenMode.ForRead) as Entity;
-
-                            if (entity == null)
+                            if (useViewportFilter &&
+                                !window.Contains(
+                                    text.X,
+                                    text.Y))
+                            {
                                 continue;
+                            }
 
-                            ReadEntityText(
-                                tr,
-                                entity,
-                                Matrix3d.Identity,
-                                layout.LayoutName,
-                                window,
-                                includeNestedBlocks,
-                                useViewportFilter,
-                                result);
+                            result.Add(
+                                new TitleText
+                                {
+                                    Text = text.Text,
+                                    X = text.X,
+                                    Y = text.Y,
+                                    Height = text.Height,
+                                    LayoutName =
+                                        layout.LayoutName
+                                });
                         }
                     }
                 }
@@ -114,105 +137,115 @@ namespace Correct_test1.Readers
             return new ModelWindow(minX, minY, maxX, maxY);
         }
 
-        private static void ReadEntityText(
-            Transaction tr,
-            Entity entity,
-            Matrix3d transform,
-            string layoutName,
-            ModelWindow window,
-            bool includeNestedBlocks,
-            bool useViewportFilter,
-            List<TitleText> output)
+        private static void CollectEntityText(
+    Transaction tr,
+    Entity entity,
+    Matrix3d transform,
+    bool includeNestedBlocks,
+    HashSet<ObjectId> activeBlocks,
+    List<TitleText> output)
         {
-            DBText dbText = entity as DBText;
+            DBText dbText =
+                entity as DBText;
+
             if (dbText != null)
             {
-                Point3d position = dbText.Position.TransformBy(transform);
-                AddText(
-                    dbText.TextString,
-                    position,
-                    layoutName,
-                    window,
-                    useViewportFilter,
-                    output);
+                Point3d position =
+                    dbText.Position.TransformBy(
+                        transform);
+
+                output.Add(
+                    new TitleText
+                    {
+                        Text = Clean(
+                            dbText.TextString),
+                        X = position.X,
+                        Y = position.Y,
+                        Height = dbText.Height
+                    });
+
                 return;
             }
 
-            MText mText = entity as MText;
+            MText mText =
+                entity as MText;
+
             if (mText != null)
             {
-                Point3d position = mText.Location.TransformBy(transform);
-                AddText(
-                    mText.Text,
-                    position,
-                    layoutName,
-                    window,
-                    useViewportFilter,
-                    output);
+                Point3d position =
+                    mText.Location.TransformBy(
+                        transform);
+
+                output.Add(
+                    new TitleText
+                    {
+                        Text = Clean(
+                            mText.Text),
+                        X = position.X,
+                        Y = position.Y,
+                        Height = mText.TextHeight
+                    });
+
                 return;
             }
 
             if (!includeNestedBlocks)
                 return;
 
-            BlockReference blockRef = entity as BlockReference;
+            BlockReference blockRef =
+                entity as BlockReference;
+
             if (blockRef == null)
+                return;
+
+            ObjectId blockId =
+                blockRef.BlockTableRecord;
+
+            if (activeBlocks.Contains(blockId))
                 return;
 
             BlockTableRecord blockDef =
                 tr.GetObject(
-                    blockRef.BlockTableRecord,
+                    blockId,
                     OpenMode.ForRead) as BlockTableRecord;
 
-            if (blockDef == null)
-                return;
-
-            Matrix3d nestedTransform =
-                transform * blockRef.BlockTransform;
-
-            foreach (ObjectId childId in blockDef)
-            {
-                Entity child =
-                    tr.GetObject(
-                        childId,
-                        OpenMode.ForRead) as Entity;
-
-                if (child == null)
-                    continue;
-
-                ReadEntityText(
-                    tr,
-                    child,
-                    nestedTransform,
-                    layoutName,
-                    window,
-                    includeNestedBlocks,
-                    useViewportFilter,
-                    output);
-            }
-        }
-
-        private static void AddText(
-            string rawText,
-            Point3d position,
-            string layoutName,
-            ModelWindow window,
-            bool useViewportFilter,
-            List<TitleText> output)
-        {
-            if (useViewportFilter &&
-                !window.Contains(position.X, position.Y))
+            if (blockDef == null ||
+                blockDef.IsFromExternalReference)
             {
                 return;
             }
 
-            output.Add(new TitleText
+            activeBlocks.Add(blockId);
+
+            try
             {
-                Text = Clean(rawText),
-                X = position.X,
-                Y = position.Y,
-                LayoutName = layoutName
-            });
+                Matrix3d nestedTransform =
+                    transform *
+                    blockRef.BlockTransform;
+
+                foreach (ObjectId childId in blockDef)
+                {
+                    Entity child =
+                        tr.GetObject(
+                            childId,
+                            OpenMode.ForRead) as Entity;
+
+                    if (child == null)
+                        continue;
+
+                    CollectEntityText(
+                        tr,
+                        child,
+                        nestedTransform,
+                        includeNestedBlocks,
+                        activeBlocks,
+                        output);
+                }
+            }
+            finally
+            {
+                activeBlocks.Remove(blockId);
+            }
         }
 
         private static string Clean(string text)

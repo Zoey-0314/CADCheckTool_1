@@ -8,35 +8,73 @@ namespace Correct_test1.Readers
 {
     public class ViewportLineReader
     {
-        public List<CadLineInfo> Read(Database db, bool includeNestedBlocks = true)
+        public List<CadLineInfo> Read(
+    Database db,
+    bool includeNestedBlocks = true)
         {
-            List<CadLineInfo> result = new List<CadLineInfo>();
+            List<CadLineInfo> result =
+                new List<CadLineInfo>();
 
             if (db == null)
                 return result;
 
-            using (Transaction tr = db.TransactionManager.StartTransaction())
+            using (Transaction tr =
+                db.TransactionManager.StartTransaction())
             {
-                DBDictionary layoutDict = tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary;
+                DBDictionary layoutDict =
+                    tr.GetObject(
+                        db.LayoutDictionaryId,
+                        OpenMode.ForRead) as DBDictionary;
+
                 if (layoutDict == null)
                     return result;
 
-                ObjectId modelSpaceId = SymbolUtilityServices.GetBlockModelSpaceId(db);
-                BlockTableRecord modelSpace = tr.GetObject(modelSpaceId, OpenMode.ForRead) as BlockTableRecord;
+                BlockTableRecord modelSpace =
+                    tr.GetObject(
+                        SymbolUtilityServices
+                            .GetBlockModelSpaceId(db),
+                        OpenMode.ForRead) as BlockTableRecord;
+
                 if (modelSpace == null)
                     return result;
 
+                List<CadLineInfo> modelLines =
+                    new List<CadLineInfo>();
+
+                HashSet<ObjectId> activeBlocks =
+                    new HashSet<ObjectId>();
+
+                foreach (ObjectId id in modelSpace)
+                {
+                    Entity entity =
+                        tr.GetObject(
+                            id,
+                            OpenMode.ForRead) as Entity;
+
+                    if (entity == null)
+                        continue;
+
+                    CollectEntityLines(
+                        tr,
+                        entity,
+                        Matrix3d.Identity,
+                        includeNestedBlocks,
+                        activeBlocks,
+                        modelLines);
+                }
+
                 foreach (DBDictionaryEntry entry in layoutDict)
                 {
-                    Layout layout = tr.GetObject(entry.Value, OpenMode.ForRead) as Layout;
+                    Layout layout =
+                        tr.GetObject(
+                            entry.Value,
+                            OpenMode.ForRead) as Layout;
+
                     if (layout == null || layout.ModelType)
                         continue;
 
-                    BlockTableRecord paperSpace = tr.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
-                    if (paperSpace == null)
-                        continue;
-
-                    ObjectIdCollection viewportIds = layout.GetViewports();
+                    ObjectIdCollection viewportIds =
+                        layout.GetViewports();
 
                     for (int i = 1; i < viewportIds.Count; i++)
                     {
@@ -52,30 +90,30 @@ namespace Correct_test1.Readers
                             continue;
                         }
 
-                        ModelWindow window = CreateWindow(viewport);
+                        ModelWindow window =
+                            CreateWindow(viewport);
 
-                        string source =
-                            "Viewport(" + viewport.Handle.ToString() + ")";
-
-                        foreach (ObjectId modelEntityId in modelSpace)
+                        foreach (CadLineInfo line in modelLines)
                         {
-                            Entity entity =
-                                tr.GetObject(
-                                    modelEntityId,
-                                    OpenMode.ForRead) as Entity;
-
-                            if (entity == null)
+                            if (!window.IntersectsSegment(
+                                    line.StartPoint,
+                                    line.EndPoint))
+                            {
                                 continue;
+                            }
 
-                            ReadEntityLines(
-                                tr,
-                                entity,
-                                Matrix3d.Identity,
-                                layout.LayoutName,
-                                window,
-                                includeNestedBlocks,
-                                new HashSet<ObjectId>(),
-                                result);
+                            result.Add(
+                                new CadLineInfo
+                                {
+                                    StartPoint =
+                                        line.StartPoint,
+
+                                    EndPoint =
+                                        line.EndPoint,
+
+                                    LayoutName =
+                                        layout.LayoutName
+                                });
                         }
                     }
                 }
@@ -99,49 +137,71 @@ namespace Correct_test1.Readers
             return new ModelWindow(minX, minY, maxX, maxY);
         }
 
-        private static void ReadEntityLines(
-            Transaction tr,
-            Entity entity,
-            Matrix3d transform,
-            string layoutName,
-            ModelWindow window,
-            bool includeNestedBlocks,
-            HashSet<ObjectId> visitedBlocks,
-            List<CadLineInfo> output)
+        private static void CollectEntityLines(
+    Transaction tr,
+    Entity entity,
+    Matrix3d transform,
+    bool includeNestedBlocks,
+    HashSet<ObjectId> activeBlocks,
+    List<CadLineInfo> output)
         {
-            Line line = entity as Line;
+            Line line =
+                entity as Line;
+
             if (line != null)
             {
-                Point3d start = line.StartPoint.TransformBy(transform);
-                Point3d end = line.EndPoint.TransformBy(transform);
+                AddModelLine(
+                    line.StartPoint.TransformBy(transform),
+                    line.EndPoint.TransformBy(transform),
+                    output);
 
-                AddLine(start, end, layoutName, window, output);
                 return;
             }
 
-            Polyline polyline = entity as Polyline;
+            Polyline polyline =
+                entity as Polyline;
+
             if (polyline != null)
             {
-                for (int index = 0; index < polyline.NumberOfVertices - 1; index++)
+                for (int i = 0;
+                     i < polyline.NumberOfVertices - 1;
+                     i++)
                 {
-                    if (Math.Abs(polyline.GetBulgeAt(index)) > 0.000001)
+                    if (Math.Abs(
+                            polyline.GetBulgeAt(i))
+                        > 0.000001)
+                    {
                         continue;
+                    }
 
-                    Point3d start = polyline.GetPoint3dAt(index).TransformBy(transform);
-                    Point3d end = polyline.GetPoint3dAt(index + 1).TransformBy(transform);
+                    AddModelLine(
+                        polyline.GetPoint3dAt(i)
+                            .TransformBy(transform),
 
-                    AddLine(start, end, layoutName, window, output);
+                        polyline.GetPoint3dAt(i + 1)
+                            .TransformBy(transform),
+
+                        output);
                 }
 
-                if (polyline.Closed && polyline.NumberOfVertices > 1)
+                if (polyline.Closed &&
+                    polyline.NumberOfVertices > 1)
                 {
-                    int last = polyline.NumberOfVertices - 1;
-                    if (Math.Abs(polyline.GetBulgeAt(last)) <= 0.000001)
-                    {
-                        Point3d start = polyline.GetPoint3dAt(last).TransformBy(transform);
-                        Point3d end = polyline.GetPoint3dAt(0).TransformBy(transform);
+                    int last =
+                        polyline.NumberOfVertices - 1;
 
-                        AddLine(start, end, layoutName, window, output);
+                    if (Math.Abs(
+                            polyline.GetBulgeAt(last))
+                        <= 0.000001)
+                    {
+                        AddModelLine(
+                            polyline.GetPoint3dAt(last)
+                                .TransformBy(transform),
+
+                            polyline.GetPoint3dAt(0)
+                                .TransformBy(transform),
+
+                            output);
                     }
                 }
 
@@ -151,59 +211,73 @@ namespace Correct_test1.Readers
             if (!includeNestedBlocks)
                 return;
 
-            BlockReference blockRef = entity as BlockReference;
+            BlockReference blockRef =
+                entity as BlockReference;
+
             if (blockRef == null)
                 return;
 
-            ObjectId blockId = blockRef.BlockTableRecord;
-            if (visitedBlocks.Contains(blockId))
+            ObjectId blockId =
+                blockRef.BlockTableRecord;
+
+            if (activeBlocks.Contains(blockId))
                 return;
 
-            BlockTableRecord blockDef = tr.GetObject(blockId, OpenMode.ForRead) as BlockTableRecord;
-            if (blockDef == null)
-                return;
+            BlockTableRecord blockDef =
+                tr.GetObject(
+                    blockId,
+                    OpenMode.ForRead) as BlockTableRecord;
 
-            visitedBlocks.Add(blockId);
-
-            Matrix3d nestedTransform = transform * blockRef.BlockTransform;
-            foreach (ObjectId childId in blockDef)
+            if (blockDef == null ||
+                blockDef.IsFromExternalReference)
             {
-                Entity child = tr.GetObject(childId, OpenMode.ForRead) as Entity;
-                if (child == null)
-                    continue;
-
-                ReadEntityLines(
-                    tr,
-                    child,
-                    nestedTransform,
-                    layoutName,
-                    window,
-                    includeNestedBlocks,
-                    visitedBlocks,
-                    output);
+                return;
             }
 
-            visitedBlocks.Remove(blockId);
-        }
+            activeBlocks.Add(blockId);
 
-        private static void AddLine(
-            Point3d start,
-            Point3d end,
-            string layoutName,
-            ModelWindow window,
-            List<CadLineInfo> output)
-        {
-            if (!window.IntersectsSegment(start, end))
-                return;
-
-            output.Add(new CadLineInfo
+            try
             {
-                StartPoint = start,
-                EndPoint = end,
-                LayoutName = layoutName
-            });
-        }
+                Matrix3d nestedTransform =
+                    transform *
+                    blockRef.BlockTransform;
 
+                foreach (ObjectId childId in blockDef)
+                {
+                    Entity child =
+                        tr.GetObject(
+                            childId,
+                            OpenMode.ForRead) as Entity;
+
+                    if (child == null)
+                        continue;
+
+                    CollectEntityLines(
+                        tr,
+                        child,
+                        nestedTransform,
+                        includeNestedBlocks,
+                        activeBlocks,
+                        output);
+                }
+            }
+            finally
+            {
+                activeBlocks.Remove(blockId);
+            }
+        }
+        private static void AddModelLine(
+    Point3d start,
+    Point3d end,
+    List<CadLineInfo> output)
+        {
+            output.Add(
+                new CadLineInfo
+                {
+                    StartPoint = start,
+                    EndPoint = end
+                });
+        }
         private struct ModelWindow
         {
             public ModelWindow(double minX, double minY, double maxX, double maxY)
