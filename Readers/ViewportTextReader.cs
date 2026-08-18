@@ -74,15 +74,45 @@ namespace Correct_test1.Readers
                     if (layout == null || layout.ModelType)
                         continue;
 
-                    ObjectIdCollection viewportIds =
-                        layout.GetViewports();
+                    BlockTableRecord paperSpace =
+    tr.GetObject(
+        layout.BlockTableRecordId,
+        OpenMode.ForRead)
+    as BlockTableRecord;
 
-                    for (int i = 1; i < viewportIds.Count; i++)
+                    if (paperSpace == null)
+                        continue;
+                    ObjectId paperViewportId =
+    ObjectId.Null;
+
+                    try
                     {
+                        ObjectIdCollection viewportIds =
+                            layout.GetViewports();
+
+                        if (viewportIds != null &&
+                            viewportIds.Count > 0)
+                        {
+                            paperViewportId =
+                                viewportIds[0];
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    foreach (ObjectId viewportId in paperSpace)
+                    {
+                        if ((!paperViewportId.IsNull &&
+     viewportId == paperViewportId) ||
+    viewportId == db.PaperSpaceVportId)
+                        {
+                            continue;
+                        }
                         Viewport viewport =
                             tr.GetObject(
-                                viewportIds[i],
-                                OpenMode.ForRead) as Viewport;
+                                viewportId,
+                                OpenMode.ForRead)
+                            as Viewport;
 
                         if (viewport == null ||
                             !viewport.On ||
@@ -124,17 +154,60 @@ namespace Correct_test1.Readers
             return result;
         }
 
-        private static ModelWindow CreateWindow(Viewport viewport)
+        private static ModelWindow CreateWindow(
+     Viewport viewport)
         {
-            double modelHeight = viewport.ViewHeight;
-            double modelWidth = viewport.Width / viewport.CustomScale;
+            double modelHeight =
+                viewport.ViewHeight;
 
-            double minX = viewport.ViewCenter.X - (modelWidth / 2.0);
-            double maxX = viewport.ViewCenter.X + (modelWidth / 2.0);
-            double minY = viewport.ViewCenter.Y - (modelHeight / 2.0);
-            double maxY = viewport.ViewCenter.Y + (modelHeight / 2.0);
+            double modelWidth =
+                viewport.Width /
+                viewport.CustomScale;
 
-            return new ModelWindow(minX, minY, maxX, maxY);
+            Matrix3d dcsToWcs =
+                Matrix3d.PlaneToWorld(
+                    viewport.ViewDirection);
+
+            dcsToWcs =
+                Matrix3d.Displacement(
+                    viewport.ViewTarget -
+                    Point3d.Origin)
+                *
+                dcsToWcs;
+
+            dcsToWcs =
+                Matrix3d.Rotation(
+                    -viewport.TwistAngle,
+                    viewport.ViewDirection,
+                    viewport.ViewTarget)
+                *
+                dcsToWcs;
+
+            Matrix3d wcsToDcs =
+                dcsToWcs.Inverse();
+
+            double minX =
+                viewport.ViewCenter.X -
+                modelWidth / 2.0;
+
+            double maxX =
+                viewport.ViewCenter.X +
+                modelWidth / 2.0;
+
+            double minY =
+                viewport.ViewCenter.Y -
+                modelHeight / 2.0;
+
+            double maxY =
+                viewport.ViewCenter.Y +
+                modelHeight / 2.0;
+
+            return new ModelWindow(
+                minX,
+                minY,
+                maxX,
+                maxY,
+                wcsToDcs);
         }
 
         private static void CollectEntityText(
@@ -266,12 +339,14 @@ namespace Correct_test1.Readers
                 double minX,
                 double minY,
                 double maxX,
-                double maxY)
+                double maxY,
+                Matrix3d wcsToDcs)
             {
                 MinX = minX;
                 MinY = minY;
                 MaxX = maxX;
                 MaxY = maxY;
+                WcsToDcs = wcsToDcs;
             }
 
             public double MinX { get; }
@@ -279,12 +354,25 @@ namespace Correct_test1.Readers
             public double MaxX { get; }
             public double MaxY { get; }
 
-            public bool Contains(double x, double y)
+            private Matrix3d WcsToDcs { get; }
+
+            public bool Contains(
+                double x,
+                double y)
             {
-                return x >= MinX &&
-                    x <= MaxX &&
-                    y >= MinY &&
-                    y <= MaxY;
+                Point3d point =
+                    new Point3d(
+                        x,
+                        y,
+                        0)
+                    .TransformBy(
+                        WcsToDcs);
+
+                return
+                    point.X >= MinX &&
+                    point.X <= MaxX &&
+                    point.Y >= MinY &&
+                    point.Y <= MaxY;
             }
         }
     }
