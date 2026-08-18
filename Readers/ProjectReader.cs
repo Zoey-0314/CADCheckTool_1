@@ -192,15 +192,29 @@ namespace Correct_test1.Readers
                     }
 
 
+                    HashSet<ObjectId> activeBlockDefinitions =
+                        new HashSet<ObjectId>();
+
+
                     foreach (
                         ObjectId entityId
                         in space)
                     {
-                        Entity entity =
-                            trans.GetObject(
-                                entityId,
-                                OpenMode.ForRead)
-                            as Entity;
+                        Entity entity;
+
+
+                        try
+                        {
+                            entity =
+                                trans.GetObject(
+                                    entityId,
+                                    OpenMode.ForRead)
+                                as Entity;
+                        }
+                        catch
+                        {
+                            continue;
+                        }
 
 
                         AddProjectLocation(
@@ -208,7 +222,9 @@ namespace Correct_test1.Readers
                             trans,
                             locations,
                             Matrix3d.Identity,
-                            layout.LayoutName);
+                            layout.LayoutName,
+                            activeBlockDefinitions,
+                            0);
                     }
                 }
 
@@ -232,23 +248,61 @@ namespace Correct_test1.Readers
         //==================================================
 
         private void AddProjectLocation(
-            Entity entity,
-            Transaction trans,
-            List<ProjectNumberLocation> locations,
-            Matrix3d transform,
-            string layoutName)
+    Entity entity,
+    Transaction trans,
+    List<ProjectNumberLocation> locations,
+    Matrix3d transform,
+    string layoutName,
+    HashSet<ObjectId> activeBlockDefinitions,
+    int depth)
         {
-            if (entity == null)
+            if (entity == null ||
+                trans == null ||
+                locations == null)
             {
                 return;
             }
 
 
             //==================================================
-            // DBText
+            // 防止极端异常图纸无限递归
             //==================================================
 
-            if (entity is DBText text)
+            if (depth > 20)
+            {
+                return;
+            }
+
+
+            //==================================================
+            // AttributeDefinition只是块定义中的属性模板。
+            //
+            // 例如默认值可能写着：
+            //
+            // N2607US004
+            //
+            // 但实际块实例AttributeReference可能已经改成：
+            //
+            // N2608US001
+            //
+            // 所以不能把AttributeDefinition当成真实项目号。
+            //==================================================
+
+            if (entity is AttributeDefinition)
+            {
+                return;
+            }
+
+
+            //==================================================
+            // 1. DBText
+            //==================================================
+
+            DBText text =
+                entity as DBText;
+
+
+            if (text != null)
             {
                 AddProjectLocation(
                     text.TextString,
@@ -264,10 +318,14 @@ namespace Correct_test1.Readers
 
 
             //==================================================
-            // MText
+            // 2. MText
             //==================================================
 
-            if (entity is MText mtext)
+            MText mtext =
+                entity as MText;
+
+
+            if (mtext != null)
             {
                 AddProjectLocation(
                     mtext.Text,
@@ -283,49 +341,116 @@ namespace Correct_test1.Readers
 
 
             //==================================================
-            // Block
+            // 3. BlockReference
             //==================================================
 
-            if (entity is BlockReference block)
+            BlockReference block =
+                entity as BlockReference;
+
+
+            if (block == null)
             {
-                BlockTableRecord btr;
+                return;
+            }
 
 
-                try
-                {
-                    btr =
-                        trans.GetObject(
-                            block.BlockTableRecord,
-                            OpenMode.ForRead)
-                        as BlockTableRecord;
-                }
-                catch
-                {
-                    return;
-                }
+            //==================================================
+            // 先读取这个Block实例真正的AttributeReference。
+            //
+            // 这里读取的是实例值，不是AttributeDefinition默认值。
+            //==================================================
+
+            ReadBlockAttributeLocations(
+                block,
+                trans,
+                locations,
+                transform,
+                layoutName);
 
 
-                if (btr == null ||
-                    btr.IsFromExternalReference)
-                {
-                    return;
-                }
+            //==================================================
+            // 再读取块定义中的固定DBText/MText和嵌套块。
+            //==================================================
+
+            BlockTableRecord btr;
 
 
-                Matrix3d blockTransform =
-                    transform *
-                    block.BlockTransform;
+            try
+            {
+                btr =
+                    trans.GetObject(
+                        block.BlockTableRecord,
+                        OpenMode.ForRead)
+                    as BlockTableRecord;
+            }
+            catch
+            {
+                return;
+            }
 
 
+            if (btr == null ||
+                btr.IsFromExternalReference)
+            {
+                return;
+            }
+
+
+            ObjectId definitionId =
+                block.BlockTableRecord;
+
+
+            //==================================================
+            // 防止循环块定义
+            //==================================================
+
+            if (activeBlockDefinitions != null &&
+                activeBlockDefinitions.Contains(
+                    definitionId))
+            {
+                return;
+            }
+
+
+            //==================================================
+            // 当前块内部实体转换到外层Layout坐标。
+            //
+            // 与CadTableReader保持相同变换顺序。
+            //==================================================
+
+            Matrix3d blockTransform =
+                transform *
+                block.BlockTransform;
+
+
+            if (activeBlockDefinitions != null)
+            {
+                activeBlockDefinitions.Add(
+                    definitionId);
+            }
+
+
+            try
+            {
                 foreach (
                     ObjectId id
                     in btr)
                 {
-                    Entity child =
-                        trans.GetObject(
-                            id,
-                            OpenMode.ForRead)
-                        as Entity;
+                    Entity child;
+
+
+                    try
+                    {
+                        child =
+                            trans.GetObject(
+                                id,
+                                OpenMode.ForRead)
+                            as Entity;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
 
                     AddProjectLocation(
@@ -333,8 +458,83 @@ namespace Correct_test1.Readers
                         trans,
                         locations,
                         blockTransform,
+                        layoutName,
+                        activeBlockDefinitions,
+                        depth + 1);
+                }
+            }
+            finally
+            {
+                if (activeBlockDefinitions != null)
+                {
+                    activeBlockDefinitions.Remove(
+                        definitionId);
+                }
+            }
+        }
+
+        private void ReadBlockAttributeLocations(
+    BlockReference block,
+    Transaction trans,
+    List<ProjectNumberLocation> locations,
+    Matrix3d parentTransform,
+    string layoutName)
+        {
+            if (block == null ||
+                trans == null ||
+                locations == null)
+            {
+                return;
+            }
+
+
+            try
+            {
+                foreach (
+                    ObjectId attributeId
+                    in block.AttributeCollection)
+                {
+                    AttributeReference attribute =
+                        trans.GetObject(
+                            attributeId,
+                            OpenMode.ForRead)
+                        as AttributeReference;
+
+
+                    if (attribute == null ||
+                        string.IsNullOrWhiteSpace(
+                            attribute.TextString))
+                    {
+                        continue;
+                    }
+
+
+                    //==================================================
+                    // AttributeReference的位置已经包含
+                    // 当前BlockReference本身的实例变换。
+                    //
+                    // 如果当前BlockReference又位于外层块中，
+                    // 这里只应用外层parentTransform。
+                    //==================================================
+
+                    Point3d position =
+                        attribute.Position
+                            .TransformBy(
+                                parentTransform);
+
+
+                    AddProjectLocation(
+                        attribute.TextString,
+                        position,
+                        locations,
                         layoutName);
                 }
+            }
+            catch
+            {
+                //==================================================
+                // 某一个异常属性不能导致整张图项目号读取失败。
+                //==================================================
             }
         }
 
