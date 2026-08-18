@@ -83,6 +83,14 @@ namespace Correct_test1.Models
         /// </summary>
         public string PageNumber { get; set; }
 
+        public List<TitleText> PageNumberSourceTexts
+        {
+            get;
+            set;
+        }
+=
+new List<TitleText>();
+
         //=========================
         // 图纸结构信息
         //=========================

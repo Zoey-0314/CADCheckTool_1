@@ -68,7 +68,15 @@ namespace Correct_test1.Readers
                 if (fieldTexts.Count == 0)
                     continue;
 
-
+                if (string.Equals(
+        region.FieldName,
+        "PageNumber",
+        StringComparison.OrdinalIgnoreCase))
+                {
+                    info.PageNumberSourceTexts =
+                        new List<TitleText>(
+                            fieldTexts);
+                }
 
                 string value =
                     MergeTexts(

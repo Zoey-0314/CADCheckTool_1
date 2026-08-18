@@ -203,15 +203,11 @@ namespace Correct_test1.Checks
                 // 绝不修改CAD实体。
                 //==================================================
 
-                if (allowAutoFix)
-                {
-                    corrected =
-                        TryCorrectPageNumber(
-                            db,
-                            texts,
-                            isHorizontal,
-                            expectedPageText);
-                }
+                corrected =
+                    TryCorrectPageNumber(
+                        db,
+                        info.PageNumberSourceTexts,
+                        expectedPageText);
 
 
                 if (corrected)
@@ -465,13 +461,12 @@ namespace Correct_test1.Checks
         /// </summary>
         private bool TryCorrectPageNumber(
             Autodesk.AutoCAD.DatabaseServices.Database db,
-            List<TitleText> texts,
-            bool isHorizontal,
+            List<TitleText> pageSourceTexts,
             string expectedPageText)
         {
             if (db == null ||
-                texts == null ||
-                texts.Count == 0 ||
+                pageSourceTexts == null ||
+                pageSourceTexts.Count == 0 ||
                 string.IsNullOrWhiteSpace(
                     expectedPageText))
             {
