@@ -73,22 +73,15 @@ namespace Correct_test1.Readers
                     if (layout == null || layout.ModelType)
                         continue;
 
-                    BlockTableRecord paperSpace =
-    tr.GetObject(
-        layout.BlockTableRecordId,
-        OpenMode.ForRead)
-    as BlockTableRecord;
+                    ObjectIdCollection viewportIds =
+                        layout.GetViewports();
 
-                    if (paperSpace == null)
-                        continue;
-
-                    foreach (ObjectId viewportId in paperSpace)
+                    for (int i = 1; i < viewportIds.Count; i++)
                     {
                         Viewport viewport =
                             tr.GetObject(
-                                viewportId,
-                                OpenMode.ForRead)
-                            as Viewport;
+                                viewportIds[i],
+                                OpenMode.ForRead) as Viewport;
 
                         if (viewport == null ||
                             !viewport.On ||
@@ -134,60 +127,17 @@ namespace Correct_test1.Readers
             return result;
         }
 
-        private static ModelWindow CreateWindow(
-     Viewport viewport)
+        private static ModelWindow CreateWindow(Viewport viewport)
         {
-            double modelHeight =
-                viewport.ViewHeight;
+            double modelHeight = viewport.ViewHeight;
+            double modelWidth = viewport.Width / viewport.CustomScale;
 
-            double modelWidth =
-                viewport.Width /
-                viewport.CustomScale;
+            double minX = viewport.ViewCenter.X - (modelWidth / 2.0);
+            double maxX = viewport.ViewCenter.X + (modelWidth / 2.0);
+            double minY = viewport.ViewCenter.Y - (modelHeight / 2.0);
+            double maxY = viewport.ViewCenter.Y + (modelHeight / 2.0);
 
-            Matrix3d dcsToWcs =
-                Matrix3d.PlaneToWorld(
-                    viewport.ViewDirection);
-
-            dcsToWcs =
-                Matrix3d.Displacement(
-                    viewport.ViewTarget -
-                    Point3d.Origin)
-                *
-                dcsToWcs;
-
-            dcsToWcs =
-                Matrix3d.Rotation(
-                    -viewport.TwistAngle,
-                    viewport.ViewDirection,
-                    viewport.ViewTarget)
-                *
-                dcsToWcs;
-
-            Matrix3d wcsToDcs =
-                dcsToWcs.Inverse();
-
-            double minX =
-                viewport.ViewCenter.X -
-                modelWidth / 2.0;
-
-            double maxX =
-                viewport.ViewCenter.X +
-                modelWidth / 2.0;
-
-            double minY =
-                viewport.ViewCenter.Y -
-                modelHeight / 2.0;
-
-            double maxY =
-                viewport.ViewCenter.Y +
-                modelHeight / 2.0;
-
-            return new ModelWindow(
-                minX,
-                minY,
-                maxX,
-                maxY,
-                wcsToDcs);
+            return new ModelWindow(minX, minY, maxX, maxY);
         }
 
         private static void CollectEntityLines(
@@ -206,6 +156,7 @@ namespace Correct_test1.Readers
                 AddModelLine(
                     line.StartPoint.TransformBy(transform),
                     line.EndPoint.TransformBy(transform),
+                    IsBlue(tr, line),
                     output);
 
                 return;
@@ -234,6 +185,8 @@ namespace Correct_test1.Readers
                         polyline.GetPoint3dAt(i + 1)
                             .TransformBy(transform),
 
+                        IsBlue(tr, polyline),
+
                         output);
                 }
 
@@ -253,6 +206,8 @@ namespace Correct_test1.Readers
 
                             polyline.GetPoint3dAt(0)
                                 .TransformBy(transform),
+
+                            IsBlue(tr, polyline),
 
                             output);
                     }
@@ -322,29 +277,54 @@ namespace Correct_test1.Readers
         private static void AddModelLine(
     Point3d start,
     Point3d end,
+    bool isBlue,
     List<CadLineInfo> output)
         {
             output.Add(
                 new CadLineInfo
                 {
                     StartPoint = start,
-                    EndPoint = end
+                    EndPoint = end,
+                    IsBlue = isBlue
                 });
+        }
+
+        private static bool IsBlue(
+    Transaction tr,
+    Entity entity)
+        {
+            if (entity == null)
+                return false;
+
+            if (entity.ColorIndex == 5)
+                return true;
+
+            if (entity.ColorIndex == 256)
+            {
+                LayerTableRecord layer =
+                    tr.GetObject(
+                        entity.LayerId,
+                        OpenMode.ForRead)
+                    as LayerTableRecord;
+
+                if (layer != null &&
+                    layer.Color != null &&
+                    layer.Color.ColorIndex == 5)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         private struct ModelWindow
         {
-            public ModelWindow(
-                double minX,
-                double minY,
-                double maxX,
-                double maxY,
-                Matrix3d wcsToDcs)
+            public ModelWindow(double minX, double minY, double maxX, double maxY)
             {
                 MinX = minX;
                 MinY = minY;
                 MaxX = maxX;
                 MaxY = maxY;
-                WcsToDcs = wcsToDcs;
             }
 
             public double MinX { get; }
@@ -352,70 +332,25 @@ namespace Correct_test1.Readers
             public double MaxX { get; }
             public double MaxY { get; }
 
-            private Matrix3d WcsToDcs { get; }
-
-            public bool IntersectsSegment(
-                Point3d start,
-                Point3d end)
+            public bool IntersectsSegment(Point3d start, Point3d end)
             {
-                Point3d dcsStart =
-                    start.TransformBy(
-                        WcsToDcs);
-
-                Point3d dcsEnd =
-                    end.TransformBy(
-                        WcsToDcs);
-
-                if (Contains(
-                        dcsStart.X,
-                        dcsStart.Y) ||
-                    Contains(
-                        dcsEnd.X,
-                        dcsEnd.Y))
-                {
+                if (Contains(start.X, start.Y) || Contains(end.X, end.Y))
                     return true;
-                }
 
-                double segmentMinX =
-                    Math.Min(
-                        dcsStart.X,
-                        dcsEnd.X);
+                double segmentMinX = Math.Min(start.X, end.X);
+                double segmentMaxX = Math.Max(start.X, end.X);
+                double segmentMinY = Math.Min(start.Y, end.Y);
+                double segmentMaxY = Math.Max(start.Y, end.Y);
 
-                double segmentMaxX =
-                    Math.Max(
-                        dcsStart.X,
-                        dcsEnd.X);
-
-                double segmentMinY =
-                    Math.Min(
-                        dcsStart.Y,
-                        dcsEnd.Y);
-
-                double segmentMaxY =
-                    Math.Max(
-                        dcsStart.Y,
-                        dcsEnd.Y);
-
-                if (segmentMaxX < MinX ||
-                    segmentMinX > MaxX ||
-                    segmentMaxY < MinY ||
-                    segmentMinY > MaxY)
-                {
+                if (segmentMaxX < MinX || segmentMinX > MaxX || segmentMaxY < MinY || segmentMinY > MaxY)
                     return false;
-                }
 
                 return true;
             }
 
-            private bool Contains(
-                double x,
-                double y)
+            private bool Contains(double x, double y)
             {
-                return
-                    x >= MinX &&
-                    x <= MaxX &&
-                    y >= MinY &&
-                    y <= MaxY;
+                return x >= MinX && x <= MaxX && y >= MinY && y <= MaxY;
             }
         }
     }
