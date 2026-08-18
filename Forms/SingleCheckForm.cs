@@ -224,6 +224,19 @@ namespace Correct_test1
                     DocumentLock lockDoc =
                         doc.LockDocument())
                 {
+                    new RevisionMarker()
+                        .ClearMarkers(
+                            doc.Database);
+
+                    new TitleBlockDrawingNumberMarker()
+                        .ClearMarkers(
+                            doc.Database);
+
+                    new MarkerManager()
+                        .ClearMarkers(
+                            doc.Database);
+
+
                     CheckService checkService =
                         new CheckService();
 

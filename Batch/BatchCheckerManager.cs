@@ -513,7 +513,28 @@ namespace Correct_test1.Batch
                     db.CloseInput(
                         true);
 
+                    if (IsEffectivelyEmptyDrawing(db))
+                    {
+                        results.Add(
+                            new CheckResult
+                            {
+                                FilePath = file,
+                                FileName = Path.GetFileName(file),
+                                Type = "空图纸",
+                                ObjectName = "DWG",
+                                CurrentValue = "无可检查实体",
+                                ExpectedValue = "完整工程图",
+                                Message = "图纸未完成或为空，已跳过检查。",
+                                IsError = true
+                            });
 
+                        AppLogger.Info(
+                            "检测到空图纸，跳过："
+                            + Path.GetFileName(file),
+                            "BatchCheckerManager");
+
+                        continue;
+                    }
                     //==================================================
                     // 第一阶段：
                     // BOM / 标准件 / 非标 / 版本等检查
@@ -1420,7 +1441,81 @@ namespace Correct_test1.Batch
 
             return results;
         }
+        private static bool IsEffectivelyEmptyDrawing(
+    Database database)
+        {
+            if (database == null ||
+                database.IsDisposed)
+            {
+                return false;
+            }
 
+            try
+            {
+                using (Transaction tr =
+                    database.TransactionManager.StartTransaction())
+                {
+                    DBDictionary layouts =
+                        tr.GetObject(
+                            database.LayoutDictionaryId,
+                            OpenMode.ForRead)
+                        as DBDictionary;
+
+                    if (layouts == null)
+                        return false;
+
+                    foreach (DBDictionaryEntry entry in layouts)
+                    {
+                        Layout layout =
+                            tr.GetObject(
+                                entry.Value,
+                                OpenMode.ForRead)
+                            as Layout;
+
+                        if (layout == null)
+                            continue;
+
+                        BlockTableRecord space =
+                            tr.GetObject(
+                                layout.BlockTableRecordId,
+                                OpenMode.ForRead)
+                            as BlockTableRecord;
+
+                        if (space == null)
+                            continue;
+
+                        foreach (ObjectId id in space)
+                        {
+                            Entity entity =
+                                tr.GetObject(
+                                    id,
+                                    OpenMode.ForRead)
+                                as Entity;
+
+                            if (entity == null)
+                                continue;
+
+                            if (entity is Viewport)
+                                continue;
+
+                            return false;
+                        }
+                    }
+
+                    tr.Commit();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error(
+                    ex,
+                    "BatchCheckerManager.IsEffectivelyEmptyDrawing");
+
+                return false;
+            }
+        }
 
         //==================================================
         // 确保AutoCAD存在有效Document

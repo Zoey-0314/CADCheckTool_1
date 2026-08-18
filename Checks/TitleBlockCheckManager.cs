@@ -494,23 +494,7 @@ namespace Correct_test1.Checks
                 expectedMatches[1].Value;
 
 
-            List<TitleFieldRegion> regions =
-                isHorizontal
-                    ? TitleBlockHorizontalConfig.Regions
-                    : TitleBlockVerticalConfig.Regions;
 
-
-            TitleFieldRegion pageRegion =
-                regions.Find(
-                    x =>
-                        x.FieldName ==
-                        "PageNumber");
-
-
-            if (pageRegion == null)
-            {
-                return false;
-            }
 
 
             //==================================================
@@ -527,23 +511,20 @@ namespace Correct_test1.Checks
             //==================================================
 
             List<TitleText> candidates =
-                texts
-                    .Where(
-                        item =>
-                            item != null &&
-                            !item.ObjectId.IsNull &&
-                            item.ObjectId.IsValid &&
-                            pageRegion.Contains(
-                                item.X,
-                                item.Y) &&
-                            Regex.IsMatch(
-                                item.Text ?? "",
-                                @"\d+"))
-                    .OrderByDescending(
-                        item => item.Y)
-                    .ThenBy(
-                        item => item.X)
-                    .ToList();
+    pageSourceTexts
+        .Where(
+            item =>
+                item != null &&
+                !item.ObjectId.IsNull &&
+                item.ObjectId.IsValid &&
+                Regex.IsMatch(
+                    item.Text ?? "",
+                    @"\d+"))
+        .OrderByDescending(
+            item => item.Y)
+        .ThenBy(
+            item => item.X)
+        .ToList();
 
 
             if (candidates.Count == 0)
