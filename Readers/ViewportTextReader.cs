@@ -467,10 +467,36 @@ namespace Correct_test1.Readers
 
                         if (leaderText != null)
                         {
-                            Point3d position =
-                                leaderText.Location
-                                    .TransformBy(
-                                        transform);
+                            Point3d position;
+
+                            try
+                            {
+                                Extents3d extents =
+                                    leaderText.GeometricExtents;
+
+                                Point3d minPoint =
+                                    extents.MinPoint
+                                        .TransformBy(
+                                            transform);
+
+                                Point3d maxPoint =
+                                    extents.MaxPoint
+                                        .TransformBy(
+                                            transform);
+
+                                position =
+                                    new Point3d(
+                                        (minPoint.X + maxPoint.X) / 2.0,
+                                        (minPoint.Y + maxPoint.Y) / 2.0,
+                                        0);
+                            }
+                            catch
+                            {
+                                position =
+                                    mLeader.TextLocation
+                                        .TransformBy(
+                                            transform);
+                            }
 
 
                             output.Add(

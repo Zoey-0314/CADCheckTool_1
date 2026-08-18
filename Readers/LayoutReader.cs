@@ -15,7 +15,7 @@ namespace Correct_test1.Readers
     public class LayoutReader
     {
         public List<LayoutInfo> ReadLayouts(
-            Database db)
+    Database db)
         {
             List<LayoutInfo> result =
                 new List<LayoutInfo>();
@@ -42,13 +42,24 @@ namespace Correct_test1.Readers
                     if (cadLayout == null)
                         continue;
 
-                    result.Add(new LayoutInfo
-                    {
-                        LayoutName = cadLayout.LayoutName,
-                        BlockTableRecordId = cadLayout.BlockTableRecordId,
-                        IsModelSpace = cadLayout.ModelType,
-                        TabOrder = cadLayout.TabOrder
-                    });
+                    if (cadLayout.ModelType)
+                        continue;
+
+                    result.Add(
+                        new LayoutInfo
+                        {
+                            LayoutName =
+                                cadLayout.LayoutName,
+
+                            BlockTableRecordId =
+                                cadLayout.BlockTableRecordId,
+
+                            IsModelSpace =
+                                false,
+
+                            TabOrder =
+                                cadLayout.TabOrder
+                        });
                 }
 
                 trans.Commit();
@@ -195,15 +206,17 @@ namespace Correct_test1.Readers
             }
         }
 
-        
+
 
 
 
         private bool IsWeldingCandidateByRange(
-            TitleText text,
-            IEnumerable<CadLineInfo> lines)
+    TitleText text,
+    IEnumerable<CadLineInfo> lines)
         {
-            bool hasLeftLine = false;
+            const double sideDistance = 40.0;
+
+            bool hasSideLine = false;
             bool hasUpperLine = false;
 
             foreach (CadLineInfo line in lines)
@@ -211,27 +224,62 @@ namespace Correct_test1.Readers
                 if (line == null)
                     continue;
 
-                double minX = System.Math.Min(line.StartPoint.X, line.EndPoint.X);
-                double maxX = System.Math.Max(line.StartPoint.X, line.EndPoint.X);
-                double minY = System.Math.Min(line.StartPoint.Y, line.EndPoint.Y);
-                double maxY = System.Math.Max(line.StartPoint.Y, line.EndPoint.Y);
+                double minX =
+                    Math.Min(
+                        line.StartPoint.X,
+                        line.EndPoint.X);
 
+                double maxX =
+                    Math.Max(
+                        line.StartPoint.X,
+                        line.EndPoint.X);
+
+                double minY =
+                    Math.Min(
+                        line.StartPoint.Y,
+                        line.EndPoint.Y);
+
+                double maxY =
+                    Math.Max(
+                        line.StartPoint.Y,
+                        line.EndPoint.Y);
+
+
+                // 左右蓝色竖线
                 bool isVertical =
-     Math.Abs(
-         line.StartPoint.X -
-         line.EndPoint.X) <= 0.5;
+                    Math.Abs(
+                        line.StartPoint.X -
+                        line.EndPoint.X) <= 0.5;
 
-                if (!hasLeftLine &&
+                if (!hasSideLine &&
                     line.IsBlue &&
                     isVertical &&
-                    text.X - maxX > 0 &&
-                    text.X - maxX <= 20 &&
-                    text.Y >= minY - 5 &&
-                    text.Y <= maxY + 5)
+                    text.Y >= minY - 10 &&
+                    text.Y <= maxY + 10)
                 {
-                    hasLeftLine = true;
+                    double leftDistance =
+                        text.X - maxX;
+
+                    double rightDistance =
+                        minX - text.X;
+
+                    bool isLeftLine =
+                        leftDistance > 0 &&
+                        leftDistance <= sideDistance;
+
+                    bool isRightLine =
+                        rightDistance > 0 &&
+                        rightDistance <= sideDistance;
+
+                    if (isLeftLine ||
+                        isRightLine)
+                    {
+                        hasSideLine = true;
+                    }
                 }
 
+
+                // 数字上方是否存在横跨数字位置的线
                 if (!hasUpperLine &&
                     minY > text.Y &&
                     minY - text.Y <= 50 &&
@@ -241,15 +289,19 @@ namespace Correct_test1.Readers
                     hasUpperLine = true;
                 }
 
-                if (hasLeftLine && hasUpperLine)
+
+                if (hasSideLine &&
+                    hasUpperLine)
+                {
                     break;
+                }
             }
 
-            return hasLeftLine && !hasUpperLine;
+
+            return
+                hasSideLine &&
+                !hasUpperLine;
         }
-
-
-
 
 
     }
