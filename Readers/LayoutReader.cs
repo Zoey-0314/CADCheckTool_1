@@ -67,34 +67,34 @@ namespace Correct_test1.Readers
             if (texts == null)
                 return result;
 
-            Dictionary<string, List<CadLineInfo>> linesByLayout =
-                new Dictionary<string, List<CadLineInfo>>(
-                    StringComparer.OrdinalIgnoreCase);
+            Dictionary<ObjectId, List<CadLineInfo>> linesByViewport =
+     new Dictionary<ObjectId, List<CadLineInfo>>();
 
             if (lines != null)
             {
                 foreach (CadLineInfo line in lines)
                 {
-                    if (line == null)
-                        continue;
-
-                    string layoutName =
-                        line.LayoutName ?? string.Empty;
-
-                    List<CadLineInfo> layoutLines;
-                    if (!linesByLayout.TryGetValue(
-                            layoutName,
-                            out layoutLines))
+                    if (line == null ||
+                        line.ViewportId.IsNull)
                     {
-                        layoutLines =
-                            new List<CadLineInfo>();
-
-                        linesByLayout.Add(
-                            layoutName,
-                            layoutLines);
+                        continue;
                     }
 
-                    layoutLines.Add(line);
+                    List<CadLineInfo> viewportLines;
+
+                    if (!linesByViewport.TryGetValue(
+                            line.ViewportId,
+                            out viewportLines))
+                    {
+                        viewportLines =
+                            new List<CadLineInfo>();
+
+                        linesByViewport.Add(
+                            line.ViewportId,
+                            viewportLines);
+                    }
+
+                    viewportLines.Add(line);
                 }
             }
 
@@ -106,10 +106,15 @@ namespace Correct_test1.Readers
                     continue;
                 }
 
-                List<CadLineInfo> layoutLines;
-                linesByLayout.TryGetValue(
-                    text.LayoutName ?? string.Empty,
-                    out layoutLines);
+                List<CadLineInfo> viewportLines =
+                    null;
+
+                if (!text.ViewportId.IsNull)
+                {
+                    linesByViewport.TryGetValue(
+                        text.ViewportId,
+                        out viewportLines);
+                }
 
                 foreach (string numericText in
                     SplitNumericTexts(text.Text))
@@ -134,10 +139,10 @@ namespace Correct_test1.Readers
 
                     // 1~99 排除焊接符号
                     bool isWelding =
-                        layoutLines != null &&
+                        viewportLines != null &&
                         IsWeldingCandidateByRange(
                             text,
-                            layoutLines);
+                            viewportLines);
 
                     if (isWelding)
                     {

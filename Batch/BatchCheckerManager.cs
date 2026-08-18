@@ -447,6 +447,18 @@ namespace Correct_test1.Batch
                 Database db =
                     null;
 
+                Document mechanicalDocument =
+                    null;
+
+                DocumentLock mechanicalDocumentLock =
+                    null;
+
+                bool documentMode =
+                    false;
+
+                bool processingSucceeded =
+                    false;
+
 
                 try
                 {
@@ -512,6 +524,82 @@ namespace Correct_test1.Batch
 
                     db.CloseInput(
                         true);
+
+                    //==================================================
+                    // Mechanical特殊对象
+                    //
+                    // 普通DWG继续使用后台Database。
+                    // 如果发现AMDTNOTE，则真正作为Document打开，
+                    // 保证Mechanical对象按正常方式加载。
+                    //==================================================
+
+                    if (ContainsAmdtNote(db))
+                    {
+                        //==================================================
+                        // 先恢复宿主Database
+                        //==================================================
+
+                        HostApplicationServices
+                            .WorkingDatabase =
+                                hostDatabase;
+
+
+                        //==================================================
+                        // 释放后台Database
+                        //==================================================
+
+                        db.Dispose();
+
+                        db =
+                            null;
+
+
+                        //==================================================
+                        // 真正打开DWG
+                        //
+                        // ReportOnly：只读打开
+                        // ApplyChanges：可写打开
+                        //==================================================
+
+                        mechanicalDocument =
+                            Application
+                                .DocumentManager
+                                .Open(
+                                    file,
+                                    !applyChanges);
+
+
+                        if (mechanicalDocument == null ||
+                            mechanicalDocument.Database == null ||
+                            mechanicalDocument.Database.IsDisposed)
+                        {
+                            throw
+                                new InvalidOperationException(
+                                    "无法以Document模式打开Mechanical图纸");
+                        }
+
+
+                        //==================================================
+                        // Document模式需要锁定
+                        //==================================================
+
+                        mechanicalDocumentLock =
+                            mechanicalDocument
+                                .LockDocument();
+
+
+                        db =
+                            mechanicalDocument.Database;
+
+
+                        documentMode =
+                            true;
+
+
+                        HostApplicationServices
+                            .WorkingDatabase =
+                                db;
+                    }
 
                     if (IsEffectivelyEmptyDrawing(db))
                     {
@@ -1239,53 +1327,54 @@ namespace Correct_test1.Batch
 
                     if (applyChanges)
                     {
-                        AppLogger.Info(
-                            "准备安全保存："
-                            + Path.GetFileName(
-                                file),
-                            "BatchCheckerManager");
+                        //==================================================
+                        // 普通后台Database
+                        // 继续使用原来的SafeDwgSaver。
+                        //
+                        // Document模式不能在Document仍打开时
+                        // 再让SafeDwgSaver替换这个DWG。
+                        // 它会在finally中CloseAndSave。
+                        //==================================================
 
-
-                        bool saved =
-                            SafeDwgSaver.Save(
-                                db,
-                                file);
-
-
-                        if (!saved)
+                        if (!documentMode)
                         {
-                            results.Add(
-                                new CheckResult
-                                {
-                                    FilePath =
-                                        file,
+                            bool saved =
+                                SafeDwgSaver.Save(
+                                    db,
+                                    file);
 
-                                    FileName =
-                                        Path.GetFileName(
-                                            file),
 
-                                    Type =
-                                        "文件保存错误",
+                            if (!saved)
+                            {
+                                results.Add(
+                                    new CheckResult
+                                    {
+                                        FilePath =
+                                            file,
 
-                                    ObjectName =
-                                        "DWG",
+                                        FileName =
+                                            Path.GetFileName(
+                                                file),
 
-                                    Message =
-                                        "SafeDwgSaver保存失败，详见日志",
+                                        Type =
+                                            "文件保存错误",
 
-                                    IsError =
-                                        true
-                                });
+                                        ObjectName =
+                                            "DWG",
+
+                                        Message =
+                                            "SafeDwgSaver保存失败，详见日志",
+
+                                        IsError =
+                                            true
+                                    });
+                            }
                         }
                     }
-                    else
-                    {
-                        AppLogger.Info(
-                            "只检查模式，不保存DWG："
-                            + Path.GetFileName(
-                                file),
-                            "BatchCheckerManager");
-                    }
+
+
+                    processingSucceeded =
+                        true;
                 }
                 catch (Exception ex)
                 {
@@ -1323,7 +1412,28 @@ namespace Correct_test1.Batch
                 finally
                 {
                     //==================================================
-                    // 必须先恢复宿主WorkingDatabase
+                    // Document锁必须先释放
+                    //==================================================
+
+                    if (mechanicalDocumentLock != null)
+                    {
+                        try
+                        {
+                            mechanicalDocumentLock
+                                .Dispose();
+                        }
+                        catch
+                        {
+                        }
+
+                        mechanicalDocumentLock =
+                            null;
+                    }
+
+
+                    //==================================================
+                    // 在关闭Mechanical Document前
+                    // 先把WorkingDatabase恢复到宿主。
                     //==================================================
 
                     try
@@ -1334,13 +1444,6 @@ namespace Correct_test1.Batch
                             HostApplicationServices
                                 .WorkingDatabase =
                                     hostDatabase;
-
-
-                            AppLogger.Info(
-                                "WorkingDatabase恢复成功："
-                                + Path.GetFileName(
-                                    file),
-                                "BatchCheckerManager");
                         }
                     }
                     catch (Exception ex)
@@ -1353,21 +1456,81 @@ namespace Correct_test1.Batch
 
 
                     //==================================================
-                    // 恢复完成以后再释放后台Database
+                    // Mechanical Document模式
+                    //
+                    // Database由Document管理，
+                    // 这里绝对不能手动db.Dispose()。
                     //==================================================
 
-                    if (db != null)
+                    if (documentMode &&
+                        mechanicalDocument != null)
+                    {
+                        try
+                        {
+                            if (applyChanges &&
+                                processingSucceeded)
+                            {
+                                mechanicalDocument
+                                    .CloseAndSave(
+                                        file);
+                            }
+                            else
+                            {
+                                mechanicalDocument
+                                    .CloseAndDiscard();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            AppLogger.Error(
+                                ex,
+                                "BatchCheckerManager.CloseMechanicalDocument",
+                                file);
+
+
+                            results.Add(
+                                new CheckResult
+                                {
+                                    FilePath =
+                                        file,
+
+                                    FileName =
+                                        Path.GetFileName(
+                                            file),
+
+                                    Type =
+                                        "文件关闭保存错误",
+
+                                    ObjectName =
+                                        "DWG",
+
+                                    Message =
+                                        ex.Message,
+
+                                    IsError =
+                                        true
+                                });
+                        }
+
+
+                        mechanicalDocument =
+                            null;
+
+                        db =
+                            null;
+                    }
+
+
+                    //==================================================
+                    // 普通后台Database
+                    //==================================================
+
+                    if (!documentMode &&
+                        db != null)
                     {
                         try
                         {
                             db.Dispose();
-
-
-                            AppLogger.Info(
-                                "后台Database释放成功："
-                                + Path.GetFileName(
-                                    file),
-                                "BatchCheckerManager");
                         }
                         catch (Exception ex)
                         {
@@ -1380,6 +1543,27 @@ namespace Correct_test1.Batch
 
                         db =
                             null;
+                    }
+
+
+                    //==================================================
+                    // 最后恢复宿主Document
+                    //==================================================
+
+                    try
+                    {
+                        if (hostDocument != null &&
+                            hostDocument.Database != null &&
+                            !hostDocument.Database.IsDisposed)
+                        {
+                            Application
+                                .DocumentManager
+                                .MdiActiveDocument =
+                                    hostDocument;
+                        }
+                    }
+                    catch
+                    {
                     }
                 }
 
@@ -1478,6 +1662,132 @@ namespace Correct_test1.Batch
 
 
             return results;
+        }
+
+        private static bool ContainsAmdtNote(
+    Database database)
+        {
+            if (database == null ||
+                database.IsDisposed)
+            {
+                return false;
+            }
+
+
+            try
+            {
+                using (
+                    Transaction tr =
+                        database
+                            .TransactionManager
+                            .StartTransaction())
+                {
+                    BlockTableRecord modelSpace =
+                        tr.GetObject(
+                            SymbolUtilityServices
+                                .GetBlockModelSpaceId(
+                                    database),
+                            OpenMode.ForRead)
+                        as BlockTableRecord;
+
+
+                    if (modelSpace == null)
+                    {
+                        return false;
+                    }
+
+
+                    foreach (
+                        ObjectId id
+                        in modelSpace)
+                    {
+                        Entity entity;
+
+
+                        try
+                        {
+                            entity =
+                                tr.GetObject(
+                                    id,
+                                    OpenMode.ForRead)
+                                as Entity;
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+
+
+                        if (entity == null)
+                        {
+                            continue;
+                        }
+
+
+                        //==============================================
+                        // 后台Database中的Mechanical代理对象
+                        //==============================================
+
+                        ProxyEntity proxy =
+                            entity as ProxyEntity;
+
+
+                        if (proxy != null)
+                        {
+                            try
+                            {
+                                if (string.Equals(
+                                        proxy.OriginalDxfName,
+                                        "AMDTNOTE",
+                                        StringComparison
+                                            .OrdinalIgnoreCase))
+                                {
+                                    return true;
+                                }
+                            }
+                            catch
+                            {
+                            }
+                        }
+
+
+                        //==============================================
+                        // 如果Mechanical对象本身已经正常加载
+                        //==============================================
+
+                        try
+                        {
+                            Autodesk.AutoCAD.Runtime.RXClass
+                                rxClass =
+                                    entity.GetRXClass();
+
+
+                            if (rxClass != null &&
+                                string.Equals(
+                                    rxClass.DxfName,
+                                    "AMDTNOTE",
+                                    StringComparison
+                                        .OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+
+                    tr.Commit();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+
+            return false;
         }
         private static bool IsEffectivelyEmptyDrawing(
     Database database)

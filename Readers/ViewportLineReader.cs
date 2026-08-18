@@ -128,8 +128,7 @@ namespace Correct_test1.Readers
                             continue;
                         }
 
-                        if (!viewport.On ||
-                            viewport.CustomScale <= 0)
+                        if (viewport.CustomScale <= 0)
                         {
                             continue;
                         }
