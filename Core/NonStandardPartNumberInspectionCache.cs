@@ -100,26 +100,32 @@ namespace Correct_test1.Core
                 {
                     if (!entry.Success)
                     {
-                        errorMessage =
-                            entry.ErrorMessage;
+                        if (DateTime.UtcNow - entry.CachedAtUtc
+                            < FailureCacheDuration)
+                        {
+                            errorMessage =
+                                entry.ErrorMessage;
 
-                        return false;
+                            return false;
+                        }
+
+                        Cache.Remove(
+                            cacheKey);
                     }
+                    else
+                    {
+                        string targetKey =
+                            NonStandardPartNumberLayoutReader
+                                .BuildKey(
+                                    drawingNumber,
+                                    partSuffix);
 
+                        contains =
+                            entry.PartKeys.Contains(
+                                targetKey);
 
-                    string targetKey =
-                        NonStandardPartNumberLayoutReader
-                            .BuildKey(
-                                drawingNumber,
-                                partSuffix);
-
-
-                    contains =
-                        entry.PartKeys.Contains(
-                            targetKey);
-
-
-                    return true;
+                        return true;
+                    }
                 }
             }
 
@@ -131,6 +137,9 @@ namespace Correct_test1.Core
             entry =
                 Load(
                     filePath);
+
+            entry.CachedAtUtc =
+                DateTime.UtcNow;
 
 
             lock (SyncRoot)
@@ -314,9 +323,16 @@ namespace Correct_test1.Core
                 + ticks;
         }
 
-
+        private static readonly TimeSpan
+    FailureCacheDuration =
+        TimeSpan.FromSeconds(30);
         private class CacheEntry
         {
+            public DateTime CachedAtUtc
+            {
+                get;
+                set;
+            }
             public bool Success
             {
                 get;
