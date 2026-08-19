@@ -186,7 +186,7 @@ begin
     MsgBox(
       'CADCheckTool v2.2.0 已为' + GetInstallModeName + '安装完成。' + #13#10 + #13#10 +
       '安装位置：' + ExpandConstant('{app}') + #13#10 +
-      '请重新启动 AutoCAD 2024。插件会自动加载，无需 NETLOAD，也无需手动修改注册表。' + #13#10 +
+      '请重新启动 AutoCAD 2024。插件会在首次输入命令时自动加载，无需 NETLOAD，也无需手动修改注册表。' + #13#10 +
       '进入 AutoCAD 后输入 CHECKDRAWING 即可使用。',
       mbInformation,
       MB_OK);
