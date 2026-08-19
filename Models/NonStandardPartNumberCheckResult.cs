@@ -5,15 +5,11 @@ namespace Correct_test1.Models
 {
     /// <summary>
     /// 非标件号存在性检查结果。
-    ///
     /// 例如：
-    ///
     /// BOM：
     /// NS333T1
-    ///
     /// 归档图号：
     /// NS333T
-    ///
     /// 件号：
     /// 1
     /// </summary>
@@ -48,7 +44,6 @@ namespace Correct_test1.Models
 
         /// <summary>
         /// BOM中的完整非标件号。
-        ///
         /// 例如：
         /// NS333T1
         /// </summary>
@@ -61,7 +56,6 @@ namespace Correct_test1.Models
 
         /// <summary>
         /// 归档图号。
-        ///
         /// NS333T1
         /// ->
         /// NS333T
@@ -75,7 +69,6 @@ namespace Correct_test1.Models
 
         /// <summary>
         /// 件号。
-        ///
         /// NS333T1
         /// ->
         /// 1

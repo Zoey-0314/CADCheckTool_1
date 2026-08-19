@@ -6,12 +6,10 @@ namespace Correct_test1.QuickRevision.Forms
 {
     /// <summary>
     /// 快速划改新文字输入窗口。
-    ///
     /// 本窗体只负责：
     /// 1. 显示原内容
     /// 2. 接收新内容
     /// 3. 返回确定/取消
-    ///
     /// 不负责任何AutoCAD数据库操作。
     /// </summary>
     public class RevisionInputForm : Form
@@ -38,7 +36,6 @@ namespace Correct_test1.QuickRevision.Forms
 
         /// <summary>
         /// 用户输入的新内容。
-        ///
         /// 只有用户点击确定后才使用。
         /// </summary>
         public string ReplacementText
@@ -111,9 +108,7 @@ namespace Correct_test1.QuickRevision.Forms
         /// </summary>
         private void InitializeControls()
         {
-            //--------------------------------
             // 原内容标题
-            //--------------------------------
 
             _originalTitleLabel =
                 new Label();
@@ -130,9 +125,7 @@ namespace Correct_test1.QuickRevision.Forms
                     25);
 
 
-            //--------------------------------
             // 原内容显示
-            //--------------------------------
 
             _originalValueLabel =
                 new Label();
@@ -157,9 +150,7 @@ namespace Correct_test1.QuickRevision.Forms
                 ContentAlignment.MiddleLeft;
 
 
-            //--------------------------------
             // 新内容标题
-            //--------------------------------
 
             _replacementTitleLabel =
                 new Label();
@@ -176,9 +167,7 @@ namespace Correct_test1.QuickRevision.Forms
                     78);
 
 
-            //--------------------------------
             // 新文字输入框
-            //--------------------------------
 
             _replacementTextBox =
                 new TextBox();
@@ -197,9 +186,7 @@ namespace Correct_test1.QuickRevision.Forms
                 0;
 
 
-            //--------------------------------
             // 确定按钮
-            //--------------------------------
 
             _okButton =
                 new Button();
@@ -224,9 +211,7 @@ namespace Correct_test1.QuickRevision.Forms
                 OkButton_Click;
 
 
-            //--------------------------------
             // 取消按钮
-            //--------------------------------
 
             _cancelButton =
                 new Button();
@@ -251,9 +236,7 @@ namespace Correct_test1.QuickRevision.Forms
                 DialogResult.Cancel;
 
 
-            //--------------------------------
             // Enter / Esc
-            //--------------------------------
 
             AcceptButton =
                 _okButton;
@@ -262,9 +245,7 @@ namespace Correct_test1.QuickRevision.Forms
                 _cancelButton;
 
 
-            //--------------------------------
             // 添加控件
-            //--------------------------------
 
             Controls.Add(
                 _originalTitleLabel);
@@ -285,9 +266,7 @@ namespace Correct_test1.QuickRevision.Forms
                 _cancelButton);
 
 
-            //--------------------------------
             // 打开窗口后直接输入
-            //--------------------------------
 
             Shown +=
                 RevisionInputForm_Shown;
@@ -328,9 +307,7 @@ namespace Correct_test1.QuickRevision.Forms
                 ReplacementText;
 
 
-            //--------------------------------
             // 不允许空内容。
-            //--------------------------------
 
             if (string.IsNullOrWhiteSpace(
                     newText))
@@ -348,9 +325,7 @@ namespace Correct_test1.QuickRevision.Forms
             }
 
 
-            //--------------------------------
             // 新旧内容完全一样时不允许继续。
-            //--------------------------------
 
             if (string.Equals(
                     OriginalText,

@@ -21,9 +21,7 @@ namespace Correct_test1.Models
         /// 项目号
         /// </summary>
         public string ProjectNumber { get; set; }
-        //=========================
         // 标题栏基础信息
-        //=========================
 
         /// <summary>
         /// 图号
@@ -49,9 +47,7 @@ namespace Correct_test1.Models
         /// </summary>
         public string SurfaceTreatment { get; set; }
 
-        //=========================
         // 签字栏
-        //=========================
 
         /// <summary>
         /// 制图
@@ -91,9 +87,7 @@ namespace Correct_test1.Models
 =
 new List<TitleText>();
 
-        //=========================
         // 图纸结构信息
-        //=========================
 
         /// <summary>
         /// 所属布局

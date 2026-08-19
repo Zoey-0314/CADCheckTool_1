@@ -16,9 +16,7 @@ namespace Correct_test1.Core
                 new List<StandardPart>();
 
 
-        //--------------------------------
         // 严格索引
-        //--------------------------------
 
         private static Dictionary<string, List<StandardPart>>
             exportStrictIndex =
@@ -32,9 +30,7 @@ namespace Correct_test1.Core
                     StringComparer.OrdinalIgnoreCase);
 
 
-        //--------------------------------
         // 宽松索引
-        //--------------------------------
 
         private static Dictionary<string, List<StandardPart>>
             exportLooseIndex =
@@ -121,7 +117,6 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 插件启动时调用。
-        ///
         /// 后台预加载标准件Excel，
         /// 不阻塞AutoCAD启动。
         /// </summary>
@@ -170,7 +165,6 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 用户修改路径以后调用。
-        ///
         /// 旧预加载如果还没完成，
         /// 新任务会等待旧任务结束后，
         /// 再按照最新配置重新加载。
@@ -245,7 +239,6 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 安全加载。
-        ///
         /// 失败不会把所有标准件误判成
         /// “标准件库未收录”。
         /// </summary>
@@ -326,9 +319,7 @@ namespace Correct_test1.Core
                         path);
 
 
-                //--------------------------------
                 // 已经加载，而且文件没有变化。
-                //--------------------------------
 
                 if (loaded &&
                     string.Equals(
@@ -343,9 +334,7 @@ namespace Correct_test1.Core
                 }
 
 
-                //--------------------------------
                 // 正式读取Excel
-                //--------------------------------
 
                 StandardPartExcelReader reader =
                     new StandardPartExcelReader();
@@ -548,19 +537,6 @@ namespace Correct_test1.Core
                         part);
                 }
             }
-        }
-
-
-        public static List<StandardPart>
-            FindByPartNumber(
-                string partNumber)
-        {
-            EnsureLoaded();
-
-
-            return
-                FindByPartNumberLoaded(
-                    partNumber);
         }
 
 

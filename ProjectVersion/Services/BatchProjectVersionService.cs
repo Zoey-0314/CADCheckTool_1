@@ -13,12 +13,9 @@ namespace Correct_test1.ProjectVersion.Services
 {
     /// <summary>
     /// 文件夹批量写入项目号+版本号。
-    ///
     /// 递归处理所有DWG。
-    ///
     /// 底层写入继续复用：
     /// ProjectVersionWriteService
-    ///
     /// 保存继续复用：
     /// SafeDwgSaver
     /// </summary>
@@ -51,10 +48,8 @@ namespace Correct_test1.ProjectVersion.Services
             }
 
 
-            //--------------------------------
             // 与现有批量检查一样：
             // 递归所有子文件夹。
-            //--------------------------------
 
             string[] files =
                 Directory.GetFiles(
@@ -67,10 +62,8 @@ namespace Correct_test1.ProjectVersion.Services
                 return results;
 
 
-            //--------------------------------
             // 直接复用现有批量检查的
             // 宿主Document逻辑。
-            //--------------------------------
 
             Document hostDocument =
                 BatchCheckerManager
@@ -90,9 +83,7 @@ namespace Correct_test1.ProjectVersion.Services
                 hostDocument.Database;
 
 
-            //--------------------------------
             // 稳定WorkingDatabase
-            //--------------------------------
 
             HostApplicationServices
                 .WorkingDatabase =
@@ -132,9 +123,7 @@ namespace Correct_test1.ProjectVersion.Services
 
                 try
                 {
-                    //--------------------------------
                     // 宿主Database必须一直有效
-                    //--------------------------------
 
                     if (hostDatabase.IsDisposed)
                     {
@@ -148,9 +137,7 @@ namespace Correct_test1.ProjectVersion.Services
                             hostDatabase;
 
 
-                    //--------------------------------
                     // 建立后台Database
-                    //--------------------------------
 
                     db =
                         new Database(
@@ -158,9 +145,7 @@ namespace Correct_test1.ProjectVersion.Services
                             true);
 
 
-                    //--------------------------------
                     // 读取DWG
-                    //--------------------------------
 
                     db.ReadDwgFile(
                         file,
@@ -170,24 +155,19 @@ namespace Correct_test1.ProjectVersion.Services
                         "");
 
 
-                    //--------------------------------
                     // 切换WorkingDatabase
-                    //--------------------------------
 
                     HostApplicationServices
                         .WorkingDatabase =
                             db;
 
 
-                    //--------------------------------
                     // 关闭输入流
-                    //--------------------------------
 
                     db.CloseInput(
                         true);
 
 
-                    //--------------------------------
                     // 关键：
                     //
                     // 直接调用已经通过单张测试的
@@ -195,7 +175,6 @@ namespace Correct_test1.ProjectVersion.Services
                     //
                     // 不重新写横竖判断、
                     // 不重新写MText逻辑。
-                    //--------------------------------
 
                     List<ProjectVersionLayoutResult>
                         layoutResults =
@@ -205,9 +184,7 @@ namespace Correct_test1.ProjectVersion.Services
                                     value);
 
 
-                    //--------------------------------
                     // 汇总当前DWG
-                    //--------------------------------
 
                     if (layoutResults != null)
                     {
@@ -257,12 +234,10 @@ namespace Correct_test1.ProjectVersion.Services
                         fileResult.CreatedCount;
 
 
-                    //--------------------------------
                     // 有实际修改才保存。
                     //
                     // 如果整张DWG没有任何符合布局，
                     // 不重新写文件。
-                    //--------------------------------
 
                     if (successLayoutCount > 0)
                     {
@@ -299,9 +274,7 @@ namespace Correct_test1.ProjectVersion.Services
                     }
                     else
                     {
-                        //--------------------------------
                         // 没有任何布局被修改。
-                        //--------------------------------
 
                         fileResult.Success =
                             fileResult
@@ -346,12 +319,10 @@ namespace Correct_test1.ProjectVersion.Services
                 }
                 finally
                 {
-                    //--------------------------------
                     // 和现有BatchCheckerManager一样：
                     //
                     // 一定先恢复宿主WorkingDatabase，
                     // 再Dispose后台Database。
-                    //--------------------------------
 
                     try
                     {
@@ -397,9 +368,7 @@ namespace Correct_test1.ProjectVersion.Services
                     fileResult);
 
 
-                //--------------------------------
                 // 进度
-                //--------------------------------
 
                 int percent =
                     (int)(
@@ -430,9 +399,7 @@ namespace Correct_test1.ProjectVersion.Services
             }
 
 
-            //--------------------------------
             // 最后再恢复一次宿主Database
-            //--------------------------------
 
             try
             {

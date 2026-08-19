@@ -46,9 +46,7 @@
             this.SuspendLayout();
 
 
-            //==================================================
             // lblTitle
-            //==================================================
 
             this.lblTitle.AutoSize =
                 true;
@@ -81,9 +79,7 @@
                 "单张图纸检查";
 
 
-            //==================================================
             // btnCheck
-            //==================================================
 
             this.btnCheck.Location =
                 new System.Drawing.Point(
@@ -112,9 +108,7 @@
                     this.btnCheck_Click);
 
 
-            //==================================================
             // btnClear
-            //==================================================
 
             this.btnClear.Location =
                 new System.Drawing.Point(
@@ -143,9 +137,7 @@
                     this.btnClear_Click);
 
 
-            //==================================================
             // btnQuickRevision
-            //==================================================
 
             this.btnQuickRevision.Location =
                 new System.Drawing.Point(
@@ -174,9 +166,7 @@
                     this.btnQuickRevision_Click);
 
 
-            //==================================================
             // btnClearQuickRevision
-            //==================================================
 
             this.btnClearQuickRevision.Location =
                 new System.Drawing.Point(
@@ -205,9 +195,7 @@
                     this.btnClearQuickRevision_Click);
 
 
-            //==================================================
             // btnClose
-            //==================================================
 
             this.btnClose.Location =
                 new System.Drawing.Point(
@@ -236,9 +224,7 @@
                     this.btnClose_Click);
 
 
-            //==================================================
             // SingleCheckForm
-            //==================================================
 
             this.AutoScaleDimensions =
                 new System.Drawing.SizeF(
@@ -293,10 +279,8 @@
                 "SingleCheckForm";
 
 
-            //--------------------------------
             // 现在这是Modeless窗口，
             // 使用CenterScreen更合适。
-            //--------------------------------
 
             this.StartPosition =
                 System.Windows.Forms
@@ -308,10 +292,8 @@
                 "单张图纸检查";
 
 
-            //--------------------------------
             // 无论关闭按钮还是右上角X，
             // 都检查是否需要退出QREVMODE。
-            //--------------------------------
 
             this.FormClosing +=
                 new System.Windows.Forms

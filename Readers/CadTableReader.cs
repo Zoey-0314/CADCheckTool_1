@@ -12,34 +12,24 @@ namespace Correct_test1.Readers
 {
     /// <summary>
     /// CAD表格读取器。
-    ///
     /// 新版核心原则：
-    ///
     /// 不再：
     /// 从BlockTableRecord反推Layout。
-    ///
     /// 而是：
     /// 从每一个Layout出发递归读取。
-    ///
     /// 因此即使Table位于：
-    ///
     /// Layout6
     /// └─ Block
     ///    └─ Block
     ///       └─ Table
-    ///
     /// 也始终知道：
-    ///
     /// SourceLayoutName = Layout6
-    ///
     /// 同时累计BlockTransform，
     /// 把Table单元格坐标转换到Layout坐标系。
     /// </summary>
     public class CadTableReader
     {
-        //==================================================
         // 主入口
-        //==================================================
 
         public List<CadTableData> Read(
             Database db)
@@ -56,9 +46,7 @@ namespace Correct_test1.Readers
 
             try
             {
-                //--------------------------------
                 // 先读取真正的Layout列表
-                //--------------------------------
 
                 LayoutReader layoutReader =
                     new LayoutReader();
@@ -80,9 +68,7 @@ namespace Correct_test1.Readers
 
 
 
-                //==================================================
                 // 每个Layout单独处理
-                //==================================================
 
                 foreach (
                     LayoutInfo layout
@@ -96,10 +82,8 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     //这里直接读取当前Layout中的所有Table，
                     // 后续再由BomTableRecognizer过滤。
-                    //==================================================
 
                     Extents3d? frame =
                         null;
@@ -134,9 +118,7 @@ namespace Correct_test1.Readers
                         }
 
 
-                        //--------------------------------
                         // 防止异常循环块引用
-                        //--------------------------------
 
                         HashSet<ObjectId>
                             activeBlockDefinitions =
@@ -171,9 +153,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 递归读取一个Layout / Block中的实体
-        //==================================================
 
         private void ReadSpace(
             Database db,
@@ -195,9 +175,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 防止极端异常图纸无限递归
-            //--------------------------------
 
             if (depth > 20)
             {
@@ -222,9 +200,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 1. AutoCAD Table
-                //==================================================
 
                 Table table =
                     entity as Table;
@@ -232,13 +208,11 @@ namespace Correct_test1.Readers
 
                 if (table != null)
                 {
-                    //--------------------------------
                     // 如果找到了图框：
                     // 只接受图框内的Table。
                     //
                     // 如果当前Layout没有成功识别图框：
                     // 不过滤。
-                    //--------------------------------
 
                     if (frame != null)
                     {
@@ -270,11 +244,9 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 2. BlockReference
                 //
                 // Table可能在嵌套块里面。
-                //==================================================
 
                 BlockReference block =
                     entity as BlockReference;
@@ -309,9 +281,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //--------------------------------
                 // 外部参照不递归
-                //--------------------------------
 
                 if (blockDefinition
                     .IsFromExternalReference)
@@ -320,9 +290,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //--------------------------------
                 // 防止块定义循环引用
-                //--------------------------------
 
                 ObjectId definitionId =
                     block.BlockTableRecord;
@@ -336,7 +304,6 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 累计块变换
                 //
                 // Layout
@@ -346,7 +313,6 @@ namespace Correct_test1.Readers
                 // Block2
                 //
                 // 最终Table坐标会转换回真正Layout坐标。
-                //==================================================
 
                 Matrix3d childTransform =
                     transform
@@ -364,9 +330,7 @@ namespace Correct_test1.Readers
                         tr,
                         blockDefinition,
 
-                        //==============================
                         // LayoutName始终不改变
-                        //==============================
 
                         sourceLayoutName,
 
@@ -385,9 +349,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 判断Table是否位于当前Layout图框内
-        //==================================================
 
         private bool IsInsideFrame(
             Table table,
@@ -446,14 +408,12 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 转换Extents
         //
         // 不能只转换MinPoint / MaxPoint，
         // 因为Block可能旋转。
         //
         // 所以转换8个角点后重新计算包围盒。
-        //==================================================
 
         private Extents3d TransformExtents(
             Extents3d extents,
@@ -586,7 +546,6 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 读取单个Table
         //
         // transform用于把：
@@ -596,7 +555,6 @@ namespace Correct_test1.Readers
         // 转换为：
         //
         // Layout真实坐标
-        //==================================================
 
         private CadTableData ReadTable(
             Table table,
@@ -623,12 +581,10 @@ namespace Correct_test1.Readers
             data.Columns =
                 table.Columns.Count;
 
-            //==================================================
             // 保存Table实际边界
             //
             // 如果Table位于Block内部，
             // 使用同一个transform转换为Layout实际坐标。
-            //==================================================
 
             try
             {
@@ -658,9 +614,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 所有单元格
-            //==================================================
 
             for (
                 int r = 0;
@@ -676,9 +630,7 @@ namespace Correct_test1.Readers
                     c < table.Columns.Count;
                     c++)
                 {
-                    //==================================================
                     // 文字
-                    //==================================================
 
                     string value =
                         "";
@@ -703,9 +655,7 @@ namespace Correct_test1.Readers
                         value);
 
 
-                    //==================================================
                     // 单元格中心坐标
-                    //==================================================
 
                     try
                     {
@@ -746,10 +696,8 @@ namespace Correct_test1.Readers
                                 Point3d originalPoint
                                 in cellPoints)
                             {
-                                //--------------------------------
                                 // 最重要：
                                 // 应用完整BlockTransform
-                                //--------------------------------
 
                                 Point3d point =
                                     originalPoint

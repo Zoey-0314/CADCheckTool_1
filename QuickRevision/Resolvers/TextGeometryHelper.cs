@@ -5,20 +5,16 @@ namespace Correct_test1.QuickRevision.Resolvers
 {
     /// <summary>
     /// 统一计算文字实际视觉范围。
-    ///
     /// MText不能直接依赖GeometricExtents，
     /// 因为MText本身可能设置了较大的换行宽度。
-    ///
-    /// 第一版QuickRevision只处理水平文字。
+    /// QuickRevision 当前只处理水平文字。
     /// </summary>
     internal static class TextGeometryHelper
     {
         /// <summary>
         /// 获取MText实际显示文字的紧凑范围。
-        ///
         /// 优先：
         /// ActualWidth + ActualHeight + Attachment + Location
-        ///
         /// 失败时才回退到GeometricExtents。
         /// </summary>
         public static bool TryGetMTextExtents(
@@ -58,9 +54,7 @@ namespace Correct_test1.QuickRevision.Resolvers
 
                     switch (text.Attachment)
                     {
-                        //--------------------------------
                         // TOP
-                        //--------------------------------
 
                         case AttachmentPoint.TopLeft:
 
@@ -120,9 +114,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                             break;
 
 
-                        //--------------------------------
                         // MIDDLE
-                        //--------------------------------
 
                         case AttachmentPoint.MiddleLeft:
 
@@ -185,9 +177,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                             break;
 
 
-                        //--------------------------------
                         // BOTTOM
-                        //--------------------------------
 
                         case AttachmentPoint.BottomLeft:
 
@@ -247,9 +237,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                             break;
 
 
-                        //--------------------------------
                         // 未知Attachment
-                        //--------------------------------
 
                         default:
 
@@ -288,9 +276,7 @@ namespace Correct_test1.QuickRevision.Resolvers
             }
 
 
-            //--------------------------------
             // ActualWidth失败才Fallback
-            //--------------------------------
 
             return
                 TryGetGeometricExtents(

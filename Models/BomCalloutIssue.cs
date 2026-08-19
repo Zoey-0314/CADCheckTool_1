@@ -8,14 +8,11 @@ namespace Correct_test1.Models
 {
     /// <summary>
     /// 单个BOM序号问题。
-    ///
-    /// 与旧版相比，
+    /// 当前对象
     /// 现在每一个问题都明确携带：
-    ///
     /// LayoutName
     /// Number
     /// Position
-    ///
     /// 因此不会再丢失布局信息。
     /// </summary>
     public class BomCalloutIssue
@@ -62,19 +59,8 @@ namespace Correct_test1.Models
 
     /// <summary>
     /// BOM序号检查结果。
-    ///
-    /// MissingCallouts / ExtraCallouts
-    /// 继续保留，
-    /// 避免旧代码立即失效。
-    ///
-    /// 新增：
-    ///
-    /// MissingIssues
-    /// ExtraIssues
-    ///
-    /// 真正绘制Marker时，
-    /// 后续统一使用Issue，
-    /// 因为Issue携带Layout信息。
+    /// MissingCallouts / ExtraCallouts 用于兼容调用方；
+    /// 绘制标记使用携带布局信息的 MissingIssues / ExtraIssues。
     /// </summary>
     public class BomCalloutResult
     {

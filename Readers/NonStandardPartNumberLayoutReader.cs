@@ -11,19 +11,13 @@ namespace Correct_test1.Readers
 {
     /// <summary>
     /// 从归档非标DWG中读取：
-    ///
     /// 图号 + 件号
-    ///
     /// 例如：
-    ///
     /// NS333T    _1
     /// 重量
     /// 备注
-    ///
     /// 表示：
-    ///
     /// NS333T1
-    ///
     /// 存在。
     /// </summary>
     public class NonStandardPartNumberLayoutReader
@@ -31,9 +25,7 @@ namespace Correct_test1.Readers
         /// <summary>
         /// 读取一张归档DWG中
         /// 所有Layout存在的“图号+件号”组合。
-        ///
         /// 返回Key：
-        ///
         /// NS333T|1
         /// NS333T|2
         /// ...
@@ -117,7 +109,6 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 第一种格式：
             //
             // 完整件号直接写在一个单元格里
@@ -127,7 +118,6 @@ namespace Correct_test1.Readers
             // ↓
             //
             // NS333H|1
-            //==================================================
 
             foreach (
                 TitleText text
@@ -171,7 +161,6 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 第二种 / 第三种格式：
             //
             // NS333T    _1
@@ -181,7 +170,6 @@ namespace Correct_test1.Readers
             // NS333D_   _999  _998  _997 ...
             //
             // 只把“同一行”的件号配给这个图号。
-            //==================================================
 
             foreach (
                 TitleText drawingText
@@ -219,9 +207,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //--------------------------------
                 // 同一行Y容差
-                //--------------------------------
 
                 const double yTolerance =
                     12.0;
@@ -243,9 +229,7 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //--------------------------------
                     // 不能把自己当件号
-                    //--------------------------------
 
                     if (object.ReferenceEquals(
                             drawingText,
@@ -255,9 +239,7 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //--------------------------------
                     // 必须基本位于同一行
-                    //--------------------------------
 
                     if (Math.Abs(
                             suffixText.Y -
@@ -268,9 +250,7 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //--------------------------------
                     // 件号必须位于图号右侧
-                    //--------------------------------
 
                     double rightDistance =
                         suffixText.X -
@@ -312,13 +292,11 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //--------------------------------
                     // NS333D_ + _999
                     //
                     // ↓
                     //
                     // NS333D|999
-                    //--------------------------------
 
                     result.Add(
                         BuildKey(
@@ -365,7 +343,6 @@ namespace Correct_test1.Readers
                         drawingText.Text);
 
 
-                //==================================================
                 // 必须是真正的基础图号：
                 //
                 // NS333T
@@ -374,7 +351,6 @@ namespace Correct_test1.Readers
                 // 不能是：
                 //
                 // NS333T1
-                //==================================================
 
                 if (!IsBaseDrawingNumber(
                         drawingValue))
@@ -383,7 +359,6 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 老式小表必须在当前图号附近
                 // 同时存在：
                 //
@@ -391,7 +366,6 @@ namespace Correct_test1.Readers
                 // 备注
                 //
                 // 不再使用整个Layout全局判断。
-                //==================================================
 
                 if (!HasNearbyLegacyLabels(
                         texts,
@@ -413,9 +387,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 找当前图号附近的件号
-                //==================================================
 
                 foreach (
                     TitleText suffixText
@@ -449,9 +421,7 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 必须在当前图号右侧。
-                    //==================================================
 
                     double rightDistance =
                         suffixText.X -
@@ -464,10 +434,8 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 防止把很远的另一个表里的_1
                     // 误配给当前图号。
-                    //==================================================
 
                     const double maxRightDistance =
                         150.0;
@@ -480,7 +448,6 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 老图允许比新版矩阵更大的Y误差。
                     //
                     // 新版：
@@ -488,7 +455,6 @@ namespace Correct_test1.Readers
                     //
                     // 老式兼容：
                     // 12
-                    //==================================================
 
                     const double legacyYTolerance =
                         12.0;
@@ -503,7 +469,6 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 如果附近还有其他基础图号，
                     //
                     // 这个suffix只能归给距离它最近的那个图号。
@@ -515,7 +480,6 @@ namespace Correct_test1.Readers
                     // NS386E_  _1
                     //
                     // 被交叉组合。
-                    //==================================================
 
                     if (!IsNearestDrawingForSuffix(
                             texts,
@@ -554,13 +518,11 @@ namespace Correct_test1.Readers
                 false;
 
 
-            //==================================================
             // 老式小表不会特别大。
             //
             // 这里不是精确表框，
             // 只是限定“附近区域”，
             // 防止使用整个Layout的重量/备注。
-            //==================================================
 
             const double maxHorizontalDistance =
                 150.0;
@@ -686,9 +648,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // suffix也必须位于另一个候选图号右侧。
-                //==================================================
 
                 double rightDistance =
                     suffixText.X -
@@ -718,11 +678,9 @@ namespace Correct_test1.Readers
                         suffixText);
 
 
-                //==================================================
                 // 找到明显更近的基础图号：
                 //
                 // 当前drawing不是这个suffix的归属。
-                //==================================================
 
                 if (otherDistance <
                     currentDistance)
@@ -756,7 +714,6 @@ namespace Correct_test1.Readers
                 drawingText.Y;
 
 
-            //==================================================
             // Y方向权重稍微放大。
             //
             // 原因：
@@ -764,7 +721,6 @@ namespace Correct_test1.Readers
             // 对件号归属来说，
             // “是不是同一行”
             // 比纯X距离更重要。
-            //==================================================
 
             return
                 Math.Abs(dx)
@@ -775,7 +731,6 @@ namespace Correct_test1.Readers
         /// <summary>
         /// 解析完整非标件号。
         /// </summary>
-        /// 
         private static bool TryReadCombinedPartNumber(
             string value,
             out string drawingNumber,
@@ -803,9 +758,7 @@ namespace Correct_test1.Readers
                     .ToUpperInvariant();
 
 
-            //--------------------------------
             // 必须是NS开头
-            //--------------------------------
 
             if (!cleaned.StartsWith(
                     "NS",
@@ -815,13 +768,11 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 直接复用现有归档图号规则。
             //
             // NS333H1
             // ↓
             // NS333H
-            //--------------------------------
 
             string baseDrawingNumber =
                 NonStandardArchiveChecker
@@ -836,7 +787,6 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 如果没有被截掉任何东西：
             //
             // NS333H
@@ -844,7 +794,6 @@ namespace Correct_test1.Readers
             // NS333H
             //
             // 说明它只有图号，没有件号。
-            //--------------------------------
 
             if (cleaned.Length <=
                 baseDrawingNumber.Length)
@@ -853,13 +802,11 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 取剩余部分。
             //
             // NS333H1
             //       ↓
             //       1
-            //--------------------------------
 
             string suffix =
                 cleaned
@@ -878,9 +825,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 当前件号仍按纯数字处理
-            //--------------------------------
 
             foreach (
                 char character
@@ -942,11 +887,9 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // NS333D_
             // ↓
             // NS333D
-            //--------------------------------
 
             string withoutUnderscore =
                 cleaned.TrimEnd(
@@ -959,14 +902,12 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 如果最后还是数字：
             //
             // NS333H1
             //
             // 说明它是完整件号，
             // 不是基础图号。
-            //--------------------------------
 
             char last =
                 withoutUnderscore[
@@ -1003,13 +944,10 @@ namespace Correct_test1.Readers
 
         /// <summary>
         /// 读取：
-        ///
         /// _1
         /// _2
         /// _101
-        ///
         /// 返回：
-        ///
         /// 1
         /// 2
         /// 101
@@ -1037,11 +975,9 @@ namespace Correct_test1.Readers
                         "");
 
 
-            //--------------------------------
             // 必须以 "_" 开头。
             //
             // 防止普通数字文字被误识别成件号。
-            //--------------------------------
 
             if (!value.StartsWith(
                     "_",
@@ -1062,10 +998,8 @@ namespace Correct_test1.Readers
             }
 
 
-            //--------------------------------
             // 当前件号规则：
             // 数字。
-            //--------------------------------
 
             foreach (
                 char character

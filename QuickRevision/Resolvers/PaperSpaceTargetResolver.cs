@@ -16,7 +16,6 @@ namespace Correct_test1.QuickRevision.Resolvers
 {
     /// <summary>
     /// Paper Space目标统一解析器。
-    ///
     /// 支持：
     /// Table Cell
     /// DBText
@@ -125,7 +124,6 @@ namespace Correct_test1.QuickRevision.Resolvers
                 }
 
 
-                //--------------------------------
                 // Table：
                 //
                 // TableCellResolver已经根据点击点
@@ -133,7 +131,6 @@ namespace Correct_test1.QuickRevision.Resolvers
                 //
                 // 找到以后直接返回，
                 // 不进行第二次通用范围过滤。
-                //--------------------------------
 
                 if (obj is Table)
                 {
@@ -159,9 +156,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                     null;
 
 
-                //--------------------------------
                 // DBText
-                //--------------------------------
 
                 if (obj is DBText)
                 {
@@ -173,9 +168,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                 }
 
 
-                //--------------------------------
                 // MText
-                //--------------------------------
 
                 else if (obj is MText)
                 {

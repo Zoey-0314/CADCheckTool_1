@@ -16,25 +16,19 @@ namespace Correct_test1.Checks
 {
     public class CheckService
     {
-        //==================================================
         // 普通单张检查入口
-        //==================================================
 
         public CheckReport Check(
             Database database)
         {
-            //--------------------------------
-            // 原有非标归档缓存
-            //--------------------------------
+            // 非标归档缓存
 
             NonStandardArchiveIndex archiveIndex =
                 NonStandardArchiveCache
                     .GetOrBuild();
 
 
-            //--------------------------------
-            // 新增版本归档缓存
-            //--------------------------------
+            // 版本归档缓存
 
             VersionArchiveIndex versionArchiveIndex =
                 VersionArchiveCache
@@ -48,9 +42,7 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
-        // 保留原有批量调用兼容
-        //==================================================
+        // 兼容批量调用
 
         public CheckReport Check(
             Database database,
@@ -68,9 +60,7 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 完整检查入口
-        //==================================================
 
         public CheckReport Check(
             Database database,
@@ -95,13 +85,9 @@ namespace Correct_test1.Checks
                 database.Filename;
 
 
-            //==================================================
             // 外部数据源状态
-            //==================================================
 
-            //--------------------------------
             // 非标归档
-            //--------------------------------
 
             report.NonStandardArchiveAvailable =
                 archiveIndex != null &&
@@ -117,9 +103,7 @@ namespace Correct_test1.Checks
             }
 
 
-            //--------------------------------
-            // 新增：版本归档
-            //--------------------------------
+            // 版本归档
 
             report.VersionArchiveAvailable =
                 versionArchiveIndex != null &&
@@ -135,9 +119,7 @@ namespace Correct_test1.Checks
             }
 
 
-            //--------------------------------
             // 标准件数据库
-            //--------------------------------
 
             string standardPartError;
 
@@ -190,9 +172,7 @@ namespace Correct_test1.Checks
                     nonStandardArchiveChecker =
                         new NonStandardArchiveChecker();
 
-                //--------------------------------
-                // 新增：非标件号存在性检查
-                //--------------------------------
+                // 非标件号存在性检查
 
                 NonStandardPartNumberChecker
                     nonStandardPartNumberChecker =
@@ -208,17 +188,13 @@ namespace Correct_test1.Checks
                     new List<BomData>();
 
 
-                //==================================================
                 // BOM检查
-                //==================================================
 
                 foreach (
     CadTableData table
     in tables)
                 {
-                    //--------------------------------
                     // 不是BOM表则跳过
-                    //--------------------------------
 
                     if (!recognizer.IsBom(
                             table))
@@ -227,9 +203,7 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //--------------------------------
                     // 解析BOM
-                    //--------------------------------
 
                     BomData bom =
                         recognizer.Parse(
@@ -241,29 +215,23 @@ namespace Correct_test1.Checks
                         continue;
                     }
 
-                    //==================================================
                     // 读取当前BOM自己右侧的项目号
                     //
                     // 注意：
                     // 不再使用当前DWG文件名决定这个BOM属于哪个项目。
-                    //==================================================
 
                     bom.ProjectNumber =
                         bomProjectNumberReader.Read(
                             database,
                             table,
                             bom);
-                    //--------------------------------
                     // 保存BOM
-                    //--------------------------------
 
                     boms.Add(
                         bom);
 
 
-                    //==================================================
                     // 当前图纸图号
-                    //==================================================
 
                     if (string.IsNullOrEmpty(
                             report.DrawingNumber) &&
@@ -279,9 +247,7 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //==================================================
-                    // 原有标准件检查
-                    //==================================================
+                    // 标准件检查
 
                     if (report
                         .StandardPartDatabaseAvailable)
@@ -292,15 +258,13 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //==================================================
-                    // 原有NS非标归档存在性检查
+                    // NS非标归档存在性检查
                     //
                     // 例如：
                     //
                     // NS333T1
                     // ↓
                     // 检查Z盘是否存在NS333T对应归档文件
-                    //==================================================
 
                     if (report
                         .NonStandardArchiveAvailable)
@@ -315,8 +279,7 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //==================================================
-                    // 新增：NS非标件号存在性检查
+                    // NS非标件号存在性检查
                     //
                     // 例如：
                     //
@@ -339,7 +302,6 @@ namespace Correct_test1.Checks
                     // NS333T    _1
                     // 重量
                     // 备注
-                    //==================================================
 
                     if (report
                         .NonStandardArchiveAvailable)
@@ -357,12 +319,10 @@ namespace Correct_test1.Checks
 
 
 
-                //==================================================
                 // BOM序号检查
                 //
                 // 新版：
                 // 每一个Layout完全独立比较。
-                //==================================================
 
                 LayoutReader layoutReader =
                     new LayoutReader();
@@ -376,11 +336,9 @@ namespace Correct_test1.Checks
                     new ViewportLineReader();
 
 
-                //==================================================
                 // 这里仍然只扫描一次CAD。
                 //
                 // 不会因为Layout分组而重复扫描。
-                //==================================================
 
                 List<TitleText> drawingTexts =
                     viewportTextReader.Read(
@@ -399,9 +357,7 @@ namespace Correct_test1.Checks
                         true);
 
 
-                //==================================================
                 // 最终总结果
-                //==================================================
 
                 BomCalloutResult totalCalloutResult =
                     new BomCalloutResult();
@@ -415,12 +371,10 @@ namespace Correct_test1.Checks
                     new HashSet<int>();
 
 
-                //==================================================
                 // 只处理真正存在BOM的Layout。
                 //
                 // 一个没有BOM的Layout，
                 // 不应该因为存在数字就全部判成“多余BOM序号”。
-                //==================================================
 
                 HashSet<string> bomLayoutNames =
                     new HashSet<string>(
@@ -444,17 +398,13 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 一个Layout一个Layout处理
-                //==================================================
 
                 foreach (
                     string layoutName
                     in bomLayoutNames)
                 {
-                    //==================================================
                     // 当前Layout的BOM
-                    //==================================================
 
                     List<BomData> layoutBoms =
                         boms
@@ -469,9 +419,7 @@ namespace Correct_test1.Checks
                             .ToList();
 
 
-                    //==================================================
                     // 当前Layout视口中的文字
-                    //==================================================
 
                     List<TitleText> layoutTexts =
                         drawingTexts
@@ -486,9 +434,7 @@ namespace Correct_test1.Checks
                             .ToList();
 
 
-                    //==================================================
                     // 当前Layout视口中的线
-                    //==================================================
 
                     List<CadLineInfo> layoutLines =
                         drawingLines
@@ -503,9 +449,7 @@ namespace Correct_test1.Checks
                             .ToList();
 
 
-                    //==================================================
                     // 当前Layout的BOM序号
-                    //==================================================
 
                     HashSet<int> layoutBomNumbers =
                         new HashSet<int>();
@@ -522,9 +466,7 @@ namespace Correct_test1.Checks
                     }
 
 
-                    //==================================================
                     // 当前Layout图中实际序号
-                    //==================================================
                     List<TitleText> acceptedLayoutTexts;
 
                     HashSet<int> layoutDrawingNumbers =
@@ -534,12 +476,10 @@ namespace Correct_test1.Checks
                                 layoutLines,
                                 out acceptedLayoutTexts);
 
-                    //==================================================
                     // 保留总集合，
                     // 兼容CheckReport已有字段。
                     //
                     // 但这些总集合以后不再用于判断Marker。
-                    //==================================================
 
                     totalBomNumbers.UnionWith(
                         layoutBomNumbers);
@@ -549,9 +489,7 @@ namespace Correct_test1.Checks
                         layoutDrawingNumbers);
 
 
-                    //==================================================
                     // 真正按Layout检查
-                    //==================================================
 
                     BomCalloutResult layoutResult =
                         calloutChecker.CheckLayout(
@@ -561,9 +499,7 @@ namespace Correct_test1.Checks
                             acceptedLayoutTexts);
 
 
-                    //==================================================
                     // 聚合结果
-                    //==================================================
 
                     totalCalloutResult
                         .MissingCallouts
@@ -594,9 +530,7 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 写入报告
-                //==================================================
 
                 report.BomNumbers =
                     totalBomNumbers;
@@ -610,9 +544,7 @@ namespace Correct_test1.Checks
                     totalCalloutResult;
 
 
-                //==================================================
-                // 新增：版本号检查
-                //==================================================
+                // 版本号检查
 
                 if (report.VersionArchiveAvailable)
                 {
@@ -639,9 +571,7 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
-                // 原有统计
-                //==================================================
+                // 检查结果统计
 
                 report.TotalCount =
                     report.Results.Count;

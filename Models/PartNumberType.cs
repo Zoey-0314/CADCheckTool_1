@@ -1,4 +1,4 @@
-namespace Correct_test1.Models
+﻿namespace Correct_test1.Models
 {
     public enum PartNumberType
     {

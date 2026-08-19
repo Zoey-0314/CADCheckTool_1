@@ -11,121 +11,9 @@ namespace Correct_test1.Readers
 {
     public class ProjectReader
     {
-        //==================================================
-        // 原有：读取项目号
-        //==================================================
-
-        public List<string> ReadProjects(
-            Database db)
-        {
-            List<string> projects =
-                new List<string>();
-
-
-            if (db == null)
-            {
-                return projects;
-            }
-
-
-            using (
-                Transaction trans =
-                    db.TransactionManager
-                        .StartTransaction())
-            {
-                BlockTable bt =
-                    trans.GetObject(
-                        db.BlockTableId,
-                        OpenMode.ForRead)
-                    as BlockTable;
-
-
-                if (bt == null)
-                {
-                    return projects;
-                }
-
-
-                ObjectId[] spaces =
-                {
-                    bt[BlockTableRecord.ModelSpace],
-                    bt[BlockTableRecord.PaperSpace]
-                };
-
-
-                foreach (
-                    ObjectId spaceId
-                    in spaces)
-                {
-                    BlockTableRecord btr =
-                        trans.GetObject(
-                            spaceId,
-                            OpenMode.ForRead)
-                        as BlockTableRecord;
-
-
-                    if (btr == null)
-                    {
-                        continue;
-                    }
-
-
-                    foreach (
-                        ObjectId id
-                        in btr)
-                    {
-                        Entity ent =
-                            trans.GetObject(
-                                id,
-                                OpenMode.ForRead)
-                            as Entity;
-
-
-                        if (ent == null)
-                        {
-                            continue;
-                        }
-
-
-                        if (ent is BlockReference block)
-                        {
-                            ReadBlock(
-                                block,
-                                trans,
-                                projects);
-                        }
-                        else if (ent is DBText text)
-                        {
-                            AddProject(
-                                text.TextString,
-                                projects);
-                        }
-                        else if (ent is MText mtext)
-                        {
-                            AddProject(
-                                mtext.Text,
-                                projects);
-                        }
-                    }
-                }
-
-
-                trans.Commit();
-            }
-
-
-            return projects;
-        }
-
-
-        //==================================================
-        // 新版：
-        // 读取项目号 + 所属Layout + 坐标
-        //
-        // 解决：
-        // Layout2的修正写到当前Layout的问题
-        //==================================================
-
+        /// <summary>
+        /// 读取项目号及其布局和坐标，确保后续标记写回原布局。
+        /// </summary>
         public List<ProjectNumberLocation>
             ReadProjectLocations(
                 Database db)
@@ -158,9 +46,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 真正逐个遍历Layout
-                //==================================================
 
                 foreach (
                     DBDictionaryEntry entry
@@ -237,7 +123,6 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // AddProjectLocation 重载1
         //
         // 负责：
@@ -245,7 +130,6 @@ namespace Correct_test1.Readers
         //
         // 注意：
         // 最后一个参数layoutName必须一直传下去
-        //==================================================
 
         private void AddProjectLocation(
     Entity entity,
@@ -264,9 +148,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 防止极端异常图纸无限递归
-            //==================================================
 
             if (depth > 20)
             {
@@ -274,7 +156,6 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // AttributeDefinition只是块定义中的属性模板。
             //
             // 例如默认值可能写着：
@@ -286,7 +167,6 @@ namespace Correct_test1.Readers
             // N2608US001
             //
             // 所以不能把AttributeDefinition当成真实项目号。
-            //==================================================
 
             if (entity is AttributeDefinition)
             {
@@ -294,9 +174,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 1. DBText
-            //==================================================
 
             DBText text =
                 entity as DBText;
@@ -317,9 +195,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 2. MText
-            //==================================================
 
             MText mtext =
                 entity as MText;
@@ -340,9 +216,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 3. BlockReference
-            //==================================================
 
             BlockReference block =
                 entity as BlockReference;
@@ -354,11 +228,9 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 先读取这个Block实例真正的AttributeReference。
             //
             // 这里读取的是实例值，不是AttributeDefinition默认值。
-            //==================================================
 
             ReadBlockAttributeLocations(
                 block,
@@ -368,9 +240,7 @@ namespace Correct_test1.Readers
                 layoutName);
 
 
-            //==================================================
             // 再读取块定义中的固定DBText/MText和嵌套块。
-            //==================================================
 
             BlockTableRecord btr;
 
@@ -400,9 +270,7 @@ namespace Correct_test1.Readers
                 block.BlockTableRecord;
 
 
-            //==================================================
             // 防止循环块定义
-            //==================================================
 
             if (activeBlockDefinitions != null &&
                 activeBlockDefinitions.Contains(
@@ -412,11 +280,9 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 当前块内部实体转换到外层Layout坐标。
             //
             // 与CadTableReader保持相同变换顺序。
-            //==================================================
 
             Matrix3d blockTransform =
                 transform *
@@ -509,13 +375,11 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // AttributeReference的位置已经包含
                     // 当前BlockReference本身的实例变换。
                     //
                     // 如果当前BlockReference又位于外层块中，
                     // 这里只应用外层parentTransform。
-                    //==================================================
 
                     Point3d position =
                         attribute.Position
@@ -532,20 +396,16 @@ namespace Correct_test1.Readers
             }
             catch
             {
-                //==================================================
                 // 某一个异常属性不能导致整张图项目号读取失败。
-                //==================================================
             }
         }
 
 
-        //==================================================
         // AddProjectLocation 重载2
         //
         // 负责：
         // 已经得到文字后，
         // 判断是不是项目号并记录。
-        //==================================================
 
         private void AddProjectLocation(
             string text,
@@ -602,9 +462,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 项目号判断
-        //==================================================
 
         private static bool IsProjectNumber(
             string text)
@@ -650,126 +508,5 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
-        // 原有ReadProjects辅助方法
-        //==================================================
-
-        private void AddProject(
-            string text,
-            List<string> projects)
-        {
-            if (string.IsNullOrEmpty(
-                    text))
-            {
-                return;
-            }
-
-
-            text =
-                text
-                    .Replace(
-                        "\\P",
-                        "")
-                    .Trim();
-
-
-            if (!IsProjectNumber(
-                    text))
-            {
-                return;
-            }
-
-
-            string projectNumber =
-                GetProjectNumber(
-                    text);
-
-
-            if (!string.IsNullOrEmpty(
-                    projectNumber))
-            {
-                projects.Add(
-                    projectNumber);
-            }
-        }
-
-
-        private void ReadBlock(
-            BlockReference block,
-            Transaction trans,
-            List<string> projects)
-        {
-            if (block == null)
-            {
-                return;
-            }
-
-
-            BlockTableRecord btr;
-
-
-            try
-            {
-                btr =
-                    trans.GetObject(
-                        block.BlockTableRecord,
-                        OpenMode.ForRead)
-                    as BlockTableRecord;
-            }
-            catch
-            {
-                return;
-            }
-
-
-            if (btr == null ||
-                btr.IsFromExternalReference)
-            {
-                return;
-            }
-
-
-            foreach (
-                ObjectId id
-                in btr)
-            {
-                Entity ent =
-                    trans.GetObject(
-                        id,
-                        OpenMode.ForRead)
-                    as Entity;
-
-
-                if (ent == null)
-                {
-                    continue;
-                }
-
-
-                if (ent is DBText text)
-                {
-                    AddProject(
-                        text.TextString,
-                        projects);
-                }
-                else if (ent is MText mtext)
-                {
-                    AddProject(
-                        mtext.Text,
-                        projects);
-                }
-                else if (ent is BlockReference childBlock)
-                {
-                    //--------------------------------
-                    // 顺便补上嵌套块递归
-                    //--------------------------------
-
-                    ReadBlock(
-                        childBlock,
-                        trans,
-                        projects);
-                }
-            }
-        }
     }
 }

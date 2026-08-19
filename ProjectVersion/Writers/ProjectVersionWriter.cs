@@ -13,7 +13,6 @@ namespace Correct_test1.ProjectVersion.Writers
 {
     /// <summary>
     /// 非标图纸项目号+版本号写入器。
-    ///
     /// 只负责一个Layout。
     /// </summary>
     public class ProjectVersionWriter
@@ -102,13 +101,11 @@ namespace Correct_test1.ProjectVersion.Writers
                     }
 
 
-                    //--------------------------------
                     // 首先寻找已有项目号MText。
                     //
                     // 支持：
                     // 1. Layout直属MText
                     // 2. BlockReference内的MText
-                    //--------------------------------
 
                     ObjectId existingId =
                         FindExistingProjectText(
@@ -131,14 +128,12 @@ namespace Correct_test1.ProjectVersion.Writers
 
                             if (existing != null)
                             {
-                                //--------------------------------
                                 // 已存在：
                                 //
                                 // 只改文字内容。
                                 //
                                 // 字体、字高、颜色、
                                 // 位置、宽度等全部保留。
-                                //--------------------------------
 
                                 existing.Contents =
                                     value;
@@ -156,7 +151,7 @@ namespace Correct_test1.ProjectVersion.Writers
 
 
                                 result.Message =
-                                    "已修改原有项目号文字。";
+                                    "已修改现有项目号文字。";
 
 
                                 return result;
@@ -164,24 +159,20 @@ namespace Correct_test1.ProjectVersion.Writers
                         }
                         catch
                         {
-                            //--------------------------------
                             // 某些外部块 / 不可写块
                             // 无法修改时继续走创建逻辑。
-                            //--------------------------------
                         }
                     }
 
 
-                    //--------------------------------
-                    // 原来没有项目号：
+                    // 没有项目号：
                     //
                     // 在当前Layout Paper Space
                     // 创建新的MText。
                     //
-                    // 第一版不直接修改共享块定义，
+                    // 不直接修改共享块定义，
                     // 防止一个Block定义被多个实例共用时
                     // 意外影响其他地方。
-                    //--------------------------------
 
                     ObjectId styleId =
                         EnsureTextStyleId(
@@ -209,33 +200,25 @@ namespace Correct_test1.ProjectVersion.Writers
                         database);
 
 
-                    //--------------------------------
                     // 内容
-                    //--------------------------------
 
                     text.Contents =
                         value;
 
 
-                    //--------------------------------
                     // 样式：CONN
-                    //--------------------------------
 
                     text.TextStyleId =
                         styleId;
 
 
-                    //--------------------------------
                     // 图层：0
-                    //--------------------------------
 
                     text.Layer =
                         "0";
 
 
-                    //--------------------------------
                     // 红色 ACI 1
-                    //--------------------------------
 
                     text.Color =
                         Color.FromColorIndex(
@@ -243,17 +226,13 @@ namespace Correct_test1.ProjectVersion.Writers
                             1);
 
 
-                    //--------------------------------
                     // 线宽：0.25 mm
-                    //--------------------------------
 
                     text.LineWeight =
                         LineWeight.LineWeight025;
 
 
-                    //--------------------------------
                     // 位置
-                    //--------------------------------
 
                     text.Location =
                         new Point3d(
@@ -262,39 +241,30 @@ namespace Correct_test1.ProjectVersion.Writers
                             0.0);
 
 
-                    //--------------------------------
                     // 对正：左上
-                    //--------------------------------
 
                     text.Attachment =
                         AttachmentPoint.TopLeft;
 
 
-                    //--------------------------------
                     // 字高
-                    //--------------------------------
 
                     text.TextHeight =
                         template.TextHeight;
 
 
-                    //--------------------------------
                     // 定义宽度
-                    //--------------------------------
 
                     text.Width =
                         template.Width;
 
 
-                    //--------------------------------
                     // 旋转：0
-                    //--------------------------------
 
                     text.Rotation =
                         0.0;
 
 
-                    //--------------------------------
                     // 行距：
                     //
                     // 横版：
@@ -305,7 +275,6 @@ namespace Correct_test1.ProjectVersion.Writers
                     //
                     // 对应截图的：
                     // 行距样式 = 至少
-                    //--------------------------------
 
                     text.LineSpacingStyle =
                         LineSpacingStyle.AtLeast;
@@ -315,9 +284,7 @@ namespace Correct_test1.ProjectVersion.Writers
                         1.0;
 
 
-                    //--------------------------------
                     // 加入当前Layout
-                    //--------------------------------
 
                     layoutSpace.AppendEntity(
                         text);
@@ -364,7 +331,6 @@ namespace Correct_test1.ProjectVersion.Writers
 
         /// <summary>
         /// 找现有项目号MText。
-        ///
         /// 按实际显示坐标与目标坐标距离判断。
         /// </summary>
         private ObjectId FindExistingProjectText(
@@ -420,9 +386,7 @@ namespace Correct_test1.ProjectVersion.Writers
                 return;
 
 
-            //--------------------------------
             // 防止异常深层块递归
-            //--------------------------------
 
             if (depth > 8)
                 return;
@@ -521,9 +485,7 @@ namespace Correct_test1.ProjectVersion.Writers
                 return;
 
 
-            //--------------------------------
             // 外部参照不修改
-            //--------------------------------
 
             if (blockDefinition
                 .IsFromExternalReference)
@@ -561,7 +523,6 @@ namespace Correct_test1.ProjectVersion.Writers
 
         /// <summary>
         /// 确保文字样式存在。
-        ///
         /// 已存在：直接使用。
         /// 不存在：自动创建标准CONN样式。
         /// </summary>
@@ -589,9 +550,7 @@ namespace Correct_test1.ProjectVersion.Writers
                 return ObjectId.Null;
 
 
-            //--------------------------------
             // 已存在，直接使用
-            //--------------------------------
 
             if (table.Has(styleName))
             {
@@ -599,9 +558,7 @@ namespace Correct_test1.ProjectVersion.Writers
             }
 
 
-            //--------------------------------
             // 不存在，自动创建
-            //--------------------------------
 
             table.UpgradeOpen();
 
@@ -614,9 +571,7 @@ namespace Correct_test1.ProjectVersion.Writers
                 styleName;
 
 
-            //--------------------------------
             // Arial + 粗体
-            //--------------------------------
 
             Autodesk.AutoCAD
                 .GraphicsInterface
@@ -635,9 +590,7 @@ namespace Correct_test1.ProjectVersion.Writers
                 font;
 
 
-            //--------------------------------
             // CONN标准属性
-            //--------------------------------
 
             newStyle.TextSize =
                 0.0;
@@ -655,9 +608,7 @@ namespace Correct_test1.ProjectVersion.Writers
                 0;
 
 
-            //--------------------------------
             // 加入文字样式表
-            //--------------------------------
 
             ObjectId styleId =
                 table.Add(

@@ -56,7 +56,6 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 当前递归链中的块定义。
                     //
                     // 只用于防止异常循环引用，
@@ -64,7 +63,6 @@ namespace Correct_test1.Readers
                     //
                     // 同一个块有多个实例时，
                     // 每个实例仍然都要读取。
-                    //==================================================
 
                     HashSet<ObjectId>
                         activeBlockDefinitions =
@@ -91,42 +89,6 @@ namespace Correct_test1.Readers
 
 
 
-        public List<TitleText> FilterNumericTexts(
-            List<TitleText> texts)
-        {
-            List<TitleText> result =
-                new List<TitleText>();
-
-            if (texts == null)
-                return result;
-
-            foreach (TitleText text in texts)
-            {
-                if (text == null ||
-                    string.IsNullOrWhiteSpace(text.Text))
-                {
-                    continue;
-                }
-
-                string value = text.Text.Trim();
-                bool isNumeric = true;
-
-                foreach (char character in value)
-                {
-                    if (character < '0' || character > '9')
-                    {
-                        isNumeric = false;
-                        break;
-                    }
-                }
-
-                if (isNumeric)
-                    result.Add(text);
-            }
-
-            return result;
-        }
-
         private void ReadSpaceTexts(
     Transaction tr,
     BlockTableRecord space,
@@ -144,9 +106,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 防止异常图纸无限递归
-            //==================================================
 
             if (depth > 20)
             {
@@ -181,7 +141,6 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // AttributeDefinition不能作为真实标题栏文字读取。
                 //
                 // 真正显示的属性文字由
@@ -194,7 +153,6 @@ namespace Correct_test1.Readers
                 // 实际属性值
                 //
                 // 重复读取。
-                //==================================================
 
                 if (ent is AttributeDefinition)
                 {
@@ -202,9 +160,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 1. 普通DBText
-                //==================================================
 
                 DBText text =
                     ent as DBText;
@@ -239,7 +195,6 @@ namespace Correct_test1.Readers
                             LayoutName =
                                 layoutName,
 
-                            //==========================================
                             // 布局空间直接文字可以安全修改。
                             //
                             // 块定义内部固定文字不能直接自动修改，
@@ -252,7 +207,6 @@ namespace Correct_test1.Readers
                             // 字高检查
                             //
                             // 不参与自动页码写回。
-                            //==========================================
 
                             ObjectId =
                                 depth == 0
@@ -265,9 +219,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 2. MText
-                //==================================================
 
                 MText mtext =
                     ent as MText;
@@ -313,9 +265,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 3. BlockReference
-                //==================================================
 
                 BlockReference block =
                     ent as BlockReference;
@@ -327,9 +277,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 先读这个BlockReference自己的AttributeReference
-                //==================================================
 
                 ReadBlockAttributes(
                     tr,
@@ -340,9 +288,7 @@ namespace Correct_test1.Readers
                     depth);
 
 
-                //==================================================
                 // 再进入块定义读取固定DBText/MText
-                //==================================================
 
                 BlockTableRecord blockDefinition;
 
@@ -367,9 +313,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 外部参照不进入
-                //==================================================
 
                 if (blockDefinition
                         .IsFromExternalReference)
@@ -382,9 +326,7 @@ namespace Correct_test1.Readers
                     block.BlockTableRecord;
 
 
-                //==================================================
                 // 防止块定义循环引用
-                //==================================================
 
                 if (activeBlockDefinitions
                         .Contains(
@@ -394,13 +336,11 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 累计块变换
                 //
                 // 和当前CadTableReader保持相同顺序：
                 //
                 // parentTransform * block.BlockTransform
-                //==================================================
 
                 Matrix3d childTransform =
                     transform
@@ -465,13 +405,11 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // AttributeReference的位置已经包含
                     // 当前BlockReference自己的变换。
                     //
                     // 如果这个BlockReference本身又位于外层块定义中，
                     // 这里只需要再应用外层parentTransform。
-                    //==================================================
 
                     Point3d position =
                         att.Position
@@ -500,7 +438,6 @@ namespace Correct_test1.Readers
                             LayoutName =
                                 layoutName,
 
-                            //==========================================
                             // 最外层BlockReference的属性
                             // 是当前Layout真正的实例属性，
                             // 可以用于页码自动修正。
@@ -508,7 +445,6 @@ namespace Correct_test1.Readers
                             // 嵌套块中的属性属于块定义内部实例，
                             // 为避免修改共享块定义，
                             // 不开放自动修改。
-                            //==========================================
 
                             ObjectId =
                                 depth == 0

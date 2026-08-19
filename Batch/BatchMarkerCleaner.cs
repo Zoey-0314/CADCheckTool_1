@@ -44,9 +44,7 @@ namespace Correct_test1.Batch
             if (files.Length == 0)
                 return results;
 
-            //--------------------------------
             // 确保有稳定AutoCAD宿主Document
-            //--------------------------------
 
             Document hostDocument =
                 EnsureHostDocument();
@@ -61,9 +59,7 @@ namespace Correct_test1.Batch
             Database hostDatabase =
                 hostDocument.Database;
 
-            //--------------------------------
             // 建立稳定WorkingDatabase
-            //--------------------------------
 
             try
             {
@@ -82,9 +78,7 @@ namespace Correct_test1.Batch
 
             int finishedCount = 0;
 
-            //--------------------------------
             // 批量处理
-            //--------------------------------
 
             foreach (string file in files)
             {
@@ -92,9 +86,7 @@ namespace Correct_test1.Batch
 
                 try
                 {
-                    //--------------------------------
                     // 每张图开始前恢复宿主Database
-                    //--------------------------------
 
                     if (hostDatabase.IsDisposed)
                     {
@@ -106,9 +98,7 @@ namespace Correct_test1.Batch
                     HostApplicationServices.WorkingDatabase =
                         hostDatabase;
 
-                    //--------------------------------
                     // 创建后台Database
-                    //--------------------------------
 
                     db =
                         new Database(
@@ -116,9 +106,7 @@ namespace Correct_test1.Batch
                             true
                         );
 
-                    //--------------------------------
                     // 读取DWG
-                    //--------------------------------
 
                     db.ReadDwgFile(
                         file,
@@ -127,9 +115,7 @@ namespace Correct_test1.Batch
                         ""
                     );
 
-                    //--------------------------------
                     // 切换到当前后台DWG
-                    //--------------------------------
 
                     HostApplicationServices.WorkingDatabase =
                         db;
@@ -143,9 +129,7 @@ namespace Correct_test1.Batch
                     db.CloseInput(true);
 
 
-                    //--------------------------------
                     // 清Revision Marker
-                    //--------------------------------
 
                     RevisionMarker revisionMarker =
                         new RevisionMarker();
@@ -154,9 +138,7 @@ namespace Correct_test1.Batch
                         db
                     );
 
-                    //--------------------------------
                     // 清图号Marker
-                    //--------------------------------
 
                     TitleBlockDrawingNumberMarker
                         titleBlockMarker =
@@ -166,9 +148,7 @@ namespace Correct_test1.Batch
                         db
                     );
 
-                    //--------------------------------
                     // 清通用Marker
-                    //--------------------------------
 
                     MarkerManager markerManager =
                         new MarkerManager();
@@ -177,9 +157,7 @@ namespace Correct_test1.Batch
                         db
                     );
 
-                    //--------------------------------
                     // 安全保存
-                    //--------------------------------
 
                     AppLogger.Info(
                         "准备保存清理后的DWG:" +
@@ -220,9 +198,7 @@ namespace Correct_test1.Batch
                 }
                 finally
                 {
-                    //--------------------------------
                     // 必须先恢复宿主WorkingDatabase
-                    //--------------------------------
 
                     try
                     {
@@ -248,9 +224,7 @@ namespace Correct_test1.Batch
                         );
                     }
 
-                    //--------------------------------
                     // 再释放后台Database
-                    //--------------------------------
 
                     if (db != null)
                     {
@@ -277,9 +251,7 @@ namespace Correct_test1.Batch
                     }
                 }
 
-                //--------------------------------
                 // 进度
-                //--------------------------------
 
                 finishedCount++;
 
@@ -305,9 +277,7 @@ namespace Correct_test1.Batch
                 );
             }
 
-            //--------------------------------
             // 最终恢复
-            //--------------------------------
 
             try
             {

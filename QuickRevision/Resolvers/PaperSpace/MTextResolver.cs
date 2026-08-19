@@ -6,7 +6,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 {
     /// <summary>
     /// Paper Space MText解析器。
-    ///
     /// 使用实际显示文字范围。
     /// </summary>
     public class MTextResolver

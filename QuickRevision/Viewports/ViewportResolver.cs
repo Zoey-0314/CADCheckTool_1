@@ -10,21 +10,16 @@ namespace Correct_test1.QuickRevision.Viewports
     /// <summary>
     /// 根据Paper Space中的点击位置，
     /// 找到用户点击的Viewport。
-    ///
     /// 用户不需要双击进入Viewport。
-    ///
-    /// 第一版：
-    /// 只处理普通矩形Viewport。
+    /// 只处理普通矩形Viewport，
     /// 暂不处理非矩形裁剪Viewport。
     /// </summary>
     public class ViewportResolver
     {
         /// <summary>
         /// 根据Paper Space中的点击点查找Viewport。
-        ///
         /// 找到：
         /// 返回ViewportContext。
-        ///
         /// 没找到：
         /// 返回null。
         /// </summary>
@@ -39,19 +34,15 @@ namespace Correct_test1.QuickRevision.Viewports
             if (transaction == null)
                 return null;
 
-            //--------------------------------
             // TILEMODE=true表示当前是普通Model Space
             //
             // QuickRevision最终要求：
             // 用户从Layout/Paper Space启动
-            //--------------------------------
 
             if (database.TileMode)
                 return null;
 
-            //--------------------------------
             // 获取当前Layout对应的Paper Space
-            //--------------------------------
 
             ObjectId paperSpaceId =
                 GetCurrentPaperSpaceId(
@@ -72,13 +63,11 @@ namespace Correct_test1.QuickRevision.Viewports
             if (paperSpace == null)
                 return null;
 
-            //--------------------------------
             // 如果存在重叠Viewport，
             // 优先选择面积最小的那个。
             //
             // 这样小Viewport套在大Viewport里面时，
             // 点击小Viewport不会误选外层的大Viewport。
-            //--------------------------------
 
             ObjectId bestViewportId =
                 ObjectId.Null;
@@ -103,18 +92,14 @@ namespace Correct_test1.QuickRevision.Viewports
                 if (viewport == null)
                     continue;
 
-                //--------------------------------
                 // Number 1是Paper Space自身Viewport
                 //
                 // 我们只要浮动Viewport。
-                //--------------------------------
 
                 if (viewport.Number <= 1)
                     continue;
 
-                //--------------------------------
                 // 跳过关闭的Viewport
-                //--------------------------------
 
                 if (!viewport.On)
                     continue;
@@ -125,9 +110,7 @@ namespace Correct_test1.QuickRevision.Viewports
                     continue;
                 }
 
-                //--------------------------------
                 // 判断点击点是否在Viewport矩形范围内
-                //--------------------------------
 
                 if (!ContainsPoint(
                         viewport,
@@ -150,9 +133,7 @@ namespace Correct_test1.QuickRevision.Viewports
                 }
             }
 
-            //--------------------------------
             // 没有找到Viewport
-            //--------------------------------
 
             if (bestViewportId.IsNull ||
                 !bestViewportId.IsValid)
@@ -160,9 +141,7 @@ namespace Correct_test1.QuickRevision.Viewports
                 return null;
             }
 
-            //--------------------------------
             // 重新读取最终选中的Viewport
-            //--------------------------------
 
             Viewport selectedViewport =
                 transaction.GetObject(
@@ -173,9 +152,7 @@ namespace Correct_test1.QuickRevision.Viewports
             if (selectedViewport == null)
                 return null;
 
-            //--------------------------------
             // 创建ViewportContext
-            //--------------------------------
 
             ViewportContext context =
                 new ViewportContext();

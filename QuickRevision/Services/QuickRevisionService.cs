@@ -15,9 +15,7 @@ namespace Correct_test1.QuickRevision.Services
 {
     /// <summary>
     /// QuickRevision核心业务编排层。
-    ///
     /// 普通目标：
-    ///
     /// 识别目标
     /// ↓
     /// 输入新内容
@@ -25,10 +23,7 @@ namespace Correct_test1.QuickRevision.Services
     /// 删除线
     /// ↓
     /// 新文字
-    ///
-    ///
     /// BOM中原内容NS开头：
-    ///
     /// 识别目标
     /// ↓
     /// 从DWG文件名读取项目号
@@ -40,9 +35,7 @@ namespace Correct_test1.QuickRevision.Services
     /// 新文字
     /// ↓
     /// BOM该行右侧生成项目号
-    ///
-    ///
-    /// 所有新增CAD实体使用同一个Transaction。
+    /// 所有创建的 CAD 实体使用同一个Transaction。
     /// 任意一步失败均不Commit。
     /// </summary>
     public class QuickRevisionService
@@ -81,9 +74,7 @@ namespace Correct_test1.QuickRevision.Services
         /// </summary>
         public bool Start()
         {
-            //--------------------------------
             // 当前Document
-            //--------------------------------
 
             Document document =
                 Autodesk.AutoCAD
@@ -112,9 +103,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // QuickRevision只在Layout中使用
-            //--------------------------------
 
             if (database.TileMode)
             {
@@ -125,9 +114,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 1. 用户选择划改对象
-            //--------------------------------
 
             RevisionTarget target;
 
@@ -161,7 +148,6 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 2. 判断是否需要额外生成项目号
             //
             // 必须满足：
@@ -169,7 +155,6 @@ namespace Correct_test1.QuickRevision.Services
             // TableCell
             // +
             // 原内容NS开头
-            //--------------------------------
 
             bool shouldWriteProjectNumber =
                 target.ShouldWriteProjectNumber;
@@ -179,10 +164,8 @@ namespace Correct_test1.QuickRevision.Services
                 "";
 
 
-            //--------------------------------
             // 如果是NS BOM项，
             // 在真正修改图纸之前先读取文件名项目号。
-            //--------------------------------
 
             if (shouldWriteProjectNumber)
             {
@@ -191,13 +174,11 @@ namespace Correct_test1.QuickRevision.Services
                         document);
 
 
-                //--------------------------------
                 // NS划改要求必须同时生成项目号。
                 //
                 // 如果文件名无法获得项目号，
                 // 本次操作直接取消，
                 // 避免出现划改完成但缺少项目号。
-                //--------------------------------
 
                 if (string.IsNullOrWhiteSpace(
                         projectNumber))
@@ -214,9 +195,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 3. 输入新内容
-            //--------------------------------
 
             string replacementText;
 
@@ -267,9 +246,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 4. 写入CAD
-            //--------------------------------
 
             try
             {
@@ -295,13 +272,9 @@ namespace Correct_test1.QuickRevision.Services
 
         /// <summary>
         /// 从当前DWG文件名读取项目号。
-        ///
         /// 直接复用已有FileNameProjectReader。
-        ///
         /// 返回例如：
-        ///
         /// N2607US004
-        ///
         /// 不包含版本号。
         /// </summary>
         private static string ReadProjectNumberFromDocument(
@@ -313,11 +286,9 @@ namespace Correct_test1.QuickRevision.Services
 
             try
             {
-                //--------------------------------
                 // 优先使用Database.Filename。
                 //
                 // 正常已保存DWG这里是完整路径。
-                //--------------------------------
 
                 string filePath =
                     document.Database == null
@@ -325,10 +296,8 @@ namespace Correct_test1.QuickRevision.Services
                         : document.Database.Filename;
 
 
-                //--------------------------------
                 // 个别情况下Filename为空，
                 // 再使用Document.Name。
-                //--------------------------------
 
                 if (string.IsNullOrWhiteSpace(
                         filePath))
@@ -377,23 +346,16 @@ namespace Correct_test1.QuickRevision.Services
 
         /// <summary>
         /// 真正执行数据库写入。
-        ///
         /// 普通目标：
-        ///
         /// 删除线
         /// +
         /// 新文字
-        ///
-        ///
         /// NS BOM目标：
-        ///
         /// 删除线
         /// +
         /// 新文字
         /// +
         /// 行右侧项目号
-        ///
-        ///
         /// 全部位于同一个Transaction中。
         /// </summary>
         private bool WriteRevision(
@@ -424,9 +386,7 @@ namespace Correct_test1.QuickRevision.Services
                             .TransactionManager
                             .StartTransaction())
                 {
-                    //--------------------------------
                     // 写入前再次确认原目标仍存在
-                    //--------------------------------
 
                     if (!IsTargetStillValid(
                             database,
@@ -440,9 +400,7 @@ namespace Correct_test1.QuickRevision.Services
                     }
 
 
-                    //--------------------------------
                     // NS目标还要再次检查TableContext
-                    //--------------------------------
 
                     if (shouldWriteProjectNumber)
                     {
@@ -468,9 +426,7 @@ namespace Correct_test1.QuickRevision.Services
                     }
 
 
-                    //--------------------------------
                     // 1. 删除线
-                    //--------------------------------
 
                     ObjectId strikeLineId =
                         _strikeLineWriter.Write(
@@ -489,9 +445,7 @@ namespace Correct_test1.QuickRevision.Services
                     }
 
 
-                    //--------------------------------
                     // 2. 用户输入的新文字
-                    //--------------------------------
 
                     ObjectId replacementTextId =
                         _replacementTextWriter.Write(
@@ -511,11 +465,9 @@ namespace Correct_test1.QuickRevision.Services
                     }
 
 
-                    //--------------------------------
                     // 3. NS开头的BOM内容
                     //
                     // 在当前行BOM右边生成项目号。
-                    //--------------------------------
 
                     if (shouldWriteProjectNumber)
                     {
@@ -533,29 +485,23 @@ namespace Correct_test1.QuickRevision.Services
                             editor.WriteMessage(
                                 "\n项目号创建失败，未修改图纸。");
 
-                            //--------------------------------
                             // 不Commit。
                             //
                             // 删除线和替换文字也会一起回滚。
-                            //--------------------------------
 
                             return false;
                         }
                     }
 
 
-                    //--------------------------------
                     // 所有需要的对象全部成功
-                    //--------------------------------
 
-                    //--------------------------------
                     // 在Commit前把当前事务中的图形变化
                     // 加入AutoCAD图形刷新队列。
                     //
                     // 连续模式下如果不做这一层，
                     // 下一次GetPoint可能立即开始，
                     // 新生成的线和文字暂时不会显示。
-                    //--------------------------------
 
                     try
                     {
@@ -574,21 +520,17 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 强制立即刷新图面
             //
             // 目的：
             // 每完成一次划改，就马上看到这一次结果，
             // 然后才进入下一次选择。
-            //--------------------------------
 
             RefreshDrawingImmediately(
                 editor);
 
 
-            //--------------------------------
             // 命令行提示
-            //--------------------------------
 
             if (shouldWriteProjectNumber)
             {
@@ -612,9 +554,7 @@ namespace Correct_test1.QuickRevision.Services
 
         /// <summary>
         /// 强制立即刷新AutoCAD图面。
-        ///
         /// 连续快速划改时：
-        ///
         /// 第1次划改
         /// ↓
         /// Commit
@@ -622,7 +562,6 @@ namespace Correct_test1.QuickRevision.Services
         /// 立即显示删除线/新文字
         /// ↓
         /// 才进入第2次选择
-        ///
         /// 避免必须按Esc后才一次性看到全部修改。
         /// </summary>
         private static void RefreshDrawingImmediately(
@@ -632,11 +571,9 @@ namespace Correct_test1.QuickRevision.Services
                 return;
 
 
-            //--------------------------------
             // 1. Regen
             //
             // 重新生成当前图形对象和显示数据。
-            //--------------------------------
 
             try
             {
@@ -647,9 +584,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 2. 刷新当前Document窗口
-            //--------------------------------
 
             try
             {
@@ -660,15 +595,12 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 3. 刷新整个AutoCAD应用窗口
             //
             // 注意QuickRevisionService中有：
-            // using System.Windows.Forms;
             //
             // 所以这里必须写完整命名空间，
             // 否则Application会产生歧义。
-            //--------------------------------
 
             try
             {
@@ -683,9 +615,7 @@ namespace Correct_test1.QuickRevision.Services
         }
         /// <summary>
         /// 连续快速划改模式。
-        ///
         /// 进入后：
-        ///
         /// 选择目标
         /// ↓
         /// 输入新值
@@ -693,7 +623,6 @@ namespace Correct_test1.QuickRevision.Services
         /// 完成一次
         /// ↓
         /// 自动继续等待下一次选择
-        ///
         /// Esc或关闭输入窗口退出。
         /// </summary>
         public void StartContinuous()
@@ -767,15 +696,12 @@ namespace Correct_test1.QuickRevision.Services
                             out shouldExit);
 
 
-                    //--------------------------------
                     // 用户Esc / 关闭输入框
-                    //--------------------------------
 
                     if (shouldExit)
                         break;
 
 
-                    //--------------------------------
                     // completed=false但没有退出：
                     //
                     // 可能点空白
@@ -783,7 +709,6 @@ namespace Correct_test1.QuickRevision.Services
                     // 可能NS项目号读取失败
                     //
                     // 继续下一次选择。
-                    //--------------------------------
                 }
                 catch (System.Exception ex)
                 {
@@ -792,9 +717,7 @@ namespace Correct_test1.QuickRevision.Services
                         ex.Message);
 
 
-                    //--------------------------------
                     // 单次失败不让整个模式崩掉。
-                    //--------------------------------
                 }
             }
 
@@ -830,9 +753,7 @@ namespace Correct_test1.QuickRevision.Services
                 document.Editor;
 
 
-            //--------------------------------
             // 1. 选择目标
-            //--------------------------------
 
             bool cancelled;
 
@@ -843,9 +764,7 @@ namespace Correct_test1.QuickRevision.Services
                     out cancelled);
 
 
-            //--------------------------------
             // Esc
-            //--------------------------------
 
             if (cancelled)
             {
@@ -856,11 +775,9 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 点了空白/无法识别
             //
             // 不退出模式。
-            //--------------------------------
 
             if (target == null ||
                 !target.IsValid())
@@ -869,9 +786,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 2. 判断NS BOM项目号
-            //--------------------------------
 
             bool shouldWriteProjectNumber =
                 target.ShouldWriteProjectNumber;
@@ -904,9 +819,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 3. 输入新内容
-            //--------------------------------
 
             string replacementText;
 
@@ -938,11 +851,9 @@ namespace Correct_test1.QuickRevision.Services
                 }
 
 
-                //--------------------------------
                 // 点击取消、X关闭输入框
                 //
                 // 视为退出连续模式。
-                //--------------------------------
 
                 if (result !=
                     DialogResult.OK)
@@ -966,9 +877,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            //--------------------------------
             // 4. 写入
-            //--------------------------------
 
             bool success =
                 WriteRevision(
@@ -1045,9 +954,7 @@ namespace Correct_test1.QuickRevision.Services
                     return false;
 
 
-                //--------------------------------
                 // Table目标额外确认Table仍存在
-                //--------------------------------
 
                 if (target.IsTableCell &&
                     target.TableContext != null)

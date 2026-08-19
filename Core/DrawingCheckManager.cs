@@ -31,13 +31,11 @@ namespace Correct_test1.Core
 
             string fileName = System.IO.Path.GetFileName(filePath);
 
-            //--------------------------------------
             // 1. 项目号检查
             //
             // 不再使用 projects[0]。
             //
             // 每一个项目号都绑定它真正所属的Layout。
-            //--------------------------------------
 
             ProjectReader projectReader =
                 new ProjectReader();
@@ -96,18 +94,15 @@ namespace Correct_test1.Core
                         filePath);
 
 
-                //==================================================
                 // 文件名本身没有可识别项目号时，
-                // 保持原有行为：
+                // 保持批量检查行为：
                 //
                 // 不进行项目号一致性比较。
-                //==================================================
 
                 if (expectedProject != null &&
                     !string.IsNullOrWhiteSpace(
                         expectedProject.ProjectNumber))
                 {
-                    //==================================================
                     // 防止：
                     //
                     // 同一个Layout里同一个项目号出现多次，
@@ -116,19 +111,16 @@ namespace Correct_test1.Core
                     // Key：
                     //
                     // Layout1|N2607US004
-                    //==================================================
 
                     HashSet<string> reportedIssues =
                         new HashSet<string>(
                             StringComparer.OrdinalIgnoreCase);
 
 
-                    //==================================================
                     // Marker也不能同一个错误项目号重复创建。
                     //
                     // CreateProjectMarkers本身会重新扫描所有位置，
                     // 所以一个错误项目号调用一次即可。
-                    //==================================================
 
                     HashSet<string> markedProjects =
                         new HashSet<string>(
@@ -147,9 +139,7 @@ namespace Correct_test1.Core
                         }
 
 
-                        //==================================================
                         // 当前项目号正确
-                        //==================================================
 
                         if (string.Equals(
                                 location.ProjectNumber,
@@ -171,9 +161,7 @@ namespace Correct_test1.Core
                             + location.ProjectNumber;
 
 
-                        //==================================================
                         // 同Layout同项目号只报告一次
-                        //==================================================
 
                         if (!reportedIssues.Add(
                                 issueKey))
@@ -221,7 +209,6 @@ namespace Correct_test1.Core
                             });
 
 
-                        //==================================================
                         // Marker
                         //
                         // 同一个错误项目号只调用一次。
@@ -229,7 +216,6 @@ namespace Correct_test1.Core
                         // MarkerManager内部已经会根据
                         // ProjectNumberLocation.LayoutName
                         // 把Marker放到真实Layout。
-                        //==================================================
 
                         if (drawMarker &&
                             markedProjects.Add(
@@ -244,9 +230,7 @@ namespace Correct_test1.Core
                     }
                 }
             }
-            //--------------------------------------
             // 2. 修改记录检查
-            //--------------------------------------
             LayoutReader layoutReader = new LayoutReader();
 
             List<LayoutInfo> layouts = layoutReader.ReadLayouts(db);
@@ -273,9 +257,7 @@ namespace Correct_test1.Core
             foreach (LayoutInfo layout in paperLayouts)
             {
                 currentPage++;
-                //--------------------------------------
                 // 标题栏检查
-                //--------------------------------------
 
                 List<CheckResult> titleResults =
                     titleManager.Check(
@@ -334,9 +316,9 @@ namespace Correct_test1.Core
                     {
                         FilePath = filePath,
                         FileName = fileName,
-                        // 新增：布局名称
+                        // 布局名称
                         LayoutName = issue.LayoutName,
-                        // 新增：修改记录标记
+                        // 修改记录标记
                         Mark = issue.Mark,
                         Type = "修改记录检查",
                         ObjectName = "标记" + issue.Mark,

@@ -31,10 +31,8 @@ namespace Correct_test1.VersionCheck.Models
 
         /// <summary>
         /// 是否真正检测到了版本号。
-        ///
         /// 标准件：
         /// V0 / V1 / V2...
-        ///
         /// 非标：
         /// L0 / L1 / L2...
         /// </summary>

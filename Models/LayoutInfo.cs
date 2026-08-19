@@ -40,9 +40,7 @@ namespace Correct_test1.Models
 
 
 
-        //==============================
         // 标题栏文字
-        //==============================
 
 
         public List<TitleText> TitleTexts { get; set; }

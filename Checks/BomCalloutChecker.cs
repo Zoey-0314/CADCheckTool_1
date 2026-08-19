@@ -13,9 +13,7 @@ namespace Correct_test1.Checks
 {
     public class BomCalloutChecker
     {
-        //==================================================
         // 读取一个BOM中的所有序号
-        //==================================================
 
         public HashSet<int> GetBomNumbers(
             BomData bom)
@@ -53,11 +51,9 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
-        // 保留旧版：
+        // 兼容带斜杠和点的序号格式：
         //
         // 只负责两个数字集合的数学比较。
-        //==================================================
 
         public BomCalloutResult Check(
             HashSet<int> bomNumbers,
@@ -103,7 +99,6 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 新版：
         //
         // 一个Layout单独检查。
@@ -115,7 +110,6 @@ namespace Correct_test1.Checks
         // BOM ↔ Layout2视口
         //
         // 绝不跨Layout合并。
-        //==================================================
 
         public BomCalloutResult CheckLayout(
             string layoutName,
@@ -134,9 +128,7 @@ namespace Correct_test1.Checks
             }
 
 
-            //==================================================
             // 当前Layout自己的BOM序号
-            //==================================================
 
             HashSet<int> bomNumbers =
                 new HashSet<int>();
@@ -155,9 +147,7 @@ namespace Correct_test1.Checks
             }
 
 
-            //==================================================
             // 数学比较
-            //==================================================
 
             BomCalloutResult basic =
                 Check(
@@ -173,12 +163,10 @@ namespace Correct_test1.Checks
                 basic.ExtraCallouts;
 
 
-            //==================================================
             // BOM有，图中没有
             //
             // Marker位置：
             // 当前Layout当前BOM的No.单元格。
-            //==================================================
 
             foreach (
                 int number
@@ -216,12 +204,10 @@ namespace Correct_test1.Checks
             }
 
 
-            //==================================================
             // 图中有，BOM没有
             //
             // Marker位置：
             // 当前Layout视口中真正识别到的文字位置。
-            //==================================================
 
             foreach (
                 int number
@@ -261,9 +247,7 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 只在当前Layout的BOM中找序号
-        //==================================================
 
         private static bool TryFindBomItem(
             List<BomData> boms,
@@ -332,10 +316,8 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 只在当前Layout对应的视口文字中
         // 找目标序号位置。
-        //==================================================
 
         private static bool TryFindDrawingPosition(
             List<TitleText> texts,

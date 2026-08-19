@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -24,7 +24,7 @@ namespace Correct_test1.Core
                 }
                 catch
                 {
-                    // ignore directory creation errors here; writes will fail later and be handled
+                    // 写入阶段统一处理目录创建失败。
                 }
                 return dir;
             }
@@ -82,7 +82,7 @@ namespace Correct_test1.Core
             }
             catch
             {
-                // suppress logging errors to avoid affecting host application
+                // 日志失败不能中断 AutoCAD 主流程。
                 try
                 {
                     string fallback = Path.Combine(Path.GetTempPath(), "Correct_test1_fallback.log");
@@ -93,7 +93,6 @@ namespace Correct_test1.Core
                 }
                 catch
                 {
-                    // swallow
                 }
             }
         }
@@ -123,7 +122,6 @@ namespace Correct_test1.Core
             Write("ERROR", message ?? ex?.Message, ex, module, file);
         }
 
-        // As requested: Exception(Exception, string)
         public static void Exception(Exception ex, string module)
         {
             Write("EXCEPTION", ex?.Message, ex, module, null);

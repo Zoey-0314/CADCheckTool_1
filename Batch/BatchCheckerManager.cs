@@ -1063,7 +1063,7 @@ namespace Correct_test1.Batch
                 }
 
 
-                // Session命令中按之前已验证有效的方式处理：
+                // Session命令中按 Session 命令要求的方式处理：
                 // 打开真实Document、锁定Document、切WorkingDatabase。
                 // 不额外强制激活/Regenerate，减少Document上下文切换。
                 documentLock =

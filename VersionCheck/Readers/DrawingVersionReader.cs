@@ -16,12 +16,10 @@ namespace Correct_test1.VersionCheck.Readers
 {
     public class DrawingVersionReader
     {
-        //--------------------------------
         // 标准件：
         // V0
         // V1
         // V10
-        //--------------------------------
 
         private static readonly Regex
             StandardVersionRegex =
@@ -30,10 +28,8 @@ namespace Correct_test1.VersionCheck.Readers
                     RegexOptions.IgnoreCase);
 
 
-        //--------------------------------
         // 项目号：
         // N2604US003
-        //--------------------------------
 
         private static readonly Regex
             ProjectRegex =
@@ -42,7 +38,6 @@ namespace Correct_test1.VersionCheck.Readers
                     RegexOptions.IgnoreCase);
 
 
-        //--------------------------------
         // 非标版本：
         //
         // 支持：
@@ -57,7 +52,6 @@ namespace Correct_test1.VersionCheck.Readers
         // N2604US003-PE1 L0
         //
         // 都可以识别。
-        //--------------------------------
 
         private static readonly Regex
             LVersionRegex =
@@ -101,9 +95,7 @@ namespace Correct_test1.VersionCheck.Readers
                 }
 
 
-                //--------------------------------
                 // 读取标题栏文字
-                //--------------------------------
 
                 List<TitleText> titleTexts =
                     titleReader.Read(
@@ -121,10 +113,8 @@ namespace Correct_test1.VersionCheck.Readers
                 }
 
 
-                //--------------------------------
                 // A3 / A4 直接决定横竖版，
                 // 并用同一基准点偏移版本号查找区域。
-                //--------------------------------
 
                 TitleBlockAnchorInfo anchorInfo;
 
@@ -236,13 +226,11 @@ namespace Correct_test1.VersionCheck.Readers
                 }
 
 
-                //--------------------------------
                 // 找到了版本位置附近的：
                 //
                 // 1. 正常版本文字
                 // 或
                 // 2. 有项目号但没有L版本
-                //--------------------------------
 
                 if (best.Info != null)
                 {
@@ -252,7 +240,6 @@ namespace Correct_test1.VersionCheck.Readers
                 }
 
 
-                //--------------------------------
                 // 什么都没找到。
                 //
                 // 按照你的规则：
@@ -261,7 +248,6 @@ namespace Correct_test1.VersionCheck.Readers
                 //
                 // 标准件固定位置又没有V0/V1...
                 // 就属于“版本号缺失”。
-                //--------------------------------
 
                 DrawingVersionInfo missing =
                     new DrawingVersionInfo
@@ -323,9 +309,7 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //--------------------------------
             // MText
-            //--------------------------------
 
             MText mtext =
                 entity as MText;
@@ -347,9 +331,7 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //--------------------------------
             // DBText
-            //--------------------------------
 
             DBText dbText =
                 entity as DBText;
@@ -371,9 +353,7 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //--------------------------------
             // BlockReference
-            //--------------------------------
 
             BlockReference block =
                 entity as BlockReference;
@@ -451,9 +431,7 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //--------------------------------
             // 必须先在指定版本区域附近
-            //--------------------------------
 
             double dx =
                 position.X -
@@ -492,14 +470,12 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //--------------------------------
             // 优先级：
             //
             // 2 = 找到了完整版本号
             // 1 = 找到项目号但L版本缺失
             //
             // 完整版本优先于缺失版本。
-            //--------------------------------
 
             if (priority <
                 best.Priority)
@@ -586,10 +562,8 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //==================================================
             // 第一优先：
             // 标准件完整V版本
-            //==================================================
 
             Match standardMatch =
                 StandardVersionRegex
@@ -643,10 +617,8 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //==================================================
             // 第二类：
             // 看有没有项目号
-            //==================================================
 
             Match projectMatch =
                 ProjectRegex.Match(
@@ -655,12 +627,10 @@ namespace Correct_test1.VersionCheck.Readers
 
             if (!projectMatch.Success)
             {
-                //--------------------------------
                 // 普通无关文字。
                 //
                 // 不把版本位置附近所有文字
                 // 都误认为版本。
-                //--------------------------------
 
                 return false;
             }
@@ -672,10 +642,8 @@ namespace Correct_test1.VersionCheck.Readers
                     .ToUpperInvariant();
 
 
-            //==================================================
             // 有项目号：
             // 再寻找L版本
-            //==================================================
 
             string afterProject =
                 value.Substring(
@@ -688,9 +656,7 @@ namespace Correct_test1.VersionCheck.Readers
                     afterProject);
 
 
-            //--------------------------------
             // 找到了L0/L1...
-            //--------------------------------
 
             if (versionMatch.Success)
             {
@@ -738,16 +704,7 @@ namespace Correct_test1.VersionCheck.Readers
             }
 
 
-            //==================================================
-            // 有项目号
-            // 但是没有任何L0/L1/L2...
-            //
-            // 例如用户当前测试图：
-            //
-            // N2604US003-PE1
-            //
-            // 这是明确的“版本号缺失”。
-            //==================================================
+            // 有项目号但没有 L0/L1/L2 等版本后缀时，判定为版本号缺失。
 
             info =
                 new DrawingVersionInfo

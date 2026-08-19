@@ -17,12 +17,9 @@ namespace Correct_test1.QuickRevision.Resolvers
 {
     /// <summary>
     /// Viewport目标解析器。
-    ///
     /// 用户始终在Paper Space点击，
     /// 不需要双击进入Viewport。
-    ///
     /// 流程：
-    ///
     /// Paper点击
     /// ↓
     /// 找到Viewport
@@ -30,7 +27,6 @@ namespace Correct_test1.QuickRevision.Resolvers
     /// Paper坐标转换为Model坐标
     /// ↓
     /// 在Model Space寻找目标
-    ///
     /// 支持：
     /// DBText
     /// MText
@@ -93,10 +89,8 @@ namespace Correct_test1.QuickRevision.Resolvers
                 return null;
 
 
-            //--------------------------------
             // 第一步：
             // 找到点击位置所在的Viewport
-            //--------------------------------
 
             ViewportContext viewportContext =
                 _viewportResolver.Resolve(
@@ -113,10 +107,8 @@ namespace Correct_test1.QuickRevision.Resolvers
                 return null;
 
 
-            //--------------------------------
             // 第二步：
             // Paper坐标 → Model坐标
-            //--------------------------------
 
             Point3d modelPoint;
 
@@ -136,10 +128,8 @@ namespace Correct_test1.QuickRevision.Resolvers
                 modelPoint;
 
 
-            //--------------------------------
             // 第三步：
             // 获取Model Space
-            //--------------------------------
 
             ObjectId modelSpaceId;
 
@@ -174,9 +164,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                 return null;
 
 
-            //--------------------------------
             // 找点击位置最近的目标
-            //--------------------------------
 
             RevisionTarget bestTarget =
                 null;
@@ -221,11 +209,9 @@ namespace Correct_test1.QuickRevision.Resolvers
                     null;
 
 
-                //--------------------------------
                 // Dimension
                 //
                 // RotatedDimension也属于这里。
-                //--------------------------------
 
                 if (obj is Dimension)
                 {
@@ -238,9 +224,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                 }
 
 
-                //--------------------------------
                 // DBText
-                //--------------------------------
 
                 else if (obj is DBText)
                 {
@@ -253,9 +237,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                 }
 
 
-                //--------------------------------
                 // MText
-                //--------------------------------
 
                 else if (obj is MText)
                 {
@@ -272,9 +254,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                     continue;
 
 
-                //--------------------------------
                 // 点击位置是否接近这个目标
-                //--------------------------------
 
                 if (!IsPointNearTarget(
                         target,
@@ -340,7 +320,6 @@ namespace Correct_test1.QuickRevision.Resolvers
             }
 
 
-            //--------------------------------
             // 以前是：
             //
             // visualHeight * 0.75
@@ -350,19 +329,16 @@ namespace Correct_test1.QuickRevision.Resolvers
             // 两个目标容易互相覆盖。
             //
             // 现在缩小到30%。
-            //--------------------------------
 
             double tolerance =
                 visualHeight *
                 0.30;
 
 
-            //--------------------------------
             // 不再使用固定0.5作为最小值。
             //
             // 因为不同图纸单位比例差异很大，
             // 固定0.5可能远大于一个小序号。
-            //--------------------------------
 
             double minimumTolerance =
                 visualHeight *

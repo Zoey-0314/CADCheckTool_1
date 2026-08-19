@@ -5,11 +5,8 @@ namespace Correct_test1.Core
 {
     /// <summary>
     /// 非标归档索引的AutoCAD会话级缓存。
-    ///
     /// AutoCAD / 插件生命周期内：
-    ///
     /// Z盘只需要建立一次索引。
-    ///
     /// PluginInitializer负责提前后台加载，
     /// CheckService和BatchCheckerManager只取缓存。
     /// </summary>
@@ -35,7 +32,6 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 当前是否已经有索引。
-        ///
         /// 注意：
         /// 有索引不代表Z盘一定可用。
         /// 还需要判断Index.IsAvailable。
@@ -87,9 +83,7 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 插件启动时调用。
-        ///
         /// 后台预热Z盘索引。
-        ///
         /// 此方法立即返回，
         /// 不阻塞AutoCAD启动。
         /// </summary>
@@ -97,17 +91,13 @@ namespace Correct_test1.Core
         {
             lock (SyncRoot)
             {
-                //--------------------------------
                 // 已经有快照
-                //--------------------------------
 
                 if (_currentIndex != null)
                     return;
 
 
-                //--------------------------------
                 // 已经有人正在扫描
-                //--------------------------------
 
                 if (IsLoadingNoLock())
                     return;
@@ -120,11 +110,9 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 获取当前归档索引。
-        ///
         /// 正常情况：
         /// PluginInitializer早已预加载完成，
         /// 这里立即返回。
-        ///
         /// 极端情况：
         /// 用户NETLOAD后立刻点击检查，
         /// 预加载还未完成，
@@ -140,20 +128,16 @@ namespace Correct_test1.Core
 
             lock (SyncRoot)
             {
-                //--------------------------------
                 // 已经有快照：
                 // 直接使用。
-                //--------------------------------
 
                 if (_currentIndex != null)
                 {
-                    //--------------------------------
                     // 如果启动时Z盘暂时不可用，
                     // 后续检查时在后台悄悄重试。
                     //
                     // 本次仍返回当前不可用状态，
                     // 不阻塞用户。
-                    //--------------------------------
 
                     if (!_currentIndex.IsAvailable &&
                         !IsLoadingNoLock())
@@ -167,12 +151,10 @@ namespace Correct_test1.Core
                 }
 
 
-                //--------------------------------
                 // 没有快照，也没有加载任务。
                 //
                 // 例如某些情况下PluginInitializer
                 // 没来得及预热。
-                //--------------------------------
 
                 if (!IsLoadingNoLock())
                 {
@@ -185,13 +167,11 @@ namespace Correct_test1.Core
             }
 
 
-            //--------------------------------
             // 这里只可能发生在：
             //
             // 第一次缓存还没有建立完成。
             //
             // 等待现有任务即可。
-            //--------------------------------
 
             try
             {
@@ -216,10 +196,8 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 后台刷新归档索引。
-        ///
         /// 当前旧索引仍然可以继续使用，
         /// 不阻塞检查。
-        ///
         /// 以后如果需要加“刷新归档索引”按钮，
         /// 直接调用这个方法即可。
         /// </summary>
@@ -227,10 +205,8 @@ namespace Correct_test1.Core
         {
             lock (SyncRoot)
             {
-                //--------------------------------
                 // 当前没有加载：
                 // 直接按最新配置刷新。
-                //--------------------------------
 
                 if (!IsLoadingNoLock())
                 {
@@ -240,14 +216,12 @@ namespace Correct_test1.Core
                 }
 
 
-                //--------------------------------
                 // 当前正在加载：
                 //
                 // 不丢掉用户的新路径。
                 //
                 // 当前任务完成以后，
                 // 自动再按照最新配置建立一次。
-                //--------------------------------
 
                 if (_refreshQueued)
                     return;
@@ -281,7 +255,6 @@ namespace Correct_test1.Core
     _refreshQueued;
         /// <summary>
         /// 启动一次后台扫描。
-        ///
         /// 调用前必须持有SyncRoot锁。
         /// </summary>
         private static void StartBuildNoLock()

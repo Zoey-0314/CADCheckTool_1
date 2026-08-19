@@ -11,13 +11,11 @@ namespace Correct_test1.Markers
 
     /// <summary>
     /// 标题栏图号错误标记
-    ///
     /// 功能:
     /// 1. 创建TITLEBLOCK_CHECK图层
     /// 2. 绘制绿色错误框
     /// 3. 添加修改提示文字
     /// 4. 清除自身产生的标记
-    ///
     /// 不负责:
     /// 图号判断
     /// </summary>
@@ -44,7 +42,6 @@ namespace Correct_test1.Markers
 
         /// <summary>
         /// 绘制标题栏图号错误标记
-        /// 
         /// 注意:
         /// 批量检查不能直接使用传入blockId
         /// 需要根据layoutName重新获取真实布局空间
@@ -80,9 +77,7 @@ namespace Correct_test1.Markers
                 {
 
 
-                    //--------------------------------
                     // 根据布局名称获取真实布局空间
-                    //--------------------------------
 
                     DBDictionary layoutDict =
                         tr.GetObject(
@@ -149,9 +144,7 @@ namespace Correct_test1.Markers
 
                     }
 
-                    //--------------------------------
                     // 创建图层
-                    //--------------------------------
 
                     // Ensure layer exists and get its id (compatible with batch mode)
                     ObjectId layerId = EnsureLayer(db, tr, LayerName, Color.FromRgb(0, 255, 0));
@@ -180,9 +173,7 @@ namespace Correct_test1.Markers
 
                     bool isBomMarker =
     textPosition != Point3d.Origin;
-                    //--------------------------------
                     // 图号区域坐标
-                    //--------------------------------
 
 
 
@@ -191,9 +182,7 @@ namespace Correct_test1.Markers
 
 
 
-                    //--------------------------------
                     // 创建绿色矩形
-                    //--------------------------------
                     if (!isBomMarker)
                     {
 
@@ -261,9 +250,7 @@ namespace Correct_test1.Markers
                         );
                     }
 
-                    //--------------------------------
                     // 创建提示文字
-                    //--------------------------------
 
 
                     DBText text =
@@ -323,7 +310,6 @@ namespace Correct_test1.Markers
 
         /// <summary>
         /// 清除标题栏检查标记
-        ///
         /// 保留 TITLEBLOCK_CHECK 图层
         /// 只删除该图层中的实体
         /// 与 RevisionMarker 保持一致

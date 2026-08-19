@@ -18,9 +18,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 单张检查
-        //==================================================
 
         private void btnSingle_Click(
             object sender,
@@ -32,17 +30,13 @@ namespace Correct_test1
                     new SingleCheckForm();
 
 
-                //--------------------------------
                 // 进入单张模式后先隐藏选择窗口
-                //--------------------------------
 
                 this.Hide();
 
 
-                //--------------------------------
                 // SingleCheckForm关闭以后，
                 // 回到检查模式选择窗口
-                //--------------------------------
 
                 form.FormClosed +=
                     delegate
@@ -61,9 +55,7 @@ namespace Correct_test1
                     };
 
 
-                //--------------------------------
                 // 使用AutoCAD Modeless窗口
-                //--------------------------------
 
                 Autodesk.AutoCAD
                     .ApplicationServices
@@ -90,52 +82,31 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 批量检查
-        //==================================================
 
         private void btnBatch_Click(
             object sender,
             EventArgs e)
         {
-            Type t =
-                Type.GetType(
-                    "Correct_test1.BatchCheckForm");
-
-
-            if (t != null)
+            try
             {
-                try
+                using (BatchCheckForm form =
+                    new BatchCheckForm())
                 {
-                    Form f =
-                        (Form)
-                        Activator.CreateInstance(
-                            t);
-
-
-                    f.ShowDialog(
-                        this);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        "Failed to open BatchCheckForm: "
-                        + ex.Message,
-                        "Error");
+                    form.ShowDialog(this);
                 }
             }
-            else
+            catch (Exception ex)
             {
                 MessageBox.Show(
-                    "BatchCheckForm is not available yet.",
-                    "Info");
+                    "无法打开批量检查窗口："
+                    + ex.Message,
+                    "CAD检查助手");
             }
         }
 
 
-        //==================================================
         // 当前图纸版本号输入
-        //==================================================
 
         private void btnProjectVersion_Click(
             object sender,
@@ -151,9 +122,7 @@ namespace Correct_test1
                         .MdiActiveDocument;
 
 
-            //--------------------------------
             // 当前必须有打开的DWG
-            //--------------------------------
 
             if (doc == null)
             {
@@ -165,9 +134,7 @@ namespace Correct_test1
             }
 
 
-            //--------------------------------
             // 弹出输入框
-            //--------------------------------
 
             using (
                 ProjectVersionInputForm form =
@@ -190,9 +157,7 @@ namespace Correct_test1
                         results;
 
 
-                    //--------------------------------
                     // 修改当前DWG时锁定Document
-                    //--------------------------------
 
                     using (
                         Autodesk.AutoCAD
@@ -211,9 +176,7 @@ namespace Correct_test1
                     }
 
 
-                    //--------------------------------
                     // 刷新图面
-                    //--------------------------------
 
                     try
                     {
@@ -230,9 +193,7 @@ namespace Correct_test1
                     }
 
 
-                    //--------------------------------
                     // 统计结果
-                    //--------------------------------
 
                     int modified = 0;
 
@@ -257,9 +218,7 @@ namespace Correct_test1
                                 continue;
 
 
-                            //--------------------------------
                             // 跳过
-                            //--------------------------------
 
                             if (result.Skipped)
                             {
@@ -276,9 +235,7 @@ namespace Correct_test1
                             }
 
 
-                            //--------------------------------
                             // 失败
-                            //--------------------------------
 
                             if (!result.Success)
                             {
@@ -295,9 +252,7 @@ namespace Correct_test1
                             }
 
 
-                            //--------------------------------
                             // 成功
-                            //--------------------------------
 
                             if (result.Created)
                             {
@@ -311,9 +266,7 @@ namespace Correct_test1
                     }
 
 
-                    //--------------------------------
                     // 完成提示
-                    //--------------------------------
 
                     StringBuilder message =
                         new StringBuilder();
@@ -380,9 +333,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 批量版本号输入
-        //==================================================
 
         private void btnBatchProjectVersion_Click(
             object sender,
@@ -390,10 +341,8 @@ namespace Correct_test1
         {
             try
             {
-                //--------------------------------
                 // 第一步：
                 // 选择需要处理的文件夹
-                //--------------------------------
 
                 using (
                     FolderBrowserDialog folderDialog =
@@ -414,9 +363,7 @@ namespace Correct_test1
                         folderDialog.SelectedPath;
 
 
-                    //--------------------------------
                     // 递归查找所有DWG
-                    //--------------------------------
 
                     string[] files =
                         Directory.GetFiles(
@@ -435,10 +382,8 @@ namespace Correct_test1
                     }
 
 
-                    //--------------------------------
                     // 第二步：
                     // 输入完整项目号+版本号
-                    //--------------------------------
 
                     using (
                         ProjectVersionInputForm inputForm =
@@ -459,10 +404,8 @@ namespace Correct_test1
                             inputForm.ProjectVersionText;
 
 
-                        //--------------------------------
                         // 第三步：
                         // 执行前确认
-                        //--------------------------------
 
                         DialogResult confirm =
                             MessageBox.Show(
@@ -490,10 +433,8 @@ namespace Correct_test1
                         }
 
 
-                        //--------------------------------
                         // 第四步：
                         // 打开现有批量进度窗口
-                        //--------------------------------
 
                         BatchProgressForm progressForm =
                             new BatchProgressForm();
@@ -527,9 +468,7 @@ namespace Correct_test1
                                         });
 
 
-                            //--------------------------------
                             // 汇总结果
-                            //--------------------------------
 
                             int successFiles = 0;
 
@@ -574,9 +513,7 @@ namespace Correct_test1
                                         result.FailedLayoutCount;
 
 
-                                    //--------------------------------
                                     // 文件成功
-                                    //--------------------------------
 
                                     if (result.Success)
                                     {
@@ -584,9 +521,7 @@ namespace Correct_test1
                                     }
                                     else
                                     {
-                                        //--------------------------------
                                         // 文件失败
-                                        //--------------------------------
 
                                         failedFiles++;
 
@@ -600,9 +535,7 @@ namespace Correct_test1
                             }
 
 
-                            //--------------------------------
                             // 最终结果提示
-                            //--------------------------------
 
                             StringBuilder message =
                                 new StringBuilder();
@@ -686,9 +619,7 @@ namespace Correct_test1
                         }
                         finally
                         {
-                            //--------------------------------
                             // 无论成功失败都关闭进度窗口
-                            //--------------------------------
 
                             try
                             {
@@ -714,13 +645,10 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 路径设置
-        //==================================================
 
         /// <summary>
         /// 打开路径设置窗口。
-        ///
         /// 可以修改：
         /// 1. 非标归档图纸目录
         /// 2. 诺升标准件数据库Excel路径

@@ -59,9 +59,7 @@ namespace Correct_test1.Models
         }
 
 
-        //==================================================
         // 标准件检查
-        //==================================================
 
         public List<StandardPartCheckResult>
             Results
@@ -73,9 +71,7 @@ namespace Correct_test1.Models
         new List<StandardPartCheckResult>();
 
 
-        //==================================================
         // 非标归档检查
-        //==================================================
 
         public List<NonStandardArchiveCheckResult>
             NonStandardArchiveResults
@@ -86,9 +82,7 @@ namespace Correct_test1.Models
         =
         new List<NonStandardArchiveCheckResult>();
 
-        //==================================================
         // 非标件号检查
-        //==================================================
 
         public List<NonStandardPartNumberCheckResult>
             NonStandardPartNumberResults
@@ -116,9 +110,7 @@ namespace Correct_test1.Models
         "";
 
 
-        //==================================================
-        // 新增：版本号检查
-        //==================================================
+        // 版本号检查
 
         public List<VersionCheckResult>
             VersionCheckResults
@@ -152,9 +144,7 @@ namespace Correct_test1.Models
         "";
 
 
-        //==================================================
         // 标准件数据库状态
-        //==================================================
 
         public bool StandardPartDatabaseAvailable
         {
@@ -172,9 +162,7 @@ namespace Correct_test1.Models
         "";
 
 
-        //==================================================
         // BOM序号
-        //==================================================
 
         public BomCalloutResult BomCalloutResult
         {

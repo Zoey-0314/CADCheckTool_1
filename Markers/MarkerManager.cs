@@ -213,9 +213,7 @@ namespace Correct_test1.Markers
                             null;
 
 
-                        //==================================================
                         // 找到这个序号真正属于哪个BOM、哪个Layout
-                        //==================================================
 
                         foreach (
                             BomData bom
@@ -287,13 +285,11 @@ namespace Correct_test1.Markers
                         }
 
 
-                        //==================================================
                         // 关键修正：
                         //
                         // 不再使用database.CurrentSpaceId。
                         //
                         // 使用这个BOM真正所属的Layout。
-                        //==================================================
 
                         ObjectId spaceId =
                             GetLayoutSpaceId(
@@ -438,11 +434,9 @@ namespace Correct_test1.Markers
                             continue;
 
 
-                        //==================================================
                         // 关键：
                         //
                         // 每一个错误都找到它真正所属Layout
-                        //==================================================
 
                         ObjectId spaceId =
                             GetLayoutSpaceId(
@@ -497,9 +491,7 @@ namespace Correct_test1.Markers
                         }
 
 
-                        //--------------------------------
-                        // 保留你原来的错位处理
-                        //--------------------------------
+                        // 保持错位处理
 
                         if (isDrawingNumberIssue &&
                             markerIndex >= 2)
@@ -543,9 +535,7 @@ namespace Correct_test1.Markers
                                 0);
 
 
-                        //==================================================
                         // 写进这个issue自己的Layout
-                        //==================================================
 
                         space.AppendEntity(
                             text);
@@ -598,10 +588,8 @@ namespace Correct_test1.Markers
                 return count;
             }
         }
-        //==================================================
         // 新版：
         // 根据已经绑定Layout的Issue绘制缺少序号Marker。
-        //==================================================
 
         public void CreateMissingCalloutMarkers(
             Database database,
@@ -692,13 +680,11 @@ namespace Correct_test1.Markers
                     "MarkerManager.CreateMissingCalloutMarkers");
             }
         }
-        //==================================================
         // 新版：
         // 图中多余序号已经绑定所属Layout和位置。
         //
         // 实体本身位于ModelSpace，
         // 所以Marker仍然画到ModelSpace。
-        //==================================================
 
         public void CreateExtraCalloutMarkers(
             Database database,
@@ -843,11 +829,9 @@ namespace Correct_test1.Markers
 
         /// <summary>
         /// 为“归档中不存在”的NS非标件创建标记。
-        ///
         /// 继续使用：
         /// CADCHECK_MARKER
-        ///
-        /// 因此原有“清除检查标记”
+        /// 因此“清除检查标记”
         /// 可以统一清除这些标记。
         /// </summary>
         public void CreateNonStandardArchiveMarkers(
@@ -901,9 +885,7 @@ namespace Correct_test1.Markers
                         }
 
 
-                        //--------------------------------
                         // 标记放在Part No.单元格旁边
-                        //--------------------------------
 
                         MarkerInfo info =
                             new MarkerInfo
@@ -918,9 +900,7 @@ namespace Correct_test1.Markers
                             };
 
 
-                        //--------------------------------
                         // 找到这个BOM真正所在的Layout
-                        //--------------------------------
 
                         ObjectId spaceId =
                             GetLayoutSpaceId(
@@ -929,11 +909,9 @@ namespace Correct_test1.Markers
                                 result.SourceLayoutName);
 
 
-                        //--------------------------------
                         // 复用StandardPartMarker绘图。
                         //
                         // 只改变XData类型。
-                        //--------------------------------
 
                         marker.Create(
                             database,
@@ -958,17 +936,13 @@ namespace Correct_test1.Markers
 
         /// <summary>
         /// 为“非标件号不存在”创建检查标记。
-        ///
         /// 例如BOM：
         /// NS333T1
-        ///
         /// 归档图纸中没有：
         /// NS333T + _1
-        ///
         /// 则在当前BOM的NS333T1旁边提示。
-        ///
         /// 继续使用CADCHECK_MARKER，
-        /// 所以原有清除检查标记功能可以一起清除。
+        /// 所以清除检查标记功能可以一起清除。
         /// </summary>
         public void CreateNonStandardPartNumberMarkers(
             Database database,
@@ -1021,9 +995,7 @@ namespace Correct_test1.Markers
                         }
 
 
-                        //--------------------------------
                         // 提示放在当前BOM件号旁边
-                        //--------------------------------
 
                         MarkerInfo info =
                              new MarkerInfo
@@ -1036,9 +1008,7 @@ namespace Correct_test1.Markers
                              };
 
 
-                        //--------------------------------
                         // 写到当前BOM真正所在Layout
-                        //--------------------------------
 
                         ObjectId spaceId =
                             GetLayoutSpaceId(
@@ -1047,9 +1017,7 @@ namespace Correct_test1.Markers
                                 result.SourceLayoutName);
 
 
-                        //--------------------------------
                         // 继续复用现有红色MText标记
-                        //--------------------------------
 
                         marker.Create(
                             database,
@@ -1074,11 +1042,9 @@ namespace Correct_test1.Markers
 
         /// <summary>
         /// 创建版本号检查提示。
-        ///
         /// 继续使用：
         /// CADCHECK_MARKER
-        ///
-        /// 所以原有“清除检查标记”
+        /// 所以“清除检查标记”
         /// 可以直接清除。
         /// </summary>
         public void CreateVersionMarkers(
@@ -1117,9 +1083,7 @@ namespace Correct_test1.Markers
                         transaction);
 
 
-                    //--------------------------------
                     // 直接复用现有MText提示绘制器
-                    //--------------------------------
 
                     StandardPartMarker marker =
                         new StandardPartMarker();
@@ -1144,9 +1108,7 @@ namespace Correct_test1.Markers
                             };
 
 
-                        //--------------------------------
                         // 必须写到版本号所在Layout
-                        //--------------------------------
 
                         ObjectId spaceId =
                             GetLayoutSpaceId(
@@ -1202,12 +1164,10 @@ namespace Correct_test1.Markers
             }
 
 
-            //==================================================
             // Layout来源不明确：
             //
             // 宁可不画，
             // 也绝对不能画到当前Layout。
-            //==================================================
 
             if (string.IsNullOrWhiteSpace(
                     layoutName))
@@ -1267,46 +1227,9 @@ namespace Correct_test1.Markers
                 "MarkerManager.GetLayoutSpaceId");
 
 
-            //==================================================
-            // 原来这里是：
-            //
-            // return database.CurrentSpaceId;
-            //
-            // 这就是布局串位的重要来源。
-            //==================================================
+            // 找不到目标布局时禁止回退到当前空间，避免标记写入错误布局。
 
             return ObjectId.Null;
-        }
-
-        private static BomItem FindBomItemByNumber(
-            List<BomData> boms,
-            int number)
-        {
-            foreach (BomData bom in boms)
-            {
-                if (bom == null || bom.Items == null)
-                    continue;
-
-                foreach (BomItem item in bom.Items)
-                {
-                    if (item == null)
-                        continue;
-
-                    int itemNumber;
-                    string cleaned = CadTextCleaner.Clean(item.No);
-                    if (int.TryParse(
-                        cleaned,
-                        NumberStyles.None,
-                        CultureInfo.InvariantCulture,
-                        out itemNumber) &&
-                        itemNumber == number)
-                    {
-                        return item;
-                    }
-                }
-            }
-
-            return null;
         }
     }
 }

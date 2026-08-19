@@ -1,35 +1,27 @@
-# CADCheckTool v2.2.0
+﻿# CADCheckTool 2.2.0 Release Notes
 
-CADCheckTool v2.2.0 is the delivery build for AutoCAD 2024 and Windows x64.
+## 交付范围
 
-## Installation
+- 兼容 AutoCAD 2024（R24.3），Windows x64，.NET Framework 4.8。
+- 提供单一 Inno Setup 安装器。
+- 支持当前用户免管理员安装和所有用户管理员安装。
+- 使用 Autodesk ApplicationPlugins 自动加载，不要求 `NETLOAD` 或手工注册表配置。
 
-1. Download `CADCheckTool_1_v2.2.0_Windows_x64.zip`.
-2. Extract the ZIP.
-3. Close AutoCAD completely.
-4. Run `CADCheckTool_1_Setup_v2.2.0.exe`.
-5. Start AutoCAD 2024 and run `CHECKDRAWING`.
+## 功能
 
-The installer deploys a complete AutoCAD application bundle to the trusted `C:\Program Files\Autodesk\ApplicationPlugins` directory. Windows requests administrator approval once during installation. No manual `NETLOAD` or AutoCAD registry edits are required, and legacy CADCheckTool registry entries are removed automatically to prevent duplicate loading.
+- 图纸标题栏、BOM、标准件、非标件、序号、修改记录和版本归档检查。
+- 单张与批量检查、标记、清除和 CSV 导出。
+- 项目版本写入和快速划改命令。
+- 批量图纸安全保存及日志记录。
 
-## Package contents
+## 交付质量
 
-- Self-contained Inno Setup installer
-- CADCheckTool plugin assembly
-- EPPlus and all other third-party runtime dependencies
-- AutoCAD `PackageContents.xml`
-- Installation guide
-- SHA-256 checksums
+- 全部源码、安装脚本和交付文档统一为 UTF-8，发布流水线检查乱码特征和关键中文字符串。
+- 删除旧注册表安装器、InstallerLauncher、测试命令、补丁脚本、无引用配置和过期网页。
+- bundle 采用运行时文件白名单，不包含 PDB、XML API 文档、AutoCAD API DLL 或源码。
+- ZIP 同时提供 SHA-256 校验文件和最新安装说明。
 
-AutoCAD's own managed API assemblies are intentionally excluded because they are supplied by AutoCAD 2024.
+## 已知边界
 
-## Main changes since v2.0.0
-
-- Configurable external data paths
-- Current and batch project/version writing
-- Drawing version archive comparison for DWG and PDF files
-- Non-standard part-number validation
-- Cross-layout marker fixes
-- Welding-symbol filtering improvements for BOM callouts
-- Improved version-check marker placement and text size
-- Installer redesigned as a per-user AutoCAD application bundle
+- 不支持 AutoCAD 2025 及更高版本；这些版本需要 .NET 8 专用构建。
+- 企业网络目录、映射盘和标准件 Excel 的访问权限由用户所在环境提供。

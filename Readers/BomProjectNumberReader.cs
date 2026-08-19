@@ -13,33 +13,26 @@ namespace Correct_test1.Readers
 {
     /// <summary>
     /// BOM右侧项目号读取器。
-    ///
     /// 项目号来源不做限制：
-    ///
     /// 1. 普通DBText
     /// 2. MText
     /// 3. AttributeReference
     /// 4. BlockReference内部文字
     /// 5. 嵌套Block内部文字
     /// 6. QuickRevision生成的项目号
-    ///
     /// 只根据：
-    ///
     /// 文字内容
     /// +
     /// 与当前BOM的空间位置
-    ///
     /// 判断是否属于当前BOM。
     /// </summary>
     public class BomProjectNumberReader
     {
-        //==================================================
         // 完整项目号：
         //
         // N2607US004
         // N2607US004-L0
         // N2607US004-PE1
-        //==================================================
 
         private static readonly Regex
             ProjectRegex =
@@ -48,13 +41,11 @@ namespace Correct_test1.Readers
                     RegexOptions.IgnoreCase);
 
 
-        //==================================================
         // 基础项目号：
         //
         // N2607US004-L0
         // ↓
         // N2607US004
-        //==================================================
 
         private static readonly Regex
             BaseProjectRegex =
@@ -63,11 +54,9 @@ namespace Correct_test1.Readers
                     RegexOptions.IgnoreCase);
 
 
-        //==================================================
         // 搜索范围
         //
         // 项目号必须在BOM右侧附近。
-        //==================================================
 
         private const double
             LeftTolerance =
@@ -84,14 +73,12 @@ namespace Correct_test1.Readers
                 10.0;
 
 
-        //==================================================
         // Layout文字缓存
         //
         // 一次单张检查中：
         //
         // 同一个Layout即使有多个BOM，
         // 也只扫描一次文字。
-        //==================================================
 
         private readonly
             Dictionary<string, List<TitleText>>
@@ -102,10 +89,8 @@ namespace Correct_test1.Readers
 
         /// <summary>
         /// 读取一个BOM右侧的项目号。
-        ///
         /// 找到：
         /// 返回 N2607US004
-        ///
         /// 没找到：
         /// 返回 ""
         /// </summary>
@@ -130,9 +115,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // Table边界无效则不判断
-            //==================================================
 
             if (!IsValidNumber(
                     table.TableMinX) ||
@@ -180,19 +163,15 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 必须在BOM右侧附近
-                //==================================================
 
                 double rightDistance =
                     text.X -
                     table.TableMaxX;
 
 
-                //--------------------------------
                 // 插入点允许略微落在BOM右边界里面，
                 // 用于兼容不同文字对正方式。
-                //--------------------------------
 
                 if (rightDistance <
                     -LeftTolerance)
@@ -208,9 +187,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // Y必须落在BOM高度附近
-                //==================================================
 
                 if (text.Y <
                         table.TableMinY -
@@ -283,7 +260,6 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 相同项目号可能出现多次。
             //
             // 例如：
@@ -291,7 +267,6 @@ namespace Correct_test1.Readers
             // 每一行右侧都生成了同一个项目号。
             //
             // 这种情况是正常的。
-            //==================================================
 
             List<string> distinctProjects =
                 candidates
@@ -311,13 +286,11 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 如果当前BOM右侧出现多个不同项目号，
             // 不自动猜。
             //
             // 宁可按“无项目号BOM”处理，
             // 也不能错误地进入另一个项目的归档。
-            //==================================================
 
             bom.ProjectNumberAmbiguous =
     true;
@@ -340,9 +313,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 一个Layout只读取一次文字
-        //==================================================
 
         private List<TitleText> GetLayoutTexts(
             Database database,
@@ -415,9 +386,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 根据Layout名称找空间
-        //==================================================
 
         private static ObjectId GetLayoutSpaceId(
             Database database,
@@ -490,11 +459,9 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // N2607US004-L0
         // ↓
         // N2607US004
-        //==================================================
 
         private static string NormalizeProjectNumber(
             string value)

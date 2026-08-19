@@ -9,10 +9,8 @@ namespace Correct_test1.VersionCheck.Core
 {
     /// <summary>
     /// 版本号归档索引。
-    ///
     /// 标准件：
     /// DrawingNumber -> 最大V
-    ///
     /// 非标件：
     /// DrawingNumber + ProjectNumber -> 最大L
     /// </summary>
@@ -86,7 +84,6 @@ namespace Correct_test1.VersionCheck.Core
 
         /// <summary>
         /// 自己扫描目录。
-        ///
         /// 只有版本路径和原非标归档路径不同时
         /// 才需要走这里。
         /// </summary>
@@ -186,7 +183,6 @@ namespace Correct_test1.VersionCheck.Core
 
         /// <summary>
         /// 直接用已有文件列表建立版本索引。
-        ///
         /// 用于复用NonStandardArchiveIndex，
         /// 避免重复扫描Z盘。
         /// </summary>
@@ -240,9 +236,7 @@ namespace Correct_test1.VersionCheck.Core
         private void AddFile(
     string filePath)
         {
-            //==================================================
             // 只认DWG和PDF
-            //==================================================
 
             string extension;
 
@@ -280,9 +274,7 @@ namespace Correct_test1.VersionCheck.Core
             }
 
 
-            //==================================================
             // 文件名
-            //==================================================
 
             string fileName;
 
@@ -306,7 +298,6 @@ namespace Correct_test1.VersionCheck.Core
             }
 
 
-            //==================================================
             // 图号
             //
             // 文件名第一个字段。
@@ -314,7 +305,6 @@ namespace Correct_test1.VersionCheck.Core
             // NS103AK 加强筋 ...
             // ↓
             // NS103AK
-            //==================================================
 
             Match drawingMatch =
                 Regex.Match(
@@ -341,9 +331,7 @@ namespace Correct_test1.VersionCheck.Core
             }
 
 
-            //==================================================
             // 有没有项目号
-            //==================================================
 
             Match projectMatch =
                 Regex.Match(
@@ -352,10 +340,8 @@ namespace Correct_test1.VersionCheck.Core
                     RegexOptions.IgnoreCase);
 
 
-            //==================================================
             // 有项目号：
             // 非标L版本
-            //==================================================
 
             if (projectMatch.Success)
             {
@@ -365,9 +351,7 @@ namespace Correct_test1.VersionCheck.Core
                         .ToUpperInvariant();
 
 
-                //--------------------------------
                 // 只在项目号后面找版本号
-                //--------------------------------
 
                 string afterProject =
                     fileName.Substring(
@@ -375,7 +359,6 @@ namespace Correct_test1.VersionCheck.Core
                         projectMatch.Length);
 
 
-                //--------------------------------
                 // 支持：
                 //
                 // N2604US003-L1
@@ -385,7 +368,6 @@ namespace Correct_test1.VersionCheck.Core
                 // N2604US003_PE1_L1
                 //
                 // 并允许L1后面继续有其他文字。
-                //--------------------------------
 
                 Match versionMatch =
                     Regex.Match(
@@ -428,10 +410,8 @@ namespace Correct_test1.VersionCheck.Core
             }
 
 
-            //==================================================
             // 没项目号：
             // 标准件V版本
-            //==================================================
 
             Match standardVersionMatch =
                 Regex.Match(

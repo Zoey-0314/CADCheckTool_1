@@ -10,14 +10,11 @@ namespace Correct_test1.QuickRevision.Picking
 {
     /// <summary>
     /// QuickRevision用户点击入口。
-    ///
     /// 负责：
-    ///
     /// 1. 保证处于Paper Space
     /// 2. 获取用户点击位置
     /// 3. 调用RevisionTargetResolver
     /// 4. 返回RevisionTarget
-    ///
     /// 不负责：
     /// 绘制
     /// 输入框
@@ -37,7 +34,7 @@ namespace Correct_test1.QuickRevision.Picking
 
 
         /// <summary>
-        /// 兼容原来的单次调用。
+        /// 兼容单次调用。
         /// </summary>
         public RevisionTarget Pick(
             Document document)
@@ -52,10 +49,8 @@ namespace Correct_test1.QuickRevision.Picking
 
         /// <summary>
         /// 连续模式使用。
-        ///
         /// cancelled = true：
         /// 用户按Esc/取消，应退出连续模式。
-        ///
         /// cancelled = false + target=null：
         /// 只是没有识别到对象，连续模式继续。
         /// </summary>
@@ -94,9 +89,7 @@ namespace Correct_test1.QuickRevision.Picking
             }
 
 
-            //--------------------------------
             // 只支持Layout
-            //--------------------------------
 
             if (database.TileMode)
             {
@@ -111,10 +104,8 @@ namespace Correct_test1.QuickRevision.Picking
             }
 
 
-            //--------------------------------
             // 如果用户当前处在Viewport内部，
             // 自动退回Paper Space。
-            //--------------------------------
 
             if (!EnsurePaperSpace(
                     editor))
@@ -130,9 +121,7 @@ namespace Correct_test1.QuickRevision.Picking
             }
 
 
-            //--------------------------------
             // 获取点击点
-            //--------------------------------
 
             PromptPointOptions options =
                 new PromptPointOptions(
@@ -144,9 +133,7 @@ namespace Correct_test1.QuickRevision.Picking
                     options);
 
 
-            //--------------------------------
             // Esc / Cancel
-            //--------------------------------
 
             if (result.Status ==
                     PromptStatus.Cancel ||
@@ -172,9 +159,7 @@ namespace Correct_test1.QuickRevision.Picking
             }
 
 
-            //--------------------------------
             // 转WCS
-            //--------------------------------
 
             Point3d paperPoint;
 
@@ -192,9 +177,7 @@ namespace Correct_test1.QuickRevision.Picking
             }
 
 
-            //--------------------------------
             // Resolver只读
-            //--------------------------------
 
             using (
                 Transaction transaction =
@@ -212,12 +195,10 @@ namespace Correct_test1.QuickRevision.Picking
                 transaction.Commit();
 
 
-                //--------------------------------
                 // 点到空白/不支持对象
                 //
                 // 注意：
                 // 这里cancelled仍然是false。
-                //--------------------------------
 
                 if (target == null)
                 {

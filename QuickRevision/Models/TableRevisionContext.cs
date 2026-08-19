@@ -4,9 +4,7 @@ namespace Correct_test1.QuickRevision.Models
 {
     /// <summary>
     /// Table单元格快速划改的附加上下文。
-    ///
     /// 只有目标来自AutoCAD Table时才存在。
-    ///
     /// 用于后续：
     /// NS开头BOM内容被划改后，
     /// 在该行最右侧表格外生成项目号。
@@ -45,9 +43,7 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 整张Table最右侧X坐标。
-        ///
         /// 后面项目号放置位置：
-        ///
         /// TableRightX + gap
         /// </summary>
         public double TableRightX
@@ -59,7 +55,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 当前BOM行的垂直中心Y坐标。
-        ///
         /// 项目号最终与当前行保持同一高度。
         /// </summary>
         public double RowCenterY

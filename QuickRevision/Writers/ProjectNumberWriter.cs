@@ -8,7 +8,6 @@ namespace Correct_test1.QuickRevision.Writers
     /// <summary>
     /// BOM中的NS内容被快速划改后，
     /// 在该BOM行最右侧外部生成项目号。
-    ///
     /// 本类只负责写入。
     /// 不负责判断NS。
     /// 不负责从文件名读取项目号。
@@ -17,10 +16,8 @@ namespace Correct_test1.QuickRevision.Writers
     {
         /// <summary>
         /// 创建项目号文字。
-        ///
         /// 成功：
         /// 返回新MText的ObjectId。
-        ///
         /// 失败：
         /// 返回ObjectId.Null。
         /// </summary>
@@ -38,9 +35,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 必须来自TableCell
-            //--------------------------------
 
             if (!target.IsTableCell ||
                 target.TableContext == null)
@@ -55,9 +50,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 项目号不能为空
-            //--------------------------------
 
             if (string.IsNullOrWhiteSpace(
                     projectNumber))
@@ -70,9 +63,7 @@ namespace Correct_test1.QuickRevision.Writers
                 projectNumber.Trim();
 
 
-            //--------------------------------
             // 获取QuickRevision专用红色图层
-            //--------------------------------
 
             ObjectId layerId =
                 RevisionEntityHelper
@@ -88,9 +79,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 注册XData
-            //--------------------------------
 
             RevisionEntityHelper
                 .EnsureRegApp(
@@ -98,10 +87,8 @@ namespace Correct_test1.QuickRevision.Writers
                     transaction);
 
 
-            //--------------------------------
             // 项目号应该写到与BOM相同的
             // Paper Space中。
-            //--------------------------------
 
             BlockTableRecord targetSpace =
                 transaction.GetObject(
@@ -114,34 +101,28 @@ namespace Correct_test1.QuickRevision.Writers
                 return ObjectId.Null;
 
 
-            //--------------------------------
             // 字高
             //
             // 直接继承原BOM文字高度。
-            //--------------------------------
 
             double textHeight =
                 GetTextHeight(
                     target);
 
 
-            //--------------------------------
             // BOM右侧留一点距离。
             //
             // 使用字高作为比例，
             // 不写死图纸单位。
-            //--------------------------------
 
             double gap =
                 textHeight * 0.8;
 
 
-            //--------------------------------
             // 放置位置：
             //
             // X = 整个BOM最右侧 + gap
             // Y = 当前BOM行中心
-            //--------------------------------
 
             double x =
                 target.TableContext
@@ -168,9 +149,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 创建MText
-            //--------------------------------
 
             MText text =
                 new MText();
@@ -186,32 +165,26 @@ namespace Correct_test1.QuickRevision.Writers
                     database);
 
 
-                //--------------------------------
                 // 项目号内容
-                //--------------------------------
 
                 text.Contents =
                     projectNumber;
 
 
-                //--------------------------------
                 // 项目号统一字高：3.5
                 //
                 // 注意：
                 // 上面的 textHeight 仍然保留，
-                // 继续用于原有 gap 计算，
+                // 用于 gap 计算，
                 // 因此位置逻辑不变。
-                //--------------------------------
 
                 text.TextHeight =
                     3.5;
 
 
-                //--------------------------------
                 // location代表文字左侧中点。
                 //
                 // 因此文字会从BOM右边向右展开。
-                //--------------------------------
 
                 text.Attachment =
                     AttachmentPoint.MiddleLeft;
@@ -221,20 +194,16 @@ namespace Correct_test1.QuickRevision.Writers
                     location;
 
 
-                //--------------------------------
-                // 第一版水平
-                //--------------------------------
+                // 水平
 
                 text.Rotation =
                     0.0;
 
 
-                //--------------------------------
                 // 项目号统一使用 CONN。
                 //
                 // 已存在：直接使用。
                 // 不存在：自动创建。
-                //--------------------------------
 
                 ObjectId connStyleId =
                     EnsureConnTextStyleId(
@@ -253,13 +222,11 @@ namespace Correct_test1.QuickRevision.Writers
                     connStyleId;
 
 
-                //--------------------------------
                 // QuickRevision统一：
                 //
                 // CADCHECK_REVISION
                 // +
                 // 红色
-                //--------------------------------
 
                 RevisionEntityHelper
                     .ApplyRevisionAppearance(
@@ -267,12 +234,10 @@ namespace Correct_test1.QuickRevision.Writers
                         layerId);
 
 
-                //--------------------------------
                 // XData
                 //
                 // 后续可以专门识别：
                 // ProjectNumber
-                //--------------------------------
 
                 RevisionEntityHelper
                     .ApplyXData(
@@ -280,9 +245,7 @@ namespace Correct_test1.QuickRevision.Writers
                         "ProjectNumber");
 
 
-                //--------------------------------
                 // 加入Paper Space
-                //--------------------------------
 
                 ObjectId textId =
                     targetSpace.AppendEntity(
@@ -330,10 +293,8 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 理论上TableResolver已经提供字高。
             // 这里只是最后Fallback。
-            //--------------------------------
 
             return 2.5;
         }
@@ -341,7 +302,6 @@ namespace Correct_test1.QuickRevision.Writers
 
         /// <summary>
         /// 获取或创建 CONN 文字样式。
-        ///
         /// 与项目号/版本号写入功能保持一致：
         /// Arial、粗体、宽度因子0.8、非倾斜。
         /// </summary>
@@ -373,9 +333,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 已存在：直接使用
-            //--------------------------------
 
             if (table.Has(
                     styleName))
@@ -385,9 +343,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 不存在：自动创建
-            //--------------------------------
 
             table.UpgradeOpen();
 
@@ -484,10 +440,8 @@ namespace Correct_test1.QuickRevision.Writers
             }
             catch (System.Exception)
             {
-                //--------------------------------
                 // 获取不到原样式时，
                 // 保留数据库默认文字样式。
-                //--------------------------------
             }
         }
 

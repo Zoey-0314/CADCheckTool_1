@@ -4,7 +4,6 @@ namespace Correct_test1.VersionCheck.Models
 {
     /// <summary>
     /// 一条版本号检查提示。
-    ///
     /// 只有当前版本落后于归档最高版本时
     /// 才产生此结果。
     /// </summary>
