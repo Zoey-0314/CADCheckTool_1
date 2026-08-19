@@ -40,6 +40,12 @@ jobs:
           $specialNames = @('.editorconfig', '.gitattributes', '.gitignore')
           $invalidFiles = [System.Collections.Generic.List[string]]::new()
           $garbledFiles = [System.Collections.Generic.List[string]]::new()
+          $garbledMarkers = @(
+            ([string][char]0xFFFD),
+            [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('6ZSf5pak5ou3')),
+            [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('5rWj54qy44K9')),
+            [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('77+977+9'))
+          )
 
           git ls-files | ForEach-Object {
             $relativePath = $_
@@ -52,13 +58,11 @@ jobs:
             try {
               $bytes = [System.IO.File]::ReadAllBytes($path)
               $content = $strictUtf8.GetString($bytes)
-              if (
-                $content.Contains([char]0xFFFD) -or
-                $content.Contains('锟斤拷') -or
-                $content.Contains('浣犲ソ') -or
-                $content.Contains('��')
-              ) {
-                $garbledFiles.Add($relativePath)
+              foreach ($marker in $garbledMarkers) {
+                if ($content.Contains($marker)) {
+                  $garbledFiles.Add($relativePath)
+                  break
+                }
               }
             }
             catch {
