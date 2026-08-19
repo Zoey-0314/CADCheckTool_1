@@ -4,7 +4,7 @@
 
 ## 运行入口
 
-`PackageContents.xml` 声明 ApplicationPlugins 包和命令。AutoCAD 启动时加载 `CADCheckTool_1.dll`，`PluginInitializer` 初始化路径配置和运行时缓存，`CommandEntry` 与 `QuickRevisionCommand` 暴露用户命令。
+`PackageContents.xml` 声明 ApplicationPlugins 包和命令。AutoCAD 先注册命令，用户首次调用 `CHECKDRAWING`、`QREV`、`QREVMODE` 或 `QREVCLEAR` 时按需加载 `CADCheckTool_1.dll`。程序集加载后，`PluginInitializer` 初始化路径配置和运行时缓存，`CommandEntry` 与 `QuickRevisionCommand` 暴露用户命令。
 
 ```mermaid
 flowchart TD
