@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 using System.Collections.Generic;
@@ -7,16 +7,16 @@ using System.Collections.Generic;
 namespace Correct_test1.Models
 {
     /// <summary>
-    /// µ¥¸öBOMĞòºÅÎÊÌâ¡£
+    /// å•ä¸ªBOMåºå·é—®é¢˜ã€‚
     ///
-    /// Óë¾É°æÏà±È£¬
-    /// ÏÖÔÚÃ¿Ò»¸öÎÊÌâ¶¼Ã÷È·Ğ¯´ø£º
+    /// ä¸æ—§ç‰ˆç›¸æ¯”ï¼Œ
+    /// ç°åœ¨æ¯ä¸€ä¸ªé—®é¢˜éƒ½æ˜ç¡®æºå¸¦ï¼š
     ///
     /// LayoutName
     /// Number
     /// Position
     ///
-    /// Òò´Ë²»»áÔÙ¶ªÊ§²¼¾ÖĞÅÏ¢¡£
+    /// å› æ­¤ä¸ä¼šå†ä¸¢å¤±å¸ƒå±€ä¿¡æ¯ã€‚
     /// </summary>
     public class BomCalloutIssue
     {
@@ -61,20 +61,20 @@ namespace Correct_test1.Models
 
 
     /// <summary>
-    /// BOMĞòºÅ¼ì²é½á¹û¡£
+    /// BOMåºå·æ£€æŸ¥ç»“æœã€‚
     ///
     /// MissingCallouts / ExtraCallouts
-    /// ¼ÌĞø±£Áô£¬
-    /// ±ÜÃâ¾É´úÂëÁ¢¼´Ê§Ğ§¡£
+    /// ç»§ç»­ä¿ç•™ï¼Œ
+    /// é¿å…æ—§ä»£ç ç«‹å³å¤±æ•ˆã€‚
     ///
-    /// ĞÂÔö£º
+    /// æ–°å¢ï¼š
     ///
     /// MissingIssues
     /// ExtraIssues
     ///
-    /// ÕæÕı»æÖÆMarkerÊ±£¬
-    /// ºóĞøÍ³Ò»Ê¹ÓÃIssue£¬
-    /// ÒòÎªIssueĞ¯´øLayoutĞÅÏ¢¡£
+    /// çœŸæ­£ç»˜åˆ¶Markeræ—¶ï¼Œ
+    /// åç»­ç»Ÿä¸€ä½¿ç”¨Issueï¼Œ
+    /// å› ä¸ºIssueæºå¸¦Layoutä¿¡æ¯ã€‚
     /// </summary>
     public class BomCalloutResult
     {

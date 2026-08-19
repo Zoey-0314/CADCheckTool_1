@@ -1,4 +1,4 @@
-using Correct_test1.Core;
+ï»¿using Correct_test1.Core;
 using Correct_test1.Models;
 using System;
 using System.Collections.Generic;
@@ -24,10 +24,10 @@ namespace Correct_test1.Checks
                     out databaseError))
             {
                 //--------------------------------
-                // Êı¾İ¿â²»¿É·ÃÎÊÊ±£¬
-                // ±¾´Î±ê×¼¼ş¼ì²éÌø¹ı¡£
+                // æ•°æ®åº“ä¸å¯è®¿é—®æ—¶ï¼Œ
+                // æœ¬æ¬¡æ ‡å‡†ä»¶æ£€æŸ¥è·³è¿‡ã€‚
                 //
-                // ²»ÄÜ°ÑËùÓĞ¼ş¶¼ÎóÅĞÎª¡°Î´ÊÕÂ¼¡±¡£
+                // ä¸èƒ½æŠŠæ‰€æœ‰ä»¶éƒ½è¯¯åˆ¤ä¸ºâ€œæœªæ”¶å½•â€ã€‚
                 //--------------------------------
 
                 return results;
@@ -54,12 +54,12 @@ namespace Correct_test1.Checks
                 if (matches.Count == 0)
                 {
                     result.Status = StandardPartCheckStatus.NotRegistered;
-                    result.Message = "±ê×¼¼ş¿âÎ´ÊÕÂ¼";
+                    result.Message = "æ ‡å‡†ä»¶åº“æœªæ”¶å½•";
                 }
                 else if (matches.Count > 1)
                 {
                     result.Status = StandardPartCheckStatus.MultipleMatch;
-                    result.Message = "±ê×¼¼şÍ¼ºÅÆ¥Åäµ½¶à¸ö±ê×¼¼ş";
+                    result.Message = "æ ‡å‡†ä»¶å›¾å·åŒ¹é…åˆ°å¤šä¸ªæ ‡å‡†ä»¶";
                 }
                 else
                 {
@@ -84,17 +84,17 @@ namespace Correct_test1.Checks
                             result.CorrectPartNumber);
 
 
-                    // Ãû³Æ´íÎó
+                    // åç§°é”™è¯¯
                     if (nameError)
                     {
                         result.Status =
                             StandardPartCheckStatus.NameError;
 
                         result.Message =
-                            "±ê×¼¼şÃû³Æ²»Ò»ÖÂ";
+                            "æ ‡å‡†ä»¶åç§°ä¸ä¸€è‡´";
 
 
-                        // Èç¹û¸ñÊ½Í¬Ê±Ò²´íÎó£¬ÔÙµ¥¶ÀÉú³ÉÒ»¸ö¸ñÊ½´íÎó½á¹û
+                        // å¦‚æœæ ¼å¼åŒæ—¶ä¹Ÿé”™è¯¯ï¼Œå†å•ç‹¬ç”Ÿæˆä¸€ä¸ªæ ¼å¼é”™è¯¯ç»“æœ
                         if (formatError)
                         {
                             StandardPartCheckResult formatResult =
@@ -114,7 +114,7 @@ namespace Correct_test1.Checks
                                 StandardPartCheckStatus.FormatDifference;
 
                             formatResult.Message =
-                                "±ê×¼¼şÍ¼ºÅ¸ñÊ½²»Í¬";
+                                "æ ‡å‡†ä»¶å›¾å·æ ¼å¼ä¸åŒ";
 
                             formatResult.BomRow =
                                 item.BomRow;
@@ -130,18 +130,18 @@ namespace Correct_test1.Checks
                     }
 
 
-                    // Ãû³ÆÕıÈ·£¬µ«¸ñÊ½´íÎó
+                    // åç§°æ­£ç¡®ï¼Œä½†æ ¼å¼é”™è¯¯
                     else if (formatError)
                     {
                         result.Status =
                             StandardPartCheckStatus.FormatDifference;
 
                         result.Message =
-                            "±ê×¼¼şÍ¼ºÅ¸ñÊ½²»Í¬";
+                            "æ ‡å‡†ä»¶å›¾å·æ ¼å¼ä¸åŒ";
                     }
 
 
-                    // Á½¸ö¶¼ÕıÈ·
+                    // ä¸¤ä¸ªéƒ½æ­£ç¡®
                     else
                     {
                         result.Status =

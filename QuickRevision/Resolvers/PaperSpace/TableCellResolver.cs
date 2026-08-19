@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 using Correct_test1.QuickRevision.Models;
@@ -6,16 +6,16 @@ using Correct_test1.QuickRevision.Models;
 namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 {
     /// <summary>
-    /// Paper SpaceÖĞµÄTableµ¥Ôª¸ñ½âÎöÆ÷¡£
+    /// Paper Spaceä¸­çš„Tableå•å…ƒæ ¼è§£æå™¨ã€‚
     ///
-    /// Ä¿±ê£º
-    /// 1. ¸ù¾İµã»÷Î»ÖÃÕÒµ½¾ßÌåCell
-    /// 2. ¶ÁÈ¡CellÎÄ×Ö
-    /// 3. ÓÅÏÈÍ¨¹ıTable.Explode()ÕÒµ½Êµ¼ÊÏÔÊ¾ÎÄ×Ö
-    /// 4. »ñÈ¡ÕæÊµÎÄ×ÖÎ»ÖÃ¡¢¿í¶È¡¢¸ß¶È¡¢ÑùÊ½
-    /// 5. Ö§³Ö×ó/ÖĞ/ÓÒ¶ÔÆë
+    /// ç›®æ ‡ï¼š
+    /// 1. æ ¹æ®ç‚¹å‡»ä½ç½®æ‰¾åˆ°å…·ä½“Cell
+    /// 2. è¯»å–Cellæ–‡å­—
+    /// 3. ä¼˜å…ˆé€šè¿‡Table.Explode()æ‰¾åˆ°å®é™…æ˜¾ç¤ºæ–‡å­—
+    /// 4. è·å–çœŸå®æ–‡å­—ä½ç½®ã€å®½åº¦ã€é«˜åº¦ã€æ ·å¼
+    /// 5. æ”¯æŒå·¦/ä¸­/å³å¯¹é½
     ///
-    /// µÚÒ»°æÈÔÖ»´¦ÀíË®Æ½Table¡£
+    /// ç¬¬ä¸€ç‰ˆä»åªå¤„ç†æ°´å¹³Tableã€‚
     /// </summary>
     public class TableCellResolver
     {
@@ -44,7 +44,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ÕÒµ½µã»÷µÄ¾ßÌåCell
+            // æ‰¾åˆ°ç‚¹å‡»çš„å…·ä½“Cell
             //--------------------------------
 
             int row;
@@ -77,7 +77,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ¶ÁÈ¡CellÎÄ×Ö
+            // è¯»å–Cellæ–‡å­—
             //--------------------------------
 
             string content;
@@ -101,14 +101,14 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ÓÅÏÈ£º
+            // ä¼˜å…ˆï¼š
             //
-            // ExplodeÕû¸öTable£¬
-            // ÕÒÕâ¸öCellÀïÕæÕıÏÔÊ¾³öÀ´µÄ
-            // MText / DBText¡£
+            // Explodeæ•´ä¸ªTableï¼Œ
+            // æ‰¾è¿™ä¸ªCellé‡ŒçœŸæ­£æ˜¾ç¤ºå‡ºæ¥çš„
+            // MText / DBTextã€‚
             //
-            // ÕâÑù×ó¶ÔÆë¡¢¾ÓÖĞ¡¢ÓÒ¶ÔÆë
-            // ¶¼²»ĞèÒªÎÒÃÇ×Ô¼º²Â¡£
+            // è¿™æ ·å·¦å¯¹é½ã€å±…ä¸­ã€å³å¯¹é½
+            // éƒ½ä¸éœ€è¦æˆ‘ä»¬è‡ªå·±çŒœã€‚
             //--------------------------------
 
             Extents3d realTextExtents;
@@ -181,8 +181,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ExplodeÃ»ÓĞµÃµ½Êµ¼ÊÎÄ×ÖÊ±£¬
-            // ÔÙÊ¹ÓÃCell×ÔÉíÊôĞÔFallback¡£
+            // Explodeæ²¡æœ‰å¾—åˆ°å®é™…æ–‡å­—æ—¶ï¼Œ
+            // å†ä½¿ç”¨Cellè‡ªèº«å±æ€§Fallbackã€‚
             //--------------------------------
 
             RevisionTarget fallbackTarget =
@@ -213,7 +213,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
         /// <summary>
-        /// Í¨¹ıTable.ExplodeÈ¡µÃÕæÕıÏÔÊ¾µÄÎÄ×Ö¡£
+        /// é€šè¿‡Table.Explodeå–å¾—çœŸæ­£æ˜¾ç¤ºçš„æ–‡å­—ã€‚
         /// </summary>
         private static bool TryGetActualCellTextGeometry(
             Table table,
@@ -301,14 +301,14 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                             //--------------------------------
-                            // BOMµÄTable.Explode³öÀ´µÄMText
-                            // ¿ÉÄÜÈÔÈ»±£ÁôÕû¸öCellµÄ¶¨Òå¿í¶È¡£
+                            // BOMçš„Table.Explodeå‡ºæ¥çš„MText
+                            // å¯èƒ½ä»ç„¶ä¿ç•™æ•´ä¸ªCellçš„å®šä¹‰å®½åº¦ã€‚
                             //
-                            // ËùÒÔ£º
-                            // ²»ÔÙÖ±½ÓÊ¹ÓÃ¸ÃMText×ÔÉíµÄ¿í¶È¡£
+                            // æ‰€ä»¥ï¼š
+                            // ä¸å†ç›´æ¥ä½¿ç”¨è¯¥MTextè‡ªèº«çš„å®½åº¦ã€‚
                             //
-                            // ÓÃCellÕæÕıµÄÎÄ×ÖexpectedText£¬
-                            // °´Êµ¼Ê×Ö¸ßºÍÑùÊ½ÖØĞÂ²âÁ¿½ô´Õ¿í¶È¡£
+                            // ç”¨CellçœŸæ­£çš„æ–‡å­—expectedTextï¼Œ
+                            // æŒ‰å®é™…å­—é«˜å’Œæ ·å¼é‡æ–°æµ‹é‡ç´§å‡‘å®½åº¦ã€‚
                             //--------------------------------
 
                             double actualTextWidth;
@@ -331,7 +331,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                             //--------------------------------
-                            // ¸ß¶ÈÈÔÈ»È¡Ô­MTextÕæÊµÏÔÊ¾¸ß¶È
+                            // é«˜åº¦ä»ç„¶å–åŸMTextçœŸå®æ˜¾ç¤ºé«˜åº¦
                             //--------------------------------
 
                             double actualTextHeight =
@@ -348,9 +348,9 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                             //--------------------------------
-                            // ²»ÔÙÄÃÔ­MTextµÄ¿í¶È£¬
-                            // Ö»ÀûÓÃËüµÄLocationºÍAttachment
-                            // È·¶¨ÎÄ×ÖÊµ¼Ê·ÅÖÃÎ»ÖÃ¡£
+                            // ä¸å†æ‹¿åŸMTextçš„å®½åº¦ï¼Œ
+                            // åªåˆ©ç”¨å®ƒçš„Locationå’ŒAttachment
+                            // ç¡®å®šæ–‡å­—å®é™…æ”¾ç½®ä½ç½®ã€‚
                             //--------------------------------
 
                             if (!TryBuildTightMTextExtents(
@@ -418,7 +418,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ÎÄ×ÖÖĞĞÄ±ØĞëÎ»ÓÚµ±Ç°CellÖĞ¡£
+                    // æ–‡å­—ä¸­å¿ƒå¿…é¡»ä½äºå½“å‰Cellä¸­ã€‚
                     //--------------------------------
 
                     Point3d center =
@@ -438,7 +438,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ÓÅÏÈÆ¥ÅäCellÕæÊµÄÚÈİ¡£
+                    // ä¼˜å…ˆåŒ¹é…CellçœŸå®å†…å®¹ã€‚
                     //--------------------------------
 
                     bool exactText =
@@ -449,8 +449,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ÒÑ¾­ÕÒµ½ÍêÈ«Æ¥ÅäÎÄ×Öºó£¬
-                    // ²»ÔÙ½ÓÊÜ²»Æ¥ÅäÎÄ×Ö¡£
+                    // å·²ç»æ‰¾åˆ°å®Œå…¨åŒ¹é…æ–‡å­—åï¼Œ
+                    // ä¸å†æ¥å—ä¸åŒ¹é…æ–‡å­—ã€‚
                     //--------------------------------
 
                     if (foundExactText &&
@@ -461,8 +461,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // µÚÒ»´ÎÕÒµ½ÍêÈ«Æ¥Åä£º
-                    // ÇåµôÖ®Ç°·ÇÍêÈ«Æ¥ÅäµÄ¾àÀëÓÅÊÆ¡£
+                    // ç¬¬ä¸€æ¬¡æ‰¾åˆ°å®Œå…¨åŒ¹é…ï¼š
+                    // æ¸…æ‰ä¹‹å‰éå®Œå…¨åŒ¹é…çš„è·ç¦»ä¼˜åŠ¿ã€‚
                     //--------------------------------
 
                     if (exactText &&
@@ -515,8 +515,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             finally
             {
                 //--------------------------------
-                // Explode³öÀ´µÄÊÇÁÙÊ±DBObject£¬
-                // Ã»ÓĞ¼ÓÈëDatabase£¬È«²¿ÊÍ·Å¡£
+                // Explodeå‡ºæ¥çš„æ˜¯ä¸´æ—¶DBObjectï¼Œ
+                // æ²¡æœ‰åŠ å…¥Databaseï¼Œå…¨éƒ¨é‡Šæ”¾ã€‚
                 //--------------------------------
 
                 foreach (DBObject obj
@@ -534,18 +534,18 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
         }
 
         /// <summary>
-        /// ¸øTableCellµÄRevisionTarget¸½¼Ó±í¸ñÉÏÏÂÎÄ¡£
+        /// ç»™TableCellçš„RevisionTargeté™„åŠ è¡¨æ ¼ä¸Šä¸‹æ–‡ã€‚
         ///
-        /// ±£´æ£º
+        /// ä¿å­˜ï¼š
         /// TableId
         /// Row
         /// Column
-        /// Table×îÓÒ±ßX
-        /// µ±Ç°ĞĞÉÏÏÂ±ß½ç
-        /// µ±Ç°ĞĞÖĞĞÄY
+        /// Tableæœ€å³è¾¹X
+        /// å½“å‰è¡Œä¸Šä¸‹è¾¹ç•Œ
+        /// å½“å‰è¡Œä¸­å¿ƒY
         ///
-        /// ºóĞøProjectNumberWriterÖ±½ÓÊ¹ÓÃÕâĞ©ĞÅÏ¢£¬
-        /// ²»ÔÙÖØĞÂ·ÖÎöTable¡£
+        /// åç»­ProjectNumberWriterç›´æ¥ä½¿ç”¨è¿™äº›ä¿¡æ¯ï¼Œ
+        /// ä¸å†é‡æ–°åˆ†æTableã€‚
         /// </summary>
         private static void AttachTableContext(
             RevisionTarget target,
@@ -577,8 +577,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // Èç¹ûÕûĞĞ¼¸ºÎ¶ÁÈ¡Ê§°Ü£¬
-            // ÖÁÉÙÊ¹ÓÃµ±Ç°Ñ¡ÖĞCellµÄÉÏÏÂ·¶Î§¡£
+            // å¦‚æœæ•´è¡Œå‡ ä½•è¯»å–å¤±è´¥ï¼Œ
+            // è‡³å°‘ä½¿ç”¨å½“å‰é€‰ä¸­Cellçš„ä¸Šä¸‹èŒƒå›´ã€‚
             //--------------------------------
 
             if (!gotGeometry)
@@ -591,7 +591,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                 //--------------------------------
-                // ÔÙ³¢ÊÔÖ»»ñÈ¡Table×îÓÒ±ß½ç
+                // å†å°è¯•åªè·å–Tableæœ€å³è¾¹ç•Œ
                 //--------------------------------
 
                 if (!TryGetTableRightX(
@@ -651,13 +651,13 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 context;
         }
         /// <summary>
-        /// »ñÈ¡£º
+        /// è·å–ï¼š
         ///
-        /// 1. ÕûÕÅTable×îÓÒ²àX
-        /// 2. Ö¸¶¨Row×îÏÂ²àY
-        /// 3. Ö¸¶¨Row×îÉÏ²àY
+        /// 1. æ•´å¼ Tableæœ€å³ä¾§X
+        /// 2. æŒ‡å®šRowæœ€ä¸‹ä¾§Y
+        /// 3. æŒ‡å®šRowæœ€ä¸Šä¾§Y
         ///
-        /// Ö±½Ó¸´ÓÃÒÑ¾­ÑéÖ¤Õı³£µÄCell.GetExtents()Âß¼­¡£
+        /// ç›´æ¥å¤ç”¨å·²ç»éªŒè¯æ­£å¸¸çš„Cell.GetExtents()é€»è¾‘ã€‚
         /// </summary>
         private static bool TryGetTableAndRowGeometry(
             Table table,
@@ -692,10 +692,10 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ±éÀúËùÓĞCell£º
+            // éå†æ‰€æœ‰Cellï¼š
             //
-            // ËùÓĞĞĞ¸ºÔğÕÒµ½Table×îÓÒ±ß
-            // Ä¿±êĞĞ¸ºÔğÕÒµ½RowÉÏÏÂ±ß½ç
+            // æ‰€æœ‰è¡Œè´Ÿè´£æ‰¾åˆ°Tableæœ€å³è¾¹
+            // ç›®æ ‡è¡Œè´Ÿè´£æ‰¾åˆ°Rowä¸Šä¸‹è¾¹ç•Œ
             //--------------------------------
 
             for (int r = 0;
@@ -728,7 +728,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ÕûÕÅ±í×îÓÒ²à
+                    // æ•´å¼ è¡¨æœ€å³ä¾§
                     //--------------------------------
 
                     if (right >
@@ -744,7 +744,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // µ±Ç°Ä¿±êĞĞ
+                    // å½“å‰ç›®æ ‡è¡Œ
                     //--------------------------------
 
                     if (r ==
@@ -782,7 +782,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 rowTopY >= rowBottomY;
         }
         /// <summary>
-        /// µ¥¶À»ñÈ¡ÕûÕÅTable×îÓÒ²àX¡£
+        /// å•ç‹¬è·å–æ•´å¼ Tableæœ€å³ä¾§Xã€‚
         /// </summary>
         private static bool TryGetTableRightX(
             Table table,
@@ -847,9 +847,9 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     tableRightX);
         }
         /// <summary>
-        /// ExplodeÊ§°ÜºóµÄFallback¡£
+        /// Explodeå¤±è´¥åçš„Fallbackã€‚
         ///
-        /// ´ËÊ±¶ÁÈ¡CellÕæÊµ£º
+        /// æ­¤æ—¶è¯»å–CellçœŸå®ï¼š
         /// TextHeight
         /// TextStyleId
         /// Alignment
@@ -883,7 +883,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // Êµ¼ÊÎÄ×Ö¸ß¶È
+            // å®é™…æ–‡å­—é«˜åº¦
             //--------------------------------
 
             double textHeight =
@@ -893,7 +893,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // Êµ¼ÊÎÄ×ÖÑùÊ½
+            // å®é™…æ–‡å­—æ ·å¼
             //--------------------------------
 
             ObjectId textStyleId =
@@ -902,7 +902,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ²âÁ¿ÎÄ×Ö¿í¶È
+            // æµ‹é‡æ–‡å­—å®½åº¦
             //--------------------------------
 
             double textWidth;
@@ -933,7 +933,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ·ÀÖ¹Òì³£³¬¹ıÕû¸öµ¥Ôª¸ñ
+            // é˜²æ­¢å¼‚å¸¸è¶…è¿‡æ•´ä¸ªå•å…ƒæ ¼
             //--------------------------------
 
             double maxWidth =
@@ -948,7 +948,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // »ñÈ¡Cell¶ÔÆë·½Ê½
+            // è·å–Cellå¯¹é½æ–¹å¼
             //--------------------------------
 
             string alignmentName =
@@ -967,7 +967,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ÉÙÁ¿±ßÔµÁô°×
+            // å°‘é‡è¾¹ç¼˜ç•™ç™½
             //--------------------------------
 
             double horizontalPadding =
@@ -978,7 +978,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // Ë®Æ½·½Ïò
+            // æ°´å¹³æ–¹å‘
             //--------------------------------
 
             double textLeft;
@@ -1029,7 +1029,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ´¹Ö±·½Ïò
+            // å‚ç›´æ–¹å‘
             //--------------------------------
 
             double textBottom;
@@ -1080,7 +1080,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // ÏŞÖÆÔÚCell·¶Î§ÄÚ
+            // é™åˆ¶åœ¨CellèŒƒå›´å†…
             //--------------------------------
 
             if (textLeft < cellLeft)
@@ -1179,7 +1179,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //-------
-            // É¾³ıÏß
+            // åˆ é™¤çº¿
             //-------
 
             target.CenterY =
@@ -1236,8 +1236,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
             //--------------------------------
-            // Cell×ÔÉíÃ»ÓĞÃ÷È·ÉèÖÃ×Ö¸ßÊ±£¬
-            // ²ÅÊ¹ÓÃFallback¡£
+            // Cellè‡ªèº«æ²¡æœ‰æ˜ç¡®è®¾ç½®å­—é«˜æ—¶ï¼Œ
+            // æ‰ä½¿ç”¨Fallbackã€‚
             //--------------------------------
 
             double fallback =
@@ -1449,13 +1449,13 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
         }
 
         /// <summary>
-        /// ×¨ÃÅ¸øBOM²âÁ¿¡°ÕæÊµ×Ö·û´®¿í¶È¡±¡£
+        /// ä¸“é—¨ç»™BOMæµ‹é‡â€œçœŸå®å­—ç¬¦ä¸²å®½åº¦â€ã€‚
         ///
-        /// ¹Ø¼ü£º
+        /// å…³é”®ï¼š
         /// MText.Width = 0
         ///
-        /// WidthÎª0ÒÔºó²»Ê¹ÓÃTableÔ­À´µÄ
-        /// Õû¸öCellÎÄ±¾¿ò¿í¶È£¬¶øÊÇÈÃÎÄ×Ö°´ÄÚÈİÕ¹¿ª¡£
+        /// Widthä¸º0ä»¥åä¸ä½¿ç”¨TableåŸæ¥çš„
+        /// æ•´ä¸ªCellæ–‡æœ¬æ¡†å®½åº¦ï¼Œè€Œæ˜¯è®©æ–‡å­—æŒ‰å†…å®¹å±•å¼€ã€‚
         /// </summary>
         private static bool TryMeasureTightTextWidth(
     Database database,
@@ -1509,8 +1509,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ¹Ø±Õ¹Ì¶¨¿í¶È£¬
-                    // ÈÃMText°´ÕÕÊµ¼ÊÄÚÈİ¼ÆËã¿í¶È¡£
+                    // å…³é—­å›ºå®šå®½åº¦ï¼Œ
+                    // è®©MTextæŒ‰ç…§å®é™…å†…å®¹è®¡ç®—å®½åº¦ã€‚
                     //--------------------------------
 
                     temp.Width =
@@ -1526,7 +1526,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ÓÅÏÈÊµ¼ÊÎÄ×Ö¿í¶È
+                    // ä¼˜å…ˆå®é™…æ–‡å­—å®½åº¦
                     //--------------------------------
 
                     width =
@@ -1534,7 +1534,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
 
                     //--------------------------------
-                    // ActualWidthÎŞĞ§Ê±Fallback
+                    // ActualWidthæ— æ•ˆæ—¶Fallback
                     //--------------------------------
 
                     if (!IsValidNumber(width) ||
@@ -1565,9 +1565,9 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
         }
 
         /// <summary>
-        /// ¸ù¾İÔ­Ê¼MTextµÄÎ»ÖÃ¡¢Attachment£¬
-        /// Ê¹ÓÃÖØĞÂ²âÁ¿³öÀ´µÄ½ô´Õ¿í¸ß£¬
-        /// ¹¹ÔìÕæÕıÓÃÓÚQuickRevisionµÄÎÄ×Ö·¶Î§¡£
+        /// æ ¹æ®åŸå§‹MTextçš„ä½ç½®ã€Attachmentï¼Œ
+        /// ä½¿ç”¨é‡æ–°æµ‹é‡å‡ºæ¥çš„ç´§å‡‘å®½é«˜ï¼Œ
+        /// æ„é€ çœŸæ­£ç”¨äºQuickRevisionçš„æ–‡å­—èŒƒå›´ã€‚
         /// </summary>
         private static bool TryBuildTightMTextExtents(
             MText source,

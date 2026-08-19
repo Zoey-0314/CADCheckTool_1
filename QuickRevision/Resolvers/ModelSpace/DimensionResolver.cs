@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 using Correct_test1.QuickRevision.Models;
@@ -8,13 +8,13 @@ using System.Globalization;
 namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 {
     /// <summary>
-    /// Model Space Dimension½âÎöÆ÷¡£
+    /// Model Space Dimensionè§£æå™¨ã€‚
     ///
-    /// RotatedDimensionµÈDimension£¬
-    /// ÓÅÏÈÍ¨¹ıExplodeÈ¡µÃÕæÕıÏÔÊ¾µÄÎÄ×Ö¡£
+    /// RotatedDimensionç­‰Dimensionï¼Œ
+    /// ä¼˜å…ˆé€šè¿‡Explodeå–å¾—çœŸæ­£æ˜¾ç¤ºçš„æ–‡å­—ã€‚
     ///
-    /// ²»ÔÙÊ¹ÓÃÕû¸öDimension.GeometricExtents£¬
-    /// Ò²²»ÔÙÖ÷ÒªÒÀÀµTextPosition¹ÀËã¡£
+    /// ä¸å†ä½¿ç”¨æ•´ä¸ªDimension.GeometricExtentsï¼Œ
+    /// ä¹Ÿä¸å†ä¸»è¦ä¾èµ–TextPositionä¼°ç®—ã€‚
     /// </summary>
     public class DimensionResolver
     {
@@ -45,7 +45,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
             //--------------------------------
-            // ÓÅÏÈÕÒµ½³ß´çÊµ¼ÊÏÔÊ¾ÎÄ×Ö
+            // ä¼˜å…ˆæ‰¾åˆ°å°ºå¯¸å®é™…æ˜¾ç¤ºæ–‡å­—
             //--------------------------------
 
             string displayText;
@@ -125,9 +125,9 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
                     //--------------------------------
-                    // ¹Ø¼ü£º
+                    // å…³é”®ï¼š
                     //
-                    // É¾³ıÏß´©¹ıÊµ¼ÊÎÄ×Ö°üÎ§¿òÖĞĞÄ¡£
+                    // åˆ é™¤çº¿ç©¿è¿‡å®é™…æ–‡å­—åŒ…å›´æ¡†ä¸­å¿ƒã€‚
                     //--------------------------------
 
                     target.CenterY =
@@ -161,7 +161,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
             //--------------------------------
-            // ExplodeÊ§°ÜÊ±²ÅFallback
+            // Explodeå¤±è´¥æ—¶æ‰Fallback
             //--------------------------------
 
             return ResolveFallback(
@@ -258,13 +258,13 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
                             //--------------------------------
-                            // ¹Ø¼üĞŞ¸Ä£º
+                            // å…³é”®ä¿®æ”¹ï¼š
                             //
-                            // Table.Explode²úÉúµÄMText
-                            // ¿ÉÄÜÈÔ´øÓĞ½Ó½üÕû¸öCell¿í¶ÈµÄ
-                            // MText¶¨Òå¿í¶È¡£
+                            // Table.Explodeäº§ç”Ÿçš„MText
+                            // å¯èƒ½ä»å¸¦æœ‰æ¥è¿‘æ•´ä¸ªCellå®½åº¦çš„
+                            // MTextå®šä¹‰å®½åº¦ã€‚
                             //
-                            // ËùÒÔ²»ÄÜÊ¹ÓÃGeometricExtents¡£
+                            // æ‰€ä»¥ä¸èƒ½ä½¿ç”¨GeometricExtentsã€‚
                             //--------------------------------
 
                             if (!TextGeometryHelper
@@ -461,7 +461,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
             //--------------------------------
-            // Fallback²ÅÊ¹ÓÃ¹ÀËã¡£
+            // Fallbackæ‰ä½¿ç”¨ä¼°ç®—ã€‚
             //--------------------------------
 
             double textWidth =

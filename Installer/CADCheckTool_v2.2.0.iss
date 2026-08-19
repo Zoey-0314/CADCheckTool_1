@@ -1,4 +1,4 @@
-#define MyAppName "CADCheckTool"
+﻿#define MyAppName "CADCheckTool"
 #define MyAppVersion "2.2.0"
 #define MyAppPublisher "Zoey-0314"
 #define MyAppURL "https://github.com/Zoey-0314/CADCheckTool_1"

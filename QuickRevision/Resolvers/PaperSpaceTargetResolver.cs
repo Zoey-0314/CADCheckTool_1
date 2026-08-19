@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 using Correct_test1.QuickRevision.Models;
@@ -15,9 +15,9 @@ using TableCellResolver =
 namespace Correct_test1.QuickRevision.Resolvers
 {
     /// <summary>
-    /// Paper SpaceÄ¿±êÍ³Ò»½âÎöÆ÷¡£
+    /// Paper Spaceç›®æ ‡ç»Ÿä¸€è§£æå™¨ã€‚
     ///
-    /// Ö§³Ö£º
+    /// æ”¯æŒï¼š
     /// Table Cell
     /// DBText
     /// MText
@@ -126,13 +126,13 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
                 //--------------------------------
-                // Table£º
+                // Tableï¼š
                 //
-                // TableCellResolverÒÑ¾­¸ù¾İµã»÷µã
-                // ÕÒµ½ÁË×¼È·Cell¡£
+                // TableCellResolverå·²ç»æ ¹æ®ç‚¹å‡»ç‚¹
+                // æ‰¾åˆ°äº†å‡†ç¡®Cellã€‚
                 //
-                // ÕÒµ½ÒÔºóÖ±½Ó·µ»Ø£¬
-                // ²»½øĞĞµÚ¶ş´ÎÍ¨ÓÃ·¶Î§¹ıÂË¡£
+                // æ‰¾åˆ°ä»¥åç›´æ¥è¿”å›ï¼Œ
+                // ä¸è¿›è¡Œç¬¬äºŒæ¬¡é€šç”¨èŒƒå›´è¿‡æ»¤ã€‚
                 //--------------------------------
 
                 if (obj is Table)

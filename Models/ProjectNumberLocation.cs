@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.Geometry;
+ï»¿using Autodesk.AutoCAD.Geometry;
 
 namespace Correct_test1.Models
 {
@@ -19,7 +19,7 @@ namespace Correct_test1.Models
 
 
         /// <summary>
-        /// ÏîÄ¿ºÅÕæÕıËùÊôµÄLayout¡£
+        /// é¡¹ç›®å·çœŸæ­£æ‰€å±çš„Layoutã€‚
         /// </summary>
         public string LayoutName
         {

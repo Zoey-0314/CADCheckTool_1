@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 using Correct_test1.QuickRevision.Models;
@@ -8,25 +8,25 @@ using System;
 namespace Correct_test1.QuickRevision.Viewports
 {
     /// <summary>
-    /// ¸ù¾İPaper SpaceÖĞµÄµã»÷Î»ÖÃ£¬
-    /// ÕÒµ½ÓÃ»§µã»÷µÄViewport¡£
+    /// æ ¹æ®Paper Spaceä¸­çš„ç‚¹å‡»ä½ç½®ï¼Œ
+    /// æ‰¾åˆ°ç”¨æˆ·ç‚¹å‡»çš„Viewportã€‚
     ///
-    /// ÓÃ»§²»ĞèÒªË«»÷½øÈëViewport¡£
+    /// ç”¨æˆ·ä¸éœ€è¦åŒå‡»è¿›å…¥Viewportã€‚
     ///
-    /// µÚÒ»°æ£º
-    /// Ö»´¦ÀíÆÕÍ¨¾ØĞÎViewport¡£
-    /// Ôİ²»´¦Àí·Ç¾ØĞÎ²Ã¼ôViewport¡£
+    /// ç¬¬ä¸€ç‰ˆï¼š
+    /// åªå¤„ç†æ™®é€šçŸ©å½¢Viewportã€‚
+    /// æš‚ä¸å¤„ç†éçŸ©å½¢è£å‰ªViewportã€‚
     /// </summary>
     public class ViewportResolver
     {
         /// <summary>
-        /// ¸ù¾İPaper SpaceÖĞµÄµã»÷µã²éÕÒViewport¡£
+        /// æ ¹æ®Paper Spaceä¸­çš„ç‚¹å‡»ç‚¹æŸ¥æ‰¾Viewportã€‚
         ///
-        /// ÕÒµ½£º
-        /// ·µ»ØViewportContext¡£
+        /// æ‰¾åˆ°ï¼š
+        /// è¿”å›ViewportContextã€‚
         ///
-        /// Ã»ÕÒµ½£º
-        /// ·µ»Ønull¡£
+        /// æ²¡æ‰¾åˆ°ï¼š
+        /// è¿”å›nullã€‚
         /// </summary>
         public ViewportContext Resolve(
             Database database,
@@ -40,17 +40,17 @@ namespace Correct_test1.QuickRevision.Viewports
                 return null;
 
             //--------------------------------
-            // TILEMODE=true±íÊ¾µ±Ç°ÊÇÆÕÍ¨Model Space
+            // TILEMODE=trueè¡¨ç¤ºå½“å‰æ˜¯æ™®é€šModel Space
             //
-            // QuickRevision×îÖÕÒªÇó£º
-            // ÓÃ»§´ÓLayout/Paper SpaceÆô¶¯
+            // QuickRevisionæœ€ç»ˆè¦æ±‚ï¼š
+            // ç”¨æˆ·ä»Layout/Paper Spaceå¯åŠ¨
             //--------------------------------
 
             if (database.TileMode)
                 return null;
 
             //--------------------------------
-            // »ñÈ¡µ±Ç°Layout¶ÔÓ¦µÄPaper Space
+            // è·å–å½“å‰Layoutå¯¹åº”çš„Paper Space
             //--------------------------------
 
             ObjectId paperSpaceId =
@@ -73,11 +73,11 @@ namespace Correct_test1.QuickRevision.Viewports
                 return null;
 
             //--------------------------------
-            // Èç¹û´æÔÚÖØµşViewport£¬
-            // ÓÅÏÈÑ¡ÔñÃæ»ı×îĞ¡µÄÄÇ¸ö¡£
+            // å¦‚æœå­˜åœ¨é‡å Viewportï¼Œ
+            // ä¼˜å…ˆé€‰æ‹©é¢ç§¯æœ€å°çš„é‚£ä¸ªã€‚
             //
-            // ÕâÑùĞ¡ViewportÌ×ÔÚ´óViewportÀïÃæÊ±£¬
-            // µã»÷Ğ¡Viewport²»»áÎóÑ¡Íâ²ãµÄ´óViewport¡£
+            // è¿™æ ·å°Viewportå¥—åœ¨å¤§Viewporté‡Œé¢æ—¶ï¼Œ
+            // ç‚¹å‡»å°Viewportä¸ä¼šè¯¯é€‰å¤–å±‚çš„å¤§Viewportã€‚
             //--------------------------------
 
             ObjectId bestViewportId =
@@ -104,16 +104,16 @@ namespace Correct_test1.QuickRevision.Viewports
                     continue;
 
                 //--------------------------------
-                // Number 1ÊÇPaper Space×ÔÉíViewport
+                // Number 1æ˜¯Paper Spaceè‡ªèº«Viewport
                 //
-                // ÎÒÃÇÖ»Òª¸¡¶¯Viewport¡£
+                // æˆ‘ä»¬åªè¦æµ®åŠ¨Viewportã€‚
                 //--------------------------------
 
                 if (viewport.Number <= 1)
                     continue;
 
                 //--------------------------------
-                // Ìø¹ı¹Ø±ÕµÄViewport
+                // è·³è¿‡å…³é—­çš„Viewport
                 //--------------------------------
 
                 if (!viewport.On)
@@ -126,7 +126,7 @@ namespace Correct_test1.QuickRevision.Viewports
                 }
 
                 //--------------------------------
-                // ÅĞ¶Ïµã»÷µãÊÇ·ñÔÚViewport¾ØĞÎ·¶Î§ÄÚ
+                // åˆ¤æ–­ç‚¹å‡»ç‚¹æ˜¯å¦åœ¨ViewportçŸ©å½¢èŒƒå›´å†…
                 //--------------------------------
 
                 if (!ContainsPoint(
@@ -151,7 +151,7 @@ namespace Correct_test1.QuickRevision.Viewports
             }
 
             //--------------------------------
-            // Ã»ÓĞÕÒµ½Viewport
+            // æ²¡æœ‰æ‰¾åˆ°Viewport
             //--------------------------------
 
             if (bestViewportId.IsNull ||
@@ -161,7 +161,7 @@ namespace Correct_test1.QuickRevision.Viewports
             }
 
             //--------------------------------
-            // ÖØĞÂ¶ÁÈ¡×îÖÕÑ¡ÖĞµÄViewport
+            // é‡æ–°è¯»å–æœ€ç»ˆé€‰ä¸­çš„Viewport
             //--------------------------------
 
             Viewport selectedViewport =
@@ -174,7 +174,7 @@ namespace Correct_test1.QuickRevision.Viewports
                 return null;
 
             //--------------------------------
-            // ´´½¨ViewportContext
+            // åˆ›å»ºViewportContext
             //--------------------------------
 
             ViewportContext context =
@@ -218,8 +218,8 @@ namespace Correct_test1.QuickRevision.Viewports
 
 
         /// <summary>
-        /// ÅĞ¶ÏPaper SpaceÖĞµÄÒ»¸öµã
-        /// ÊÇ·ñÎ»ÓÚViewport¾ØĞÎ·¶Î§ÄÚ¡£
+        /// åˆ¤æ–­Paper Spaceä¸­çš„ä¸€ä¸ªç‚¹
+        /// æ˜¯å¦ä½äºViewportçŸ©å½¢èŒƒå›´å†…ã€‚
         /// </summary>
         private static bool ContainsPoint(
             Viewport viewport,
@@ -259,8 +259,8 @@ namespace Correct_test1.QuickRevision.Viewports
 
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°LayoutµÄPaper Space
-        /// BlockTableRecord ObjectId¡£
+        /// è·å–å½“å‰Layoutçš„Paper Space
+        /// BlockTableRecord ObjectIdã€‚
         /// </summary>
         private static ObjectId GetCurrentPaperSpaceId(
             Transaction transaction)

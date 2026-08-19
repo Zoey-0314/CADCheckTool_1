@@ -1,4 +1,4 @@
-namespace Correct_test1
+ï»¿namespace Correct_test1
 {
     partial class CheckSelectForm
     {
@@ -78,7 +78,7 @@ namespace Correct_test1
                 0;
 
             this.btnSingle.Text =
-                "µ¥ÕÅ¼ì²é";
+                "å•å¼ æ£€æŸ¥";
 
             this.btnSingle.UseVisualStyleBackColor =
                 true;
@@ -109,7 +109,7 @@ namespace Correct_test1
                 1;
 
             this.btnBatch.Text =
-                "ÅúÁ¿¼ì²é";
+                "æ‰¹é‡æ£€æŸ¥";
 
             this.btnBatch.UseVisualStyleBackColor =
                 true;
@@ -140,7 +140,7 @@ namespace Correct_test1
                 2;
 
             this.btnProjectVersion.Text =
-                "µ±Ç°Í¼Ö½°æ±¾ºÅÊäÈë";
+                "å½“å‰å›¾çº¸ç‰ˆæœ¬å·è¾“å…¥";
 
             this.btnProjectVersion.UseVisualStyleBackColor =
                 true;
@@ -170,7 +170,7 @@ namespace Correct_test1
                 3;
 
             this.btnBatchProjectVersion.Text =
-                "ÅúÁ¿°æ±¾ºÅÊäÈë";
+                "æ‰¹é‡ç‰ˆæœ¬å·è¾“å…¥";
 
             this.btnBatchProjectVersion.UseVisualStyleBackColor =
                 true;
@@ -200,7 +200,7 @@ namespace Correct_test1
                 4;
 
             this.btnPathSettings.Text =
-                "Â·¾¶ÉèÖÃ";
+                "è·¯å¾„è®¾ç½®";
 
             this.btnPathSettings.UseVisualStyleBackColor =
                 true;
@@ -242,7 +242,7 @@ namespace Correct_test1
                 5;
 
             this.lblTitle.Text =
-                "CAD¼ì²éÖúÊÖ";
+                "CADæ£€æŸ¥åŠ©æ‰‹";
 
 
             //==================================================
@@ -304,7 +304,7 @@ namespace Correct_test1
                     .CenterParent;
 
             this.Text =
-                "CAD¼ì²éÖúÊÖ";
+                "CADæ£€æŸ¥åŠ©æ‰‹";
 
 
             this.ResumeLayout(

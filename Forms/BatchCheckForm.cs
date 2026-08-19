@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -31,13 +31,13 @@ namespace Correct_test1
             {
                 DialogResult modeResult =
                     MessageBox.Show(
-                        "ÇëÑ¡ÔñÅúÁ¿¼ì²éÄ£Ê½£º\n\n"
-                        + "¡¾ÊÇ¡¿¼ì²é²¢ĞŞ¸Ä\n"
-                        + "×Ô¶¯ĞŞÕıÒ³Âë¡¢Ğ´Èë¼ì²é±ê¼Ç²¢±£´æDWG¡£\n\n"
-                        + "¡¾·ñ¡¿Ö»¼ì²é\n"
-                        + "Ö»Éú³ÉCSV±¨¸æ£¬²»ĞŞ¸ÄÈÎºÎDWG¡£\n\n"
-                        + "¡¾È¡Ïû¡¿ÍË³ö",
-                        "ÅúÁ¿¼ì²éÄ£Ê½",
+                        "è¯·é€‰æ‹©æ‰¹é‡æ£€æŸ¥æ¨¡å¼ï¼š\n\n"
+                        + "ã€æ˜¯ã€‘æ£€æŸ¥å¹¶ä¿®æ”¹\n"
+                        + "è‡ªåŠ¨ä¿®æ­£é¡µç ã€å†™å…¥æ£€æŸ¥æ ‡è®°å¹¶ä¿å­˜DWGã€‚\n\n"
+                        + "ã€å¦ã€‘åªæ£€æŸ¥\n"
+                        + "åªç”ŸæˆCSVæŠ¥å‘Šï¼Œä¸ä¿®æ”¹ä»»ä½•DWGã€‚\n\n"
+                        + "ã€å–æ¶ˆã€‘é€€å‡º",
+                        "æ‰¹é‡æ£€æŸ¥æ¨¡å¼",
                         MessageBoxButtons.YesNoCancel,
                         MessageBoxIcon.Question);
 
@@ -62,7 +62,7 @@ namespace Correct_test1
                         new FolderBrowserDialog())
                 {
                     dialog.Description =
-                        "ÇëÑ¡ÔñĞèÒªÅúÁ¿¼ì²éµÄDWGÎÄ¼ş¼Ğ";
+                        "è¯·é€‰æ‹©éœ€è¦æ‰¹é‡æ£€æŸ¥çš„DWGæ–‡ä»¶å¤¹";
 
 
                     if (dialog.ShowDialog()
@@ -83,8 +83,8 @@ namespace Correct_test1
                     if (doc == null)
                     {
                         MessageBox.Show(
-                            "µ±Ç°Ã»ÓĞÓĞĞ§µÄAutoCADËŞÖ÷Í¼Ö½¡£",
-                            "ÅúÁ¿¼ì²é");
+                            "å½“å‰æ²¡æœ‰æœ‰æ•ˆçš„AutoCADå®¿ä¸»å›¾çº¸ã€‚",
+                            "æ‰¹é‡æ£€æŸ¥");
 
                         return;
                     }
@@ -95,8 +95,8 @@ namespace Correct_test1
                             mode))
                     {
                         MessageBox.Show(
-                            "ÒÑÓĞÅúÁ¿¼ì²éÕıÔÚµÈ´ı»òÔËĞĞ£¬ÇëÎğÖØ¸´Æô¶¯¡£",
-                            "ÅúÁ¿¼ì²é");
+                            "å·²æœ‰æ‰¹é‡æ£€æŸ¥æ­£åœ¨ç­‰å¾…æˆ–è¿è¡Œï¼Œè¯·å‹¿é‡å¤å¯åŠ¨ã€‚",
+                            "æ‰¹é‡æ£€æŸ¥");
 
                         return;
                     }
@@ -104,9 +104,9 @@ namespace Correct_test1
 
                     try
                     {
-                        // Modeless°´Å¥Ö»¸ºÔğÅÅ¶Ó¡£
-                        // ÕæÕıÅúÁ¿¼ì²éÓÉSessionÃüÁîÖ´ĞĞ£¬
-                        // ±ÜÃâÔÚmodeless»Øµ÷ÀïÖ±½ÓÇĞ»»/´ò¿ªDocument¡£
+                        // ModelessæŒ‰é’®åªè´Ÿè´£æ’é˜Ÿã€‚
+                        // çœŸæ­£æ‰¹é‡æ£€æŸ¥ç”±Sessionå‘½ä»¤æ‰§è¡Œï¼Œ
+                        // é¿å…åœ¨modelesså›è°ƒé‡Œç›´æ¥åˆ‡æ¢/æ‰“å¼€Documentã€‚
                         doc.SendStringToExecute(
                             "CADCHECKBATCHRUN ",
                             true,
@@ -127,7 +127,7 @@ namespace Correct_test1
             {
                 MessageBox.Show(
                     ex.Message,
-                    "ÅúÁ¿¼ì²éÆô¶¯Ê§°Ü");
+                    "æ‰¹é‡æ£€æŸ¥å¯åŠ¨å¤±è´¥");
             }
         }
 
@@ -153,15 +153,15 @@ namespace Correct_test1
                 else
                 {
                     MessageBox.Show(
-                        "ÔİÎŞÅúÁ¿¼ì²é±¨¸æ",
-                        "CAD¼ì²éÖúÊÖ");
+                        "æš‚æ— æ‰¹é‡æ£€æŸ¥æŠ¥å‘Š",
+                        "CADæ£€æŸ¥åŠ©æ‰‹");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
                     ex.Message,
-                    "´ò¿ª±¨¸æÊ§°Ü");
+                    "æ‰“å¼€æŠ¥å‘Šå¤±è´¥");
             }
         }
 
@@ -183,7 +183,7 @@ namespace Correct_test1
                 if (doc == null)
                 {
                     MessageBox.Show(
-                        "µ±Ç°Ã»ÓĞ´ò¿ªCADÍ¼Ö½");
+                        "å½“å‰æ²¡æœ‰æ‰“å¼€CADå›¾çº¸");
 
                     return;
                 }
@@ -212,13 +212,13 @@ namespace Correct_test1
 
 
                 MessageBox.Show(
-                    "µ±Ç°Í¼Ö½ĞŞ¸Ä×¢ÊÍÒÑÇå³ı");
+                    "å½“å‰å›¾çº¸ä¿®æ”¹æ³¨é‡Šå·²æ¸…é™¤");
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
                     ex.Message,
-                    "Çå³ıÊ§°Ü");
+                    "æ¸…é™¤å¤±è´¥");
             }
         }
 
@@ -237,7 +237,7 @@ namespace Correct_test1
                         new FolderBrowserDialog())
                 {
                     dialog.Description =
-                        "ÇëÑ¡ÔñĞèÒªÇå³ıĞŞ¸Ä×¢ÊÍµÄDWGÎÄ¼ş¼Ğ";
+                        "è¯·é€‰æ‹©éœ€è¦æ¸…é™¤ä¿®æ”¹æ³¨é‡Šçš„DWGæ–‡ä»¶å¤¹";
 
 
                     if (dialog.ShowDialog()
@@ -290,17 +290,17 @@ namespace Correct_test1
 
 
                     MessageBox.Show(
-                        "Çå³ıÍê³É\n\n"
-                        + "´¦ÀíÎÄ¼şÊıÁ¿£º"
+                        "æ¸…é™¤å®Œæˆ\n\n"
+                        + "å¤„ç†æ–‡ä»¶æ•°é‡ï¼š"
                         + result.Count,
-                        "ÅúÁ¿Çå³ı");
+                        "æ‰¹é‡æ¸…é™¤");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
                     ex.Message,
-                    "ÅúÁ¿Çå³ıÊ§°Ü");
+                    "æ‰¹é‡æ¸…é™¤å¤±è´¥");
             }
             finally
             {

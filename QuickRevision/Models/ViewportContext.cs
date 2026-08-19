@@ -1,22 +1,22 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 namespace Correct_test1.QuickRevision.Models
 {
     /// <summary>
-    /// ÃèÊöÒ»´ÎViewportµã»÷ËùĞèÒªµÄÉÏÏÂÎÄ¡£
+    /// æè¿°ä¸€æ¬¡Viewportç‚¹å‡»æ‰€éœ€è¦çš„ä¸Šä¸‹æ–‡ã€‚
     ///
-    /// ÓÃ»§Ê¼ÖÕÔÚPaper Spaceµã»÷£¬
-    /// ²»ÒªÇóÓÃ»§Ë«»÷½øÈëViewport¡£
+    /// ç”¨æˆ·å§‹ç»ˆåœ¨Paper Spaceç‚¹å‡»ï¼Œ
+    /// ä¸è¦æ±‚ç”¨æˆ·åŒå‡»è¿›å…¥Viewportã€‚
     ///
-    /// ViewportResolverÕÒµ½ViewportÖ®ºó£¬
-    /// Ê¹ÓÃ¸ÃÄ£ĞÍ°ÑViewportÏà¹ØĞÅÏ¢´«¸ø
-    /// ViewportCoordinateConverter¡£
+    /// ViewportResolveræ‰¾åˆ°Viewportä¹‹åï¼Œ
+    /// ä½¿ç”¨è¯¥æ¨¡å‹æŠŠViewportç›¸å…³ä¿¡æ¯ä¼ ç»™
+    /// ViewportCoordinateConverterã€‚
     /// </summary>
     public class ViewportContext
     {
         /// <summary>
-        /// Viewport¶ÔÏóObjectId¡£
+        /// Viewportå¯¹è±¡ObjectIdã€‚
         /// </summary>
         public ObjectId ViewportId
         {
@@ -26,10 +26,10 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// Viewport±àºÅ¡£
+        /// Viewportç¼–å·ã€‚
         ///
-        /// Í¨³£²¼¾Ö¿Õ¼ä±¾ÉíÎª1£¬
-        /// ¸¡¶¯ViewportÍ¨³£Îª2¼°ÒÔÉÏ¡£
+        /// é€šå¸¸å¸ƒå±€ç©ºé—´æœ¬èº«ä¸º1ï¼Œ
+        /// æµ®åŠ¨Viewporté€šå¸¸ä¸º2åŠä»¥ä¸Šã€‚
         /// </summary>
         public int ViewportNumber
         {
@@ -39,7 +39,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ÓÃ»§ÔÚPaper SpaceÖĞµã»÷µÄÎ»ÖÃ¡£
+        /// ç”¨æˆ·åœ¨Paper Spaceä¸­ç‚¹å‡»çš„ä½ç½®ã€‚
         /// </summary>
         public Point3d PaperPoint
         {
@@ -49,10 +49,10 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// Paper Spaceµã»÷µã×ª»»µ½
-        /// Model SpaceºóµÄ×ø±ê¡£
+        /// Paper Spaceç‚¹å‡»ç‚¹è½¬æ¢åˆ°
+        /// Model Spaceåçš„åæ ‡ã€‚
         ///
-        /// ÓÉViewportCoordinateConverter¸ºÔğ¼ÆËã¡£
+        /// ç”±ViewportCoordinateConverterè´Ÿè´£è®¡ç®—ã€‚
         /// </summary>
         public Point3d ModelPoint
         {
@@ -62,7 +62,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ViewportÔÚPaper SpaceÖĞµÄÖĞĞÄµã¡£
+        /// Viewportåœ¨Paper Spaceä¸­çš„ä¸­å¿ƒç‚¹ã€‚
         /// </summary>
         public Point3d CenterPoint
         {
@@ -72,7 +72,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ViewportÔÚPaper SpaceÖĞµÄ¿í¶È¡£
+        /// Viewportåœ¨Paper Spaceä¸­çš„å®½åº¦ã€‚
         /// </summary>
         public double Width
         {
@@ -82,7 +82,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ViewportÔÚPaper SpaceÖĞµÄ¸ß¶È¡£
+        /// Viewportåœ¨Paper Spaceä¸­çš„é«˜åº¦ã€‚
         /// </summary>
         public double Height
         {
@@ -92,7 +92,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ViewportËõ·Å±ÈÀı¡£
+        /// Viewportç¼©æ”¾æ¯”ä¾‹ã€‚
         /// </summary>
         public double CustomScale
         {
@@ -102,9 +102,9 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ViewportËù¿´µ½Model SpaceÇøÓòµÄÖĞĞÄ¡£
+        /// Viewportæ‰€çœ‹åˆ°Model SpaceåŒºåŸŸçš„ä¸­å¿ƒã€‚
         ///
-        /// ViewCenterÊ¹ÓÃ¶şÎ¬×ø±ê¡£
+        /// ViewCenterä½¿ç”¨äºŒç»´åæ ‡ã€‚
         /// </summary>
         public Point2d ViewCenter
         {
@@ -114,7 +114,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// Viewport¹Û²ìÄ¿±êµã¡£
+        /// Viewportè§‚å¯Ÿç›®æ ‡ç‚¹ã€‚
         /// </summary>
         public Point3d ViewTarget
         {
@@ -124,11 +124,11 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// Viewport¹Û²ì·½Ïò¡£
+        /// Viewportè§‚å¯Ÿæ–¹å‘ã€‚
         ///
-        /// µÚÒ»°æÖ÷ÒªÕë¶ÔÆÕÍ¨¶şÎ¬»úĞµÍ¼£¬
-        /// µ«Õâ¸ö×Ö¶Î±£ÁôÏÂÀ´£¬
-        /// ±ÜÃâÒÔºóÖØĞÂ¸ÄÄ£ĞÍ¡£
+        /// ç¬¬ä¸€ç‰ˆä¸»è¦é’ˆå¯¹æ™®é€šäºŒç»´æœºæ¢°å›¾ï¼Œ
+        /// ä½†è¿™ä¸ªå­—æ®µä¿ç•™ä¸‹æ¥ï¼Œ
+        /// é¿å…ä»¥åé‡æ–°æ”¹æ¨¡å‹ã€‚
         /// </summary>
         public Vector3d ViewDirection
         {
@@ -138,10 +138,10 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ViewportÊÓÍ¼Å¤×ª½Ç¡£
+        /// Viewportè§†å›¾æ‰­è½¬è§’ã€‚
         ///
-        /// µ±Ç°µÚÒ»°æ²»¿¼ÂÇĞı×ªViewport£¬
-        /// µ«ÌáÇ°±£´æÕâ¸öÊôĞÔ¡£
+        /// å½“å‰ç¬¬ä¸€ç‰ˆä¸è€ƒè™‘æ—‹è½¬Viewportï¼Œ
+        /// ä½†æå‰ä¿å­˜è¿™ä¸ªå±æ€§ã€‚
         /// </summary>
         public double TwistAngle
         {
@@ -151,7 +151,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// µ±Ç°µã»÷µãÊÇ·ñÎ»ÓÚ¸ÃViewport¾ØĞÎ·¶Î§ÄÚ¡£
+        /// å½“å‰ç‚¹å‡»ç‚¹æ˜¯å¦ä½äºè¯¥ViewportçŸ©å½¢èŒƒå›´å†…ã€‚
         /// </summary>
         public bool ContainsPaperPoint()
         {
@@ -182,7 +182,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// ÅĞ¶ÏViewportContextÊÇ·ñ¾ß±¸»ù±¾ÓĞĞ§Êı¾İ¡£
+        /// åˆ¤æ–­ViewportContextæ˜¯å¦å…·å¤‡åŸºæœ¬æœ‰æ•ˆæ•°æ®ã€‚
         /// </summary>
         public bool IsValid()
         {

@@ -1,13 +1,13 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 
 using Correct_test1.QuickRevision.Models;
 
 namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 {
     /// <summary>
-    /// ½âÎöModel SpaceÖĞµÄDBText¡£
+    /// è§£æModel Spaceä¸­çš„DBTextã€‚
     ///
-    /// µ±Ç°µÚÒ»°æÖ»´¦ÀíË®Æ½ÎÄ×Ö¡£
+    /// å½“å‰ç¬¬ä¸€ç‰ˆåªå¤„ç†æ°´å¹³æ–‡å­—ã€‚
     /// </summary>
     public class DbTextResolver
     {

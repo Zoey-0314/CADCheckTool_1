@@ -1,13 +1,13 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 
 using Correct_test1.QuickRevision.Models;
 
 namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 {
     /// <summary>
-    /// Paper Space MText½âÎöÆ÷¡£
+    /// Paper Space MTextè§£æå™¨ã€‚
     ///
-    /// Ê¹ÓÃÊµ¼ÊÏÔÊ¾ÎÄ×Ö·¶Î§¡£
+    /// ä½¿ç”¨å®é™…æ˜¾ç¤ºæ–‡å­—èŒƒå›´ã€‚
     /// </summary>
     public class MTextResolver
     {

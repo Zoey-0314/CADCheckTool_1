@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Core;
 using Correct_test1.Models;
@@ -33,7 +33,7 @@ namespace Correct_test1.Markers
             if (!IsValidPoint(info.Position))
             {
                 AppLogger.Info(
-                    "Ìø¹ıStandardPartMarker£º×ø±êÎŞĞ§",
+                    "è·³è¿‡StandardPartMarkerï¼šåæ ‡æ— æ•ˆ",
                     "StandardPartMarker");
 
                 return;
@@ -85,8 +85,8 @@ namespace Correct_test1.Markers
                     text,
                     true);
 
-                // Ö»ÔÚµ÷ÓÃ·½Ã÷È·ÒªÇóÊ±£¬
-                // ÔÙÏòÓÒÒÆ¶¯Ò»¸öÌáÊ¾ÎÄ×ÖµÄÊµ¼Ê¿í¶È¡£
+                // åªåœ¨è°ƒç”¨æ–¹æ˜ç¡®è¦æ±‚æ—¶ï¼Œ
+                // å†å‘å³ç§»åŠ¨ä¸€ä¸ªæç¤ºæ–‡å­—çš„å®é™…å®½åº¦ã€‚
                 if (moveRightByOwnWidth)
                 {
                     double textWidth =

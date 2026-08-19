@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 using Correct_test1.QuickRevision.Models;
@@ -16,22 +16,22 @@ using DimensionResolver =
 namespace Correct_test1.QuickRevision.Resolvers
 {
     /// <summary>
-    /// ViewportÄ¿±ê½âÎöÆ÷¡£
+    /// Viewportç›®æ ‡è§£æå™¨ã€‚
     ///
-    /// ÓÃ»§Ê¼ÖÕÔÚPaper Spaceµã»÷£¬
-    /// ²»ĞèÒªË«»÷½øÈëViewport¡£
+    /// ç”¨æˆ·å§‹ç»ˆåœ¨Paper Spaceç‚¹å‡»ï¼Œ
+    /// ä¸éœ€è¦åŒå‡»è¿›å…¥Viewportã€‚
     ///
-    /// Á÷³Ì£º
+    /// æµç¨‹ï¼š
     ///
-    /// Paperµã»÷
-    /// ¡ı
-    /// ÕÒµ½Viewport
-    /// ¡ı
-    /// Paper×ø±ê×ª»»ÎªModel×ø±ê
-    /// ¡ı
-    /// ÔÚModel SpaceÑ°ÕÒÄ¿±ê
+    /// Paperç‚¹å‡»
+    /// â†“
+    /// æ‰¾åˆ°Viewport
+    /// â†“
+    /// Paperåæ ‡è½¬æ¢ä¸ºModelåæ ‡
+    /// â†“
+    /// åœ¨Model Spaceå¯»æ‰¾ç›®æ ‡
     ///
-    /// Ö§³Ö£º
+    /// æ”¯æŒï¼š
     /// DBText
     /// MText
     /// Dimension
@@ -74,8 +74,8 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
         /// <summary>
-        /// ¸ù¾İPaper SpaceÖĞµÄµã»÷Î»ÖÃ£¬
-        /// ³¢ÊÔ½âÎöViewportÄÚµÄModel SpaceÄ¿±ê¡£
+        /// æ ¹æ®Paper Spaceä¸­çš„ç‚¹å‡»ä½ç½®ï¼Œ
+        /// å°è¯•è§£æViewportå†…çš„Model Spaceç›®æ ‡ã€‚
         /// </summary>
         public RevisionTarget Resolve(
             Database database,
@@ -94,8 +94,8 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
             //--------------------------------
-            // µÚÒ»²½£º
-            // ÕÒµ½µã»÷Î»ÖÃËùÔÚµÄViewport
+            // ç¬¬ä¸€æ­¥ï¼š
+            // æ‰¾åˆ°ç‚¹å‡»ä½ç½®æ‰€åœ¨çš„Viewport
             //--------------------------------
 
             ViewportContext viewportContext =
@@ -114,8 +114,8 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
             //--------------------------------
-            // µÚ¶ş²½£º
-            // Paper×ø±ê ¡ú Model×ø±ê
+            // ç¬¬äºŒæ­¥ï¼š
+            // Paperåæ ‡ â†’ Modelåæ ‡
             //--------------------------------
 
             Point3d modelPoint;
@@ -137,8 +137,8 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
             //--------------------------------
-            // µÚÈı²½£º
-            // »ñÈ¡Model Space
+            // ç¬¬ä¸‰æ­¥ï¼š
+            // è·å–Model Space
             //--------------------------------
 
             ObjectId modelSpaceId;
@@ -175,7 +175,7 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
             //--------------------------------
-            // ÕÒµã»÷Î»ÖÃ×î½üµÄÄ¿±ê
+            // æ‰¾ç‚¹å‡»ä½ç½®æœ€è¿‘çš„ç›®æ ‡
             //--------------------------------
 
             RevisionTarget bestTarget =
@@ -224,7 +224,7 @@ namespace Correct_test1.QuickRevision.Resolvers
                 //--------------------------------
                 // Dimension
                 //
-                // RotatedDimensionÒ²ÊôÓÚÕâÀï¡£
+                // RotatedDimensionä¹Ÿå±äºè¿™é‡Œã€‚
                 //--------------------------------
 
                 if (obj is Dimension)
@@ -273,7 +273,7 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
                 //--------------------------------
-                // µã»÷Î»ÖÃÊÇ·ñ½Ó½üÕâ¸öÄ¿±ê
+                // ç‚¹å‡»ä½ç½®æ˜¯å¦æ¥è¿‘è¿™ä¸ªç›®æ ‡
                 //--------------------------------
 
                 if (!IsPointNearTarget(
@@ -307,8 +307,8 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
         /// <summary>
-        /// ÅĞ¶ÏModel Spaceµã»÷Î»ÖÃ
-        /// ÊÇ·ñ½Ó½üÄ¿±êÎÄ×ÖÇøÓò¡£
+        /// åˆ¤æ–­Model Spaceç‚¹å‡»ä½ç½®
+        /// æ˜¯å¦æ¥è¿‘ç›®æ ‡æ–‡å­—åŒºåŸŸã€‚
         /// </summary>
         private static bool IsPointNearTarget(
     RevisionTarget target,
@@ -341,15 +341,15 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
             //--------------------------------
-            // ÒÔÇ°ÊÇ£º
+            // ä»¥å‰æ˜¯ï¼š
             //
             // visualHeight * 0.75
             //
-            // ¶ÔÓÚ1¡¢2ÕâÖÖ¿¿µÃºÜ½üµÄĞòºÅ£¬
-            // µã»÷ÇøÓòÌ«´ó£¬
-            // Á½¸öÄ¿±êÈİÒ×»¥Ïà¸²¸Ç¡£
+            // å¯¹äº1ã€2è¿™ç§é å¾—å¾ˆè¿‘çš„åºå·ï¼Œ
+            // ç‚¹å‡»åŒºåŸŸå¤ªå¤§ï¼Œ
+            // ä¸¤ä¸ªç›®æ ‡å®¹æ˜“äº’ç›¸è¦†ç›–ã€‚
             //
-            // ÏÖÔÚËõĞ¡µ½30%¡£
+            // ç°åœ¨ç¼©å°åˆ°30%ã€‚
             //--------------------------------
 
             double tolerance =
@@ -358,10 +358,10 @@ namespace Correct_test1.QuickRevision.Resolvers
 
 
             //--------------------------------
-            // ²»ÔÙÊ¹ÓÃ¹Ì¶¨0.5×÷Îª×îĞ¡Öµ¡£
+            // ä¸å†ä½¿ç”¨å›ºå®š0.5ä½œä¸ºæœ€å°å€¼ã€‚
             //
-            // ÒòÎª²»Í¬Í¼Ö½µ¥Î»±ÈÀı²îÒìºÜ´ó£¬
-            // ¹Ì¶¨0.5¿ÉÄÜÔ¶´óÓÚÒ»¸öĞ¡ĞòºÅ¡£
+            // å› ä¸ºä¸åŒå›¾çº¸å•ä½æ¯”ä¾‹å·®å¼‚å¾ˆå¤§ï¼Œ
+            // å›ºå®š0.5å¯èƒ½è¿œå¤§äºä¸€ä¸ªå°åºå·ã€‚
             //--------------------------------
 
             double minimumTolerance =
