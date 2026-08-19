@@ -7,9 +7,7 @@ namespace Correct_test1.QuickRevision.Writers
 {
     /// <summary>
     /// 创建快速划改删除线。
-    ///
-    /// 第一版只处理水平删除线。
-    ///
+    /// 仅处理水平删除线。
     /// 删除线严格按照RevisionTarget
     /// 的真实文字左右范围创建，
     /// 不额外延长。
@@ -33,9 +31,7 @@ namespace Correct_test1.QuickRevision.Writers
                 return ObjectId.Null;
 
 
-            //--------------------------------
             // QuickRevision红色专用图层
-            //--------------------------------
 
             ObjectId layerId =
                 RevisionEntityHelper
@@ -57,9 +53,7 @@ namespace Correct_test1.QuickRevision.Writers
                     transaction);
 
 
-            //--------------------------------
             // 获取写入空间
-            //--------------------------------
 
             BlockTableRecord targetSpace =
                 transaction.GetObject(
@@ -72,11 +66,9 @@ namespace Correct_test1.QuickRevision.Writers
                 return ObjectId.Null;
 
 
-            //--------------------------------
             // 不再增加margin。
             //
             // Resolver已经提供实际文字范围。
-            //--------------------------------
 
             double startX =
                 target.LeftX;
@@ -93,9 +85,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 删除线穿过文字中心
-            //--------------------------------
 
             Point3d startPoint =
                 new Point3d(
@@ -134,9 +124,7 @@ namespace Correct_test1.QuickRevision.Writers
                     database);
 
 
-                //--------------------------------
                 // 图层 + 红色
-                //--------------------------------
 
                 RevisionEntityHelper
                     .ApplyRevisionAppearance(
@@ -144,9 +132,7 @@ namespace Correct_test1.QuickRevision.Writers
                         layerId);
 
 
-                //--------------------------------
                 // XData
-                //--------------------------------
 
                 RevisionEntityHelper
                     .ApplyXData(

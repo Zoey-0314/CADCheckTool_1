@@ -57,9 +57,7 @@
             this.SuspendLayout();
 
 
-            //==================================================
             // btnSingle
-            //==================================================
 
             this.btnSingle.Location =
                 new System.Drawing.Point(
@@ -88,9 +86,7 @@
                     this.btnSingle_Click);
 
 
-            //==================================================
             // btnBatch
-            //==================================================
 
             this.btnBatch.Location =
                 new System.Drawing.Point(
@@ -119,9 +115,7 @@
                     this.btnBatch_Click);
 
 
-            //==================================================
             // btnProjectVersion
-            //==================================================
 
             this.btnProjectVersion.Location =
                 new System.Drawing.Point(
@@ -149,9 +143,7 @@
                 new System.EventHandler(
                     this.btnProjectVersion_Click);
 
-            //==================================================
             // btnBatchProjectVersion
-            //==================================================
 
             this.btnBatchProjectVersion.Location =
                 new System.Drawing.Point(
@@ -179,9 +171,7 @@
                 new System.EventHandler(
                     this.btnBatchProjectVersion_Click);
 
-            //==================================================
             // btnPathSettings
-            //==================================================
 
             this.btnPathSettings.Location =
                 new System.Drawing.Point(
@@ -210,9 +200,7 @@
                     this.btnPathSettings_Click);
 
 
-            //==================================================
             // lblTitle
-            //==================================================
 
             this.lblTitle.AutoSize =
                 true;
@@ -245,9 +233,7 @@
                 "CAD检查助手";
 
 
-            //==================================================
             // CheckSelectForm
-            //==================================================
 
             this.AutoScaleDimensions =
                 new System.Drawing.SizeF(

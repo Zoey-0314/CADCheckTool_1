@@ -27,9 +27,7 @@ namespace Correct_test1
     int percent,
     string fileName)
         {
-            //--------------------------------
-            // 原有调用保持原样
-            //--------------------------------
+            // 保持调用顺序
 
             UpdateProgress(
                 percent,
@@ -74,9 +72,7 @@ namespace Correct_test1
 
             Application.DoEvents();
         }
-        //==================================================
         // 批量版本号输入
-        //==================================================
 
         private void btnBatchProjectVersion_Click(
             object sender,
@@ -84,10 +80,8 @@ namespace Correct_test1
         {
             try
             {
-                //--------------------------------
                 // 第一步：
                 // 选择文件夹
-                //--------------------------------
 
                 using (
                     FolderBrowserDialog folderDialog =
@@ -108,9 +102,7 @@ namespace Correct_test1
                         folderDialog.SelectedPath;
 
 
-                    //--------------------------------
                     // 检查DWG数量
-                    //--------------------------------
 
                     string[] files =
                         Directory.GetFiles(
@@ -129,10 +121,8 @@ namespace Correct_test1
                     }
 
 
-                    //--------------------------------
                     // 第二步：
                     // 输入一次完整版本号
-                    //--------------------------------
 
                     using (
                         ProjectVersionInputForm inputForm =
@@ -153,10 +143,8 @@ namespace Correct_test1
                             inputForm.ProjectVersionText;
 
 
-                        //--------------------------------
                         // 第三步：
                         // 最终确认
-                        //--------------------------------
 
                         DialogResult confirm =
                             MessageBox.Show(
@@ -182,10 +170,8 @@ namespace Correct_test1
                         }
 
 
-                        //--------------------------------
                         // 第四步：
                         // 打开现有批量进度窗口
-                        //--------------------------------
 
                         BatchProgressForm progressForm =
                             new BatchProgressForm();
@@ -219,9 +205,7 @@ namespace Correct_test1
                                         });
 
 
-                            //--------------------------------
                             // 汇总结果
-                            //--------------------------------
 
                             int successFiles = 0;
                             int failedFiles = 0;

@@ -13,10 +13,8 @@ namespace Correct_test1.Checks
     {
         /// <summary>
         /// 检查一个BOM。
-        ///
         /// 只返回：
         /// 在归档目录中不存在的NS非标件。
-        ///
         /// 已存在的不返回结果。
         /// </summary>
         public List<NonStandardArchiveCheckResult>
@@ -36,11 +34,9 @@ namespace Correct_test1.Checks
             }
 
 
-            //--------------------------------
             // 归档目录不可用：
             //
             // 不把任何NS误判为不存在。
-            //--------------------------------
 
             if (archiveIndex == null ||
                 !archiveIndex.IsAvailable)
@@ -57,11 +53,9 @@ namespace Correct_test1.Checks
                     continue;
 
 
-                //--------------------------------
                 // 直接复用现有NS分类器。
                 //
                 // 不重新写StartsWith("NS")规则。
-                //--------------------------------
 
                 if (PartNumberTypeClassifier
                         .Classify(
@@ -73,19 +67,15 @@ namespace Correct_test1.Checks
                 }
 
 
-                //--------------------------------
                 // 得到归档搜索关键字
-                //--------------------------------
 
                 string searchKey =
                     BuildSearchKey(
                         item.PartNumber);
 
 
-                //--------------------------------
                 // 无效NS图号不参与搜索，
                 // 防止出现只剩"NS"然后大范围误匹配。
-                //--------------------------------
 
                 if (string.IsNullOrWhiteSpace(
                         searchKey))
@@ -94,9 +84,7 @@ namespace Correct_test1.Checks
                 }
 
 
-                //--------------------------------
                 // 在内存索引中查找
-                //--------------------------------
 
                 string matchedFilePath;
 
@@ -107,24 +95,20 @@ namespace Correct_test1.Checks
                         out matchedFilePath);
 
 
-                //--------------------------------
                 // 找到了：
                 //
                 // 正常，不生成任何结果。
-                //--------------------------------
 
                 if (exists)
                     continue;
 
 
-                //--------------------------------
                 // 没找到：
                 //
                 // 后续这个结果会：
                 //
                 // 1. 单张检查标记
                 // 2. 批量检查加入报表
-                //--------------------------------
 
                 NonStandardArchiveCheckResult result =
                     new NonStandardArchiveCheckResult();
@@ -168,18 +152,13 @@ namespace Correct_test1.Checks
 
         /// <summary>
         /// 将BOM中的NS件号转换为归档搜索关键字。
-        ///
         /// 规则：
-        ///
         /// NS452J101
         /// -> NS452J
-        ///
         /// NS452CA123
         /// -> NS452CA
-        ///
         /// NS452CA
         /// -> NS452CA
-        ///
         /// 只删除末尾连续数字。
         /// 中间数字保持不变。
         /// </summary>
@@ -193,9 +172,7 @@ namespace Correct_test1.Checks
             }
 
 
-            //--------------------------------
             // 使用现有CAD文字清洗能力。
-            //--------------------------------
 
             string value =
                 CadTextCleaner.Clean(
@@ -213,9 +190,7 @@ namespace Correct_test1.Checks
                 value.Trim();
 
 
-            //--------------------------------
             // 必须是真正的NS非标件
-            //--------------------------------
 
             if (PartNumberTypeClassifier
                     .Classify(
@@ -227,23 +202,19 @@ namespace Correct_test1.Checks
             }
 
 
-            //--------------------------------
             // 从字符串最后开始，
             // 删除连续数字。
-            //--------------------------------
 
             int endIndex =
                 value.Length;
 
 
-            //--------------------------------
             // 从末尾开始过滤：
             //
             // 1. 数字
             // 2. 下划线
             //
             // 可以连续、混合出现。
-            //--------------------------------
 
             while (endIndex > 0)
             {
@@ -270,7 +241,6 @@ namespace Correct_test1.Checks
                 .Trim();
 
 
-            //--------------------------------
             // 防止：
             //
             // NS123
@@ -278,7 +248,6 @@ namespace Correct_test1.Checks
             //
             // 这种错误数据导致搜索整个归档中
             // 所有包含NS的文件。
-            //--------------------------------
 
             if (result.Length <= 2 ||
                 string.Equals(

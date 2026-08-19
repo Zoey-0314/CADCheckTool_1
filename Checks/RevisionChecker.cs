@@ -12,16 +12,13 @@ namespace Correct_test1.Checks
 
         /// <summary>
         /// 修改记录完整性检查
-        ///
         /// 规则：
         /// 1. Mark 有值
         /// 2. Description 有值
         /// 才认为是一条有效修改记录
-        ///
         /// 检查：
         /// Date
         /// Signer
-        ///
         /// 不检查：
         /// RevisionNumber
         /// </summary>
@@ -59,9 +56,7 @@ namespace Correct_test1.Checks
                     continue;
                 }
 
-                //=========================
                 // 检查日期
-                //=========================
 
                 if (
                     string.IsNullOrWhiteSpace(
@@ -79,9 +74,7 @@ namespace Correct_test1.Checks
 
                 }
 
-                //=========================
                 // 检查签名
-                //=========================
 
                 if (
                     string.IsNullOrWhiteSpace(

@@ -9,10 +9,8 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 {
     /// <summary>
     /// Model Space Dimension解析器。
-    ///
     /// RotatedDimension等Dimension，
     /// 优先通过Explode取得真正显示的文字。
-    ///
     /// 不再使用整个Dimension.GeometricExtents，
     /// 也不再主要依赖TextPosition估算。
     /// </summary>
@@ -44,9 +42,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                 return null;
 
 
-            //--------------------------------
             // 优先找到尺寸实际显示文字
-            //--------------------------------
 
             string displayText;
 
@@ -124,11 +120,9 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                         topY;
 
 
-                    //--------------------------------
                     // 关键：
                     //
                     // 删除线穿过实际文字包围框中心。
-                    //--------------------------------
 
                     target.CenterY =
                         (
@@ -160,9 +154,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
             }
 
 
-            //--------------------------------
             // Explode失败时才Fallback
-            //--------------------------------
 
             return ResolveFallback(
                 database,
@@ -241,9 +233,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                         ObjectId.Null;
 
 
-                    //--------------------------------
                     // MText
-                    //--------------------------------
 
                     MText mtext =
      obj as MText;
@@ -257,7 +247,6 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                                     mtext.Text);
 
 
-                            //--------------------------------
                             // 关键修改：
                             //
                             // Table.Explode产生的MText
@@ -265,7 +254,6 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                             // MText定义宽度。
                             //
                             // 所以不能使用GeometricExtents。
-                            //--------------------------------
 
                             if (!TextGeometryHelper
                                     .TryGetMTextExtents(
@@ -290,9 +278,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                     }
                     else
                     {
-                        //--------------------------------
                         // DBText
-                        //--------------------------------
 
                         DBText dbText =
                             obj as DBText;
@@ -460,9 +446,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
             }
 
 
-            //--------------------------------
             // Fallback才使用估算。
-            //--------------------------------
 
             double textWidth =
                 EstimateTextWidth(

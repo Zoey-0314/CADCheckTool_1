@@ -8,10 +8,10 @@
         // 文件名
         public string FileName { get; set; }
 
-        // 新增：布局名称
+        // 布局名称
         public string LayoutName { get; set; }
 
-        // 新增：修改记录标记
+        // 修改记录标记
         public string Mark { get; set; }
 
         // 检查类型

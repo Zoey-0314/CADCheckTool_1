@@ -6,8 +6,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 {
     /// <summary>
     /// 解析Paper Space中的DBText。
-    ///
-    /// 第一版只处理水平文字。
+    /// 仅处理水平文字。
     /// </summary>
     public class DbTextResolver
     {
@@ -84,7 +83,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             target.Text =
                 content;
 
-            //--------------------------------
             // 重要：
             //
             // PaperSpace不直接使用
@@ -92,7 +90,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             //
             // 直接使用原文字所属空间，
             // 后续Writer就一定写回同一个Layout。
-            //--------------------------------
 
             target.TargetSpaceId =
                 text.OwnerId;

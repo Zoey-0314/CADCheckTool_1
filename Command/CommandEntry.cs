@@ -110,13 +110,11 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 批量检查必须从Session命令执行。
         //
         // 这样需要打开Mechanical图纸时，
         // Document切换发生在AutoCAD正式Session上下文，
         // 而不是modeless WinForms按钮回调里。
-        //==================================================
 
         [CommandMethod(
     "CADCHECKBATCHRUN",

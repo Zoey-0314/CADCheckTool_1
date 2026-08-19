@@ -42,9 +42,7 @@
             this.SuspendLayout();
 
 
-            //==================================================
             // lblPrompt
-            //==================================================
 
             this.lblPrompt.AutoSize =
                 true;
@@ -69,9 +67,7 @@
                 "请输入完整项目号及版本号：";
 
 
-            //==================================================
             // lblExample
-            //==================================================
 
             this.lblExample.AutoSize =
                 true;
@@ -96,9 +92,7 @@
                 "例如：N2604US001-L0";
 
 
-            //==================================================
             // txtProjectVersion
-            //==================================================
 
             this.txtProjectVersion.Location =
                 new System.Drawing.Point(
@@ -117,9 +111,7 @@
                 2;
 
 
-            //==================================================
             // btnOk
-            //==================================================
 
             this.btnOk.Location =
                 new System.Drawing.Point(
@@ -148,9 +140,7 @@
                     this.btnOk_Click);
 
 
-            //==================================================
             // btnCancel
-            //==================================================
 
             this.btnCancel.DialogResult =
                 System.Windows.Forms.DialogResult.Cancel;
@@ -182,9 +172,7 @@
                     this.btnCancel_Click);
 
 
-            //==================================================
             // ProjectVersionInputForm
-            //==================================================
 
             this.AcceptButton =
                 this.btnOk;

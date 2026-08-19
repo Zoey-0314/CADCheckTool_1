@@ -10,7 +10,6 @@ namespace Correct_test1.QuickRevision.Commands
     {
         /// <summary>
         /// 单次快速划改。
-        /// 保留作为测试命令。
         /// </summary>
         [CommandMethod(
             "QREV",
@@ -48,7 +47,6 @@ namespace Correct_test1.QuickRevision.Commands
 
         /// <summary>
         /// 连续快速划改模式。
-        ///
         /// 连续修改多个位置，
         /// Esc退出。
         /// </summary>

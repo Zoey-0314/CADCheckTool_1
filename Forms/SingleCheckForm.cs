@@ -20,20 +20,15 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 快速划改
-        //==================================================
 
         /// <summary>
         /// 进入连续快速划改模式。
-        ///
         /// 点击一次按钮后：
-        ///
         /// 选择目标
         /// → 输入
         /// → 完成
         /// → 自动继续选择下一处
-        ///
         /// Esc退出。
         /// </summary>
         private void btnQuickRevision_Click(
@@ -56,9 +51,7 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 已经处于快速划改模式
-                //--------------------------------
 
                 if (IsQuickRevisionRunning())
                 {
@@ -72,9 +65,7 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 不随便取消用户正在执行的其他命令
-                //--------------------------------
 
                 if (IsAnyCadCommandRunning())
                 {
@@ -87,10 +78,8 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 在AutoCAD命令上下文中
                 // 正式启动连续划改模式
-                //--------------------------------
 
                 doc.SendStringToExecute(
                     "QREVMODE ",
@@ -109,7 +98,6 @@ namespace Correct_test1
 
         /// <summary>
         /// 只清除QuickRevision生成内容。
-        ///
         /// 不影响：
         /// CADCHECK_MARKER
         /// 检查标记
@@ -136,12 +124,10 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 如果此时正处于QREVMODE：
                 //
                 // 先退出连续划改，
                 // 然后执行QREVCLEAR。
-                //--------------------------------
 
                 if (IsQuickRevisionRunning())
                 {
@@ -155,9 +141,7 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 不取消其他不相关CAD命令
-                //--------------------------------
 
                 if (IsAnyCadCommandRunning())
                 {
@@ -170,9 +154,7 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 通过正式AutoCAD命令清除
-                //--------------------------------
 
                 doc.SendStringToExecute(
                     "QREVCLEAR ",
@@ -189,9 +171,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
-        // 原有单张检查
-        //==================================================
+        // 单张检查
 
         private void btnCheck_Click(
     object sender,
@@ -212,10 +192,8 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // report必须声明在using外面，
                 // 因为检查完成后的提示也要使用它。
-                //--------------------------------
 
                 CheckReport report = null;
 
@@ -241,14 +219,12 @@ namespace Correct_test1
                         new CheckService();
 
 
-                    //--------------------------------
                     // 执行所有检查
                     //
                     // 包括：
                     // 标准件
                     // BOM序号
                     // 非标归档
-                    //--------------------------------
 
                     report =
                         checkService.Check(
@@ -270,36 +246,27 @@ namespace Correct_test1
                         new MarkerManager();
 
 
-                    //--------------------------------
-                    // 原有标准件标记
-                    //--------------------------------
+                    // 标准件标记
 
                     markerManager.CreateMarkers(
                         doc.Database,
                         report.Results);
 
 
-                    //--------------------------------
-                    // 新增：
                     // NS非标件归档缺失标记
-                    //--------------------------------
 
                     markerManager
                         .CreateNonStandardArchiveMarkers(
                             doc.Database,
                             report.NonStandardArchiveResults);
 
-                    //--------------------------------
-                    // 新增：非标件号检查标记
-                    //--------------------------------
+                    // 非标件号检查标记
 
                     markerManager
                         .CreateNonStandardPartNumberMarkers(
                             doc.Database,
                             report.NonStandardPartNumberResults);
-                    //--------------------------------
-                    // 新增：版本号最新版本提示
-                    //--------------------------------
+                    // 版本号最新版本提示
 
                     markerManager
                         .CreateVersionMarkers(
@@ -307,10 +274,7 @@ namespace Correct_test1
                             report.VersionCheckResults);
 
 
-                    //--------------------------------
-                    // 原有：
                     // BOM有，但图中没有的序号
-                    //--------------------------------
 
                     markerManager
                         .CreateMissingCalloutMarkers(
@@ -320,10 +284,7 @@ namespace Correct_test1
                                 .MissingIssues);
 
 
-                    //--------------------------------
-                    // 原有：
                     // 图中有，但BOM没有的序号
-                    //--------------------------------
 
                     markerManager
                         .CreateExtraCalloutMarkers(
@@ -334,20 +295,16 @@ namespace Correct_test1
                 }
 
 
-                //--------------------------------
                 // 正常完成提示
-                //--------------------------------
 
                 string completeMessage =
                     "检查完成，详细问题已标注在图纸中。";
 
 
-                //--------------------------------
                 // Z盘不可用时：
                 //
                 // 不把NS件误报成“归档不存在”，
                 // 但明确告诉用户这一项没有检查。
-                //--------------------------------
 
                 if (report != null &&
                     !report.NonStandardArchiveAvailable)
@@ -364,9 +321,7 @@ namespace Correct_test1
                             + report.NonStandardArchiveError;
                     }
                 }
-                //--------------------------------
                 // 版本归档不可用提示
-                //--------------------------------
 
                 if (report != null &&
                     !report.VersionArchiveAvailable)
@@ -398,9 +353,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
-        // 原有清除检查标记
-        //==================================================
+        // 清除检查标记
 
         private void btnClear_Click(
             object sender,
@@ -464,9 +417,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 关闭
-        //==================================================
 
         private void btnClose_Click(
             object sender,
@@ -495,12 +446,10 @@ namespace Correct_test1
                     return;
 
 
-                //--------------------------------
                 // 只有QREVMODE正在运行时
                 // 才发送取消。
                 //
                 // 不影响其他CAD命令。
-                //--------------------------------
 
                 if (IsQuickRevisionRunning())
                 {
@@ -517,9 +466,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // AutoCAD状态辅助方法
-        //==================================================
 
         private static Document GetActiveDocument()
         {

@@ -181,12 +181,10 @@ namespace Correct_test1.VersionCheck.Core
                 AppPathConfig.Current;
 
 
-            //--------------------------------
             // 两套路径完全相同：
             //
             // 直接使用已有归档扫描结果。
             // 不再访问一遍Z盘。
-            //--------------------------------
 
             if (PathsEqual(
                     settings.VersionArchivePath,
@@ -214,10 +212,8 @@ namespace Correct_test1.VersionCheck.Core
             }
 
 
-            //--------------------------------
             // 路径不同：
             // 单独建立版本归档索引
-            //--------------------------------
 
             return
                 VersionArchiveIndex.Build(

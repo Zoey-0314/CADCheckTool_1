@@ -18,27 +18,19 @@
         /// </summary>
         public string Mark { get; set; }
 
-        //========================
         // 标记坐标
-        //========================
         public double MarkX { get; set; }
         public double MarkY { get; set; }
 
-        //========================
         // 更改内容坐标
-        //========================
         public double DescriptionX { get; set; }
         public double DescriptionY { get; set; }
 
-        //========================
         // 更改日期坐标
-        //========================
         public double DateX { get; set; }
         public double DateY { get; set; }
 
-        //========================
         // 签名坐标
-        //========================
         public double SignerX { get; set; }
         public double SignerY { get; set; }
 

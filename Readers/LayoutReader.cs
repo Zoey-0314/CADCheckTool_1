@@ -157,32 +157,7 @@ namespace Correct_test1.Readers
                     {
                         continue;
                     }
-                    if (number == 6)
-                    {
-                        Autodesk.AutoCAD.ApplicationServices.Document document =
-                            Autodesk.AutoCAD.ApplicationServices.Application
-                                .DocumentManager
-                                .MdiActiveDocument;
-
-                        if (document != null)
-                        {
-                            document.Editor.WriteMessage(
-                                "\n[BOM6] 实际判断坐标：X="
-                                + text.X.ToString("0.0000")
-                                + "，Y="
-                                + text.Y.ToString("0.0000")
-                                + "，ViewportId="
-                                + (text.ViewportId.IsNull
-                                    ? "Null"
-                                    : text.ViewportId.Handle.ToString())
-                                + "，同视口线数量="
-                                + (viewportLines == null
-                                    ? "Null"
-                                    : viewportLines.Count.ToString()));
-                        }
-                    }
-
-                    // >=100 保留原有判断逻辑
+                    // >=100 的序号直接确认
                     if (number >= 100)
                     {
                         result.Add(number);
@@ -195,7 +170,7 @@ namespace Correct_test1.Readers
                         continue;
                     }
 
-                    // 1~99 保留原有焊接符号判断逻辑
+                    // 1~99 排除焊接符号
                     bool isWelding =
                         viewportLines != null &&
                         IsWeldingCandidateByRange(

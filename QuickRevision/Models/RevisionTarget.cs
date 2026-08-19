@@ -4,14 +4,11 @@ namespace Correct_test1.QuickRevision.Models
 {
     /// <summary>
     /// QuickRevision统一目标模型。
-    ///
     /// 无论原始对象是：
-    ///
     /// DBText
     /// MText
     /// Dimension
     /// TableCell
-    ///
     /// 最终统一转换为RevisionTarget。
     /// </summary>
     public class RevisionTarget
@@ -28,9 +25,7 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 原始对象类型。
-        ///
         /// 例如：
-        ///
         /// DBText
         /// MText
         /// RotatedDimension
@@ -44,8 +39,7 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// 用户原来看到的内容。
-        ///
+        /// 用户修改前看到的内容。
         /// NS项目号判断也使用这个原始内容，
         /// 而不是用户输入的新内容。
         /// </summary>
@@ -57,11 +51,9 @@ namespace Correct_test1.QuickRevision.Models
 
 
         /// <summary>
-        /// 快速划改新增实体应该写入的空间。
-        ///
+        /// 快速划改新实体应该写入的空间。
         /// PaperSpace目标：
         /// 对应Layout BlockTableRecord。
-        ///
         /// Viewport目标：
         /// ModelSpace。
         /// </summary>
@@ -114,7 +106,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 原文字中心Y。
-        ///
         /// StrikeLineWriter目前使用这个值
         /// 创建水平删除线。
         /// </summary>
@@ -127,7 +118,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 原文字高度。
-        ///
         /// ReplacementTextWriter和以后
         /// ProjectNumberWriter都会尽量继承这个高度。
         /// </summary>
@@ -164,7 +154,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 来自Viewport时保存对应Viewport。
-        ///
         /// PaperSpace对象保持ObjectId.Null。
         /// </summary>
         public ObjectId ViewportId
@@ -176,7 +165,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 原文字样式。
-        ///
         /// 能读取到时保存，
         /// 新文字尽量继承。
         /// </summary>
@@ -189,10 +177,8 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// Table专属上下文。
-        ///
         /// 普通DBText/MText/Dimension：
         /// null
-        ///
         /// TableCell：
         /// 保存Table、行列、表格右边界等信息。
         /// </summary>
@@ -219,11 +205,9 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 当前目标是否满足：
-        ///
         /// TableCell
         /// +
         /// 原内容NS开头
-        ///
         /// 后续Service直接使用这个属性判断
         /// 是否需要自动生成项目号。
         /// </summary>

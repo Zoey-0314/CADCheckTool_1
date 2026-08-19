@@ -12,10 +12,8 @@ namespace Correct_test1.Readers
     {
 
 
-        //====================================================
         // 横版坐标
         // 左五列 + 右五列
-        //====================================================
 
         private readonly double[] HorizontalXLines =
         {
@@ -44,9 +42,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 竖版坐标
-        //====================================================
 
         private readonly double[] VerticalXLines =
         {
@@ -67,9 +63,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 横版入口
-        //====================================================
 
         public List<RevisionLocation> ReadHorizontalLocations(
             string layoutName,
@@ -88,9 +82,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 竖版入口
-        //====================================================
 
         public List<RevisionLocation> ReadVerticalLocations(
             string layoutName,
@@ -109,9 +101,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 核心读取
-        //====================================================
 
         private List<RevisionLocation> ReadLocations(
             string layoutName,
@@ -298,9 +288,7 @@ namespace Correct_test1.Readers
 
 
 
-                //========================
                 // 日期
-                //========================
 
                 TitleText date =
                     FindSameRowText(
@@ -346,9 +334,7 @@ namespace Correct_test1.Readers
 
 
 
-                //========================
                 // 签名
-                //========================
 
                 TitleText signer =
                     FindSameRowText(
@@ -393,9 +379,7 @@ namespace Correct_test1.Readers
 
 
 
-                //========================
                 // 更改内容
-                //========================
 
 
                 TitleText desc =
@@ -456,9 +440,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 查找同一行指定列文字
-        //====================================================
 
         private TitleText FindSameRowText(
             List<TitleText> texts,
@@ -486,9 +468,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 根据X判断列
-        //====================================================
 
         private int GetColumn(
             double x,
@@ -520,9 +500,7 @@ namespace Correct_test1.Readers
 
 
 
-        //====================================================
         // 判断是否标记数字
-        //====================================================
 
         private bool IsNumber(
             string text)

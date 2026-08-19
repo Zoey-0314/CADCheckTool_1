@@ -7,15 +7,13 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 {
     /// <summary>
     /// Paper Space中的Table单元格解析器。
-    ///
     /// 目标：
     /// 1. 根据点击位置找到具体Cell
     /// 2. 读取Cell文字
     /// 3. 优先通过Table.Explode()找到实际显示文字
     /// 4. 获取真实文字位置、宽度、高度、样式
     /// 5. 支持左/中/右对齐
-    ///
-    /// 第一版仍只处理水平Table。
+    /// 当前仅处理水平Table。
     /// </summary>
     public class TableCellResolver
     {
@@ -43,9 +41,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 return null;
 
 
-            //--------------------------------
             // 找到点击的具体Cell
-            //--------------------------------
 
             int row;
             int column;
@@ -76,9 +72,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     column];
 
 
-            //--------------------------------
             // 读取Cell文字
-            //--------------------------------
 
             string content;
 
@@ -100,7 +94,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 优先：
             //
             // Explode整个Table，
@@ -109,7 +102,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             //
             // 这样左对齐、居中、右对齐
             // 都不需要我们自己猜。
-            //--------------------------------
 
             Extents3d realTextExtents;
 
@@ -180,10 +172,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // Explode没有得到实际文字时，
             // 再使用Cell自身属性Fallback。
-            //--------------------------------
 
             RevisionTarget fallbackTarget =
     CreateFallbackTarget(
@@ -276,9 +266,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                         ObjectId.Null;
 
 
-                    //--------------------------------
                     // MText
-                    //--------------------------------
 
                     MText mtext =
     obj as MText;
@@ -300,7 +288,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                                 mtext.TextStyleId;
 
 
-                            //--------------------------------
                             // BOM的Table.Explode出来的MText
                             // 可能仍然保留整个Cell的定义宽度。
                             //
@@ -309,7 +296,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                             //
                             // 用Cell真正的文字expectedText，
                             // 按实际字高和样式重新测量紧凑宽度。
-                            //--------------------------------
 
                             double actualTextWidth;
 
@@ -330,9 +316,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                             }
 
 
-                            //--------------------------------
                             // 高度仍然取原MText真实显示高度
-                            //--------------------------------
 
                             double actualTextHeight =
                                 mtext.ActualHeight;
@@ -347,11 +331,9 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                             }
 
 
-                            //--------------------------------
                             // 不再拿原MText的宽度，
                             // 只利用它的Location和Attachment
                             // 确定文字实际放置位置。
-                            //--------------------------------
 
                             if (!TryBuildTightMTextExtents(
                                     mtext,
@@ -369,9 +351,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     }
                     else
                     {
-                        //--------------------------------
                         // DBText
-                        //--------------------------------
 
                         DBText dbText =
                             obj as DBText;
@@ -417,9 +397,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     }
 
 
-                    //--------------------------------
                     // 文字中心必须位于当前Cell中。
-                    //--------------------------------
 
                     Point3d center =
                         GetCenter(
@@ -437,9 +415,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     }
 
 
-                    //--------------------------------
                     // 优先匹配Cell真实内容。
-                    //--------------------------------
 
                     bool exactText =
                         string.Equals(
@@ -448,10 +424,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                             System.StringComparison.Ordinal);
 
 
-                    //--------------------------------
                     // 已经找到完全匹配文字后，
                     // 不再接受不匹配文字。
-                    //--------------------------------
 
                     if (foundExactText &&
                         !exactText)
@@ -460,10 +434,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     }
 
 
-                    //--------------------------------
                     // 第一次找到完全匹配：
-                    // 清掉之前非完全匹配的距离优势。
-                    //--------------------------------
+                    // 清掉非完全匹配的距离优势。
 
                     if (exactText &&
                         !foundExactText)
@@ -514,10 +486,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
             finally
             {
-                //--------------------------------
                 // Explode出来的是临时DBObject，
                 // 没有加入Database，全部释放。
-                //--------------------------------
 
                 foreach (DBObject obj
                     in exploded)
@@ -535,7 +505,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
         /// <summary>
         /// 给TableCell的RevisionTarget附加表格上下文。
-        ///
         /// 保存：
         /// TableId
         /// Row
@@ -543,7 +512,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
         /// Table最右边X
         /// 当前行上下边界
         /// 当前行中心Y
-        ///
         /// 后续ProjectNumberWriter直接使用这些信息，
         /// 不再重新分析Table。
         /// </summary>
@@ -576,10 +544,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     out rowTopY);
 
 
-            //--------------------------------
             // 如果整行几何读取失败，
             // 至少使用当前选中Cell的上下范围。
-            //--------------------------------
 
             if (!gotGeometry)
             {
@@ -590,9 +556,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     selectedCellTop;
 
 
-                //--------------------------------
                 // 再尝试只获取Table最右边界
-                //--------------------------------
 
                 if (!TryGetTableRightX(
                         table,
@@ -652,11 +616,9 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
         }
         /// <summary>
         /// 获取：
-        ///
         /// 1. 整张Table最右侧X
         /// 2. 指定Row最下侧Y
         /// 3. 指定Row最上侧Y
-        ///
         /// 直接复用已经验证正常的Cell.GetExtents()逻辑。
         /// </summary>
         private static bool TryGetTableAndRowGeometry(
@@ -691,12 +653,10 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 false;
 
 
-            //--------------------------------
             // 遍历所有Cell：
             //
             // 所有行负责找到Table最右边
             // 目标行负责找到Row上下边界
-            //--------------------------------
 
             for (int r = 0;
                 r < table.Rows.Count;
@@ -727,9 +687,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                         continue;
 
 
-                    //--------------------------------
                     // 整张表最右侧
-                    //--------------------------------
 
                     if (right >
                         tableRightX)
@@ -743,9 +701,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                         true;
 
 
-                    //--------------------------------
                     // 当前目标行
-                    //--------------------------------
 
                     if (r ==
                         targetRow)
@@ -848,7 +804,6 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
         }
         /// <summary>
         /// Explode失败后的Fallback。
-        ///
         /// 此时读取Cell真实：
         /// TextHeight
         /// TextStyleId
@@ -882,9 +837,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 实际文字高度
-            //--------------------------------
 
             double textHeight =
                 GetCellTextHeight(
@@ -892,18 +845,14 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     cellHeight);
 
 
-            //--------------------------------
             // 实际文字样式
-            //--------------------------------
 
             ObjectId textStyleId =
                 GetCellTextStyleId(
                     cell);
 
 
-            //--------------------------------
             // 测量文字宽度
-            //--------------------------------
 
             double textWidth;
 
@@ -932,9 +881,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 防止异常超过整个单元格
-            //--------------------------------
 
             double maxWidth =
                 cellWidth * 0.98;
@@ -947,9 +894,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 获取Cell对齐方式
-            //--------------------------------
 
             string alignmentName =
                 "";
@@ -966,9 +911,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 少量边缘留白
-            //--------------------------------
 
             double horizontalPadding =
                 textHeight * 0.35;
@@ -977,9 +920,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 textHeight * 0.20;
 
 
-            //--------------------------------
             // 水平方向
-            //--------------------------------
 
             double textLeft;
             double textRight;
@@ -1028,9 +969,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 垂直方向
-            //--------------------------------
 
             double textBottom;
             double textTop;
@@ -1079,9 +1018,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // 限制在Cell范围内
-            //--------------------------------
 
             if (textLeft < cellLeft)
                 textLeft = cellLeft;
@@ -1178,9 +1115,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 topY;
 
 
-            //-------
             // 删除线
-            //-------
 
             target.CenterY =
                 (
@@ -1235,10 +1170,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
             }
 
 
-            //--------------------------------
             // Cell自身没有明确设置字高时，
             // 才使用Fallback。
-            //--------------------------------
 
             double fallback =
                 cellHeight * 0.60;
@@ -1450,11 +1383,9 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
         /// <summary>
         /// 专门给BOM测量“真实字符串宽度”。
-        ///
         /// 关键：
         /// MText.Width = 0
-        ///
-        /// Width为0以后不使用Table原来的
+        /// Width为0以后不使用Table 的
         /// 整个Cell文本框宽度，而是让文字按内容展开。
         /// </summary>
         private static bool TryMeasureTightTextWidth(
@@ -1508,10 +1439,8 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                     }
 
 
-                    //--------------------------------
                     // 关闭固定宽度，
                     // 让MText按照实际内容计算宽度。
-                    //--------------------------------
 
                     temp.Width =
                         0.0;
@@ -1525,17 +1454,13 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                         Point3d.Origin;
 
 
-                    //--------------------------------
                     // 优先实际文字宽度
-                    //--------------------------------
 
                     width =
                         temp.ActualWidth;
 
 
-                    //--------------------------------
                     // ActualWidth无效时Fallback
-                    //--------------------------------
 
                     if (!IsValidNumber(width) ||
                         width <= 0)
@@ -1603,9 +1528,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 
                 switch (source.Attachment)
                 {
-                    //--------------------------------
                     // Top
-                    //--------------------------------
 
                     case AttachmentPoint.TopLeft:
 
@@ -1665,9 +1588,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                         break;
 
 
-                    //--------------------------------
                     // Middle
-                    //--------------------------------
 
                     case AttachmentPoint.MiddleLeft:
 
@@ -1730,9 +1651,7 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                         break;
 
 
-                    //--------------------------------
                     // Bottom
-                    //--------------------------------
 
                     case AttachmentPoint.BottomLeft:
 

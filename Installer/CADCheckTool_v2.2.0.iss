@@ -13,10 +13,11 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}/issues
 AppUpdatesURL={#MyAppURL}/releases
-DefaultDirName={autopf}\Autodesk\ApplicationPlugins\CADCheckTool.bundle
+DefaultDirName={code:GetDefaultDirName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog commandline
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\artifacts\release
@@ -39,12 +40,39 @@ MinVersion=10.0.17763
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[InstallDelete]
+Type: filesandordirs; Name: "{app}\Contents"
+Type: filesandordirs; Name: "{app}\Docs"
+Type: files; Name: "{app}\PackageContents.xml"
+
 [Files]
 Source: "..\artifacts\bundle\CADCheckTool.bundle\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Code]
 const
   DotNet48Release = 528040;
+
+function GetDefaultDirName(Param: String): String;
+begin
+  if IsAdminInstallMode then
+  begin
+    Result := ExpandConstant(
+      '{autopf}\Autodesk\ApplicationPlugins\CADCheckTool.bundle');
+  end
+  else
+  begin
+    Result := ExpandConstant(
+      '{userappdata}\Autodesk\ApplicationPlugins\CADCheckTool.bundle');
+  end;
+end;
+
+function GetInstallModeName: String;
+begin
+  if IsAdminInstallMode then
+    Result := '所有用户'
+  else
+    Result := '当前用户';
+end;
 
 function IsDotNet48Installed: Boolean;
 var
@@ -134,13 +162,16 @@ begin
     HKCU32,
     'SOFTWARE\Autodesk\AutoCAD');
 
-  RemoveLegacyRegistrationRecursive(
-    HKLM64,
-    'SOFTWARE\Autodesk\AutoCAD');
+  if IsAdminInstallMode then
+  begin
+    RemoveLegacyRegistrationRecursive(
+      HKLM64,
+      'SOFTWARE\Autodesk\AutoCAD');
 
-  RemoveLegacyRegistrationRecursive(
-    HKLM32,
-    'SOFTWARE\Autodesk\AutoCAD');
+    RemoveLegacyRegistrationRecursive(
+      HKLM32,
+      'SOFTWARE\Autodesk\AutoCAD');
+  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -153,9 +184,11 @@ begin
   if CurStep = ssPostInstall then
   begin
     MsgBox(
-      'CADCheckTool v2.2.0 安装完成。' + #13#10 + #13#10 +
-      '请重新启动 AutoCAD 2024。插件会自动加载，无需 NETLOAD，也无需手动修改注册表。' + #13#10 +
-      '进入 AutoCAD 后输入 CHECKDRAWING 即可使用。',
+      'CADCheckTool v2.2.0 已为' + GetInstallModeName + '安装完成。' +
+      #13#10 + #13#10 +
+      '安装位置：' + ExpandConstant('{app}') + #13#10 +
+      '请重新启动 AutoCAD 2024。插件会自动加载，无需 NETLOAD，也无需手动修改注册表。' +
+      #13#10 + '进入 AutoCAD 后输入 CHECKDRAWING 即可使用。',
       mbInformation,
       MB_OK);
   end;

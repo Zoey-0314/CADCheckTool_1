@@ -7,12 +7,9 @@ namespace Correct_test1.QuickRevision.Resolvers
 {
     /// <summary>
     /// QuickRevision目标解析总入口。
-    ///
     /// 本类只负责调度：
-    ///
     /// 1. 先尝试Paper Space
     /// 2. 再尝试Viewport / Model Space
-    ///
     /// 不负责具体CAD对象解析。
     /// </summary>
     public class RevisionTargetResolver
@@ -50,16 +47,13 @@ namespace Correct_test1.QuickRevision.Resolvers
             }
 
 
-            //--------------------------------
-            // QuickRevision第一版：
+            // QuickRevision：
             // 只从Layout中启动。
-            //--------------------------------
 
             if (database.TileMode)
                 return null;
 
 
-            //--------------------------------
             // 第一优先级：
             // Paper Space
             //
@@ -67,7 +61,6 @@ namespace Correct_test1.QuickRevision.Resolvers
             // BOM Table
             // Paper DBText
             // Paper MText
-            //--------------------------------
 
             RevisionTarget paperTarget =
                 _paperSpaceResolver.Resolve(
@@ -82,7 +75,6 @@ namespace Correct_test1.QuickRevision.Resolvers
             }
 
 
-            //--------------------------------
             // 第二优先级：
             // Viewport中的Model Space
             //
@@ -90,7 +82,6 @@ namespace Correct_test1.QuickRevision.Resolvers
             // Dimension
             // MText
             // DBText
-            //--------------------------------
 
             RevisionTarget viewportTarget =
                 _viewportResolver.Resolve(
@@ -105,9 +96,7 @@ namespace Correct_test1.QuickRevision.Resolvers
             }
 
 
-            //--------------------------------
             // 都没有识别到
-            //--------------------------------
 
             return null;
         }

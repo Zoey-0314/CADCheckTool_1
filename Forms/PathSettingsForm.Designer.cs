@@ -66,9 +66,7 @@
             this.SuspendLayout();
 
 
-            //==================================================
             // 非标归档
-            //==================================================
 
             this.lblArchive.AutoSize =
                 true;
@@ -111,9 +109,7 @@
                     this.btnBrowseArchive_Click);
 
 
-            //==================================================
             // 标准件数据库
-            //==================================================
 
             this.lblStandardPart.AutoSize =
                 true;
@@ -156,9 +152,7 @@
                     this.btnBrowseStandardPart_Click);
 
 
-            //==================================================
             // 版本归档
-            //==================================================
 
             this.lblVersionArchive.AutoSize =
                 true;
@@ -201,9 +195,7 @@
                     this.btnBrowseVersionArchive_Click);
 
 
-            //==================================================
             // 按钮
-            //==================================================
 
             this.btnDefault.Location =
                 new System.Drawing.Point(
@@ -259,9 +251,7 @@
                     this.btnCancel_Click);
 
 
-            //==================================================
             // Form
-            //==================================================
 
             this.AutoScaleDimensions =
                 new System.Drawing.SizeF(

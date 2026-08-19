@@ -7,15 +7,13 @@ namespace Correct_test1.QuickRevision.Writers
 {
     /// <summary>
     /// 创建快速划改后的新文字。
-    ///
     /// 特点：
-    ///
     /// 1. 原对象不修改
     /// 2. 新文字位于原文字右侧
     /// 3. 尽量使用原文字实际高度
     /// 4. 尽量继承原文字样式
     /// 5. 统一红色
-    /// 6. 第一版只创建水平文字
+    /// 6. 只创建水平文字
     /// </summary>
     public class ReplacementTextWriter
     {
@@ -48,9 +46,7 @@ namespace Correct_test1.QuickRevision.Writers
                 replacementText.Trim();
 
 
-            //--------------------------------
             // 红色QuickRevision图层
-            //--------------------------------
 
             ObjectId layerId =
                 RevisionEntityHelper
@@ -72,9 +68,7 @@ namespace Correct_test1.QuickRevision.Writers
                     transaction);
 
 
-            //--------------------------------
             // 获取写入空间
-            //--------------------------------
 
             BlockTableRecord targetSpace =
                 transaction.GetObject(
@@ -87,27 +81,21 @@ namespace Correct_test1.QuickRevision.Writers
                 return ObjectId.Null;
 
 
-            //--------------------------------
             // 直接使用Resolver取得的实际字高。
-            //--------------------------------
 
             double textHeight =
                 GetTextHeight(
                     target);
 
 
-            //--------------------------------
             // 新旧内容之间留适当间距。
-            //--------------------------------
 
             double gap =
                 textHeight *
                 0.60;
 
 
-            //--------------------------------
             // 新文字左侧中心点
-            //--------------------------------
 
             Point3d location =
                 new Point3d(
@@ -140,25 +128,19 @@ namespace Correct_test1.QuickRevision.Writers
                     database);
 
 
-                //--------------------------------
                 // 内容
-                //--------------------------------
 
                 text.Contents =
                     replacementText;
 
 
-                //--------------------------------
                 // 原始真实字高
-                //--------------------------------
 
                 text.TextHeight =
                     textHeight;
 
 
-                //--------------------------------
                 // Location对应文字左侧中点
-                //--------------------------------
 
                 text.Attachment =
                     AttachmentPoint.MiddleLeft;
@@ -168,26 +150,20 @@ namespace Correct_test1.QuickRevision.Writers
                     location;
 
 
-                //--------------------------------
-                // 第一版水平
-                //--------------------------------
+                // 水平
 
                 text.Rotation =
                     0.0;
 
 
-                //--------------------------------
                 // 尽量继承原文字样式
-                //--------------------------------
 
                 ApplyTextStyle(
                     text,
                     target);
 
 
-                //--------------------------------
                 // 红色 + 专用图层
-                //--------------------------------
 
                 RevisionEntityHelper
                     .ApplyRevisionAppearance(
@@ -195,9 +171,7 @@ namespace Correct_test1.QuickRevision.Writers
                         layerId);
 
 
-                //--------------------------------
                 // XData
-                //--------------------------------
 
                 RevisionEntityHelper
                     .ApplyXData(
@@ -281,10 +255,8 @@ namespace Correct_test1.QuickRevision.Writers
             }
             catch (System.Exception)
             {
-                //--------------------------------
                 // 样式失败时使用数据库默认样式，
                 // 不因此取消整个快速划改。
-                //--------------------------------
             }
         }
 

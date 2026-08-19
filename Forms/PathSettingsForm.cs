@@ -42,9 +42,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 非标归档路径
-        //==================================================
 
         private void btnBrowseArchive_Click(
             object sender,
@@ -79,9 +77,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 标准件Excel
-        //==================================================
 
         private void btnBrowseStandardPart_Click(
             object sender,
@@ -130,9 +126,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 版本归档路径
-        //==================================================
 
         private void btnBrowseVersionArchive_Click(
             object sender,
@@ -167,9 +161,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 保存
-        //==================================================
 
         private void btnSave_Click(
             object sender,
@@ -193,9 +185,7 @@ namespace Correct_test1
                     .Trim();
 
 
-            //--------------------------------
             // 非标归档
-            //--------------------------------
 
             if (!Directory.Exists(
                     archivePath))
@@ -209,9 +199,7 @@ namespace Correct_test1
             }
 
 
-            //--------------------------------
             // 标准件数据库
-            //--------------------------------
 
             if (!File.Exists(
                     standardPartPath))
@@ -240,9 +228,7 @@ namespace Correct_test1
             }
 
 
-            //--------------------------------
             // 版本归档
-            //--------------------------------
 
             if (!Directory.Exists(
                     versionArchivePath))
@@ -272,9 +258,7 @@ namespace Correct_test1
                     });
 
 
-                //--------------------------------
                 // 三套外部数据立即后台刷新
-                //--------------------------------
 
                 NonStandardArchiveCache
                     .RefreshAsync();
@@ -311,9 +295,7 @@ namespace Correct_test1
         }
 
 
-        //==================================================
         // 默认
-        //==================================================
 
         private void btnDefault_Click(
             object sender,

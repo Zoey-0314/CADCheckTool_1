@@ -8,13 +8,10 @@ namespace Correct_test1.QuickRevision.Viewports
 {
     /// <summary>
     /// Viewport坐标转换器。
-    ///
     /// 负责：
-    ///
     /// Paper Space坐标
     ///        ↕
     /// Model Space WCS坐标
-    ///
     /// 用户不需要实际进入Viewport。
     /// </summary>
     public class ViewportCoordinateConverter
@@ -35,12 +32,10 @@ namespace Correct_test1.QuickRevision.Viewports
 
             try
             {
-                //--------------------------------
                 // 第一步
                 //
                 // Paper Space相对于Viewport中心
                 // 的偏移量。
-                //--------------------------------
 
                 double paperOffsetX =
                     context.PaperPoint.X -
@@ -51,7 +46,6 @@ namespace Correct_test1.QuickRevision.Viewports
                     context.CenterPoint.Y;
 
 
-                //--------------------------------
                 // 第二步
                 //
                 // 根据Viewport比例换算成
@@ -62,7 +56,6 @@ namespace Correct_test1.QuickRevision.Viewports
                 // Paper单位 / Model单位
                 //
                 // 所以Paper → Model需要除。
-                //--------------------------------
 
                 double modelOffsetX =
                     paperOffsetX /
@@ -73,12 +66,10 @@ namespace Correct_test1.QuickRevision.Viewports
                     context.CustomScale;
 
 
-                //--------------------------------
                 // 第三步
                 //
                 // 加上Viewport当前ViewCenter，
                 // 得到Model空间DCS坐标。
-                //--------------------------------
 
                 Point3d dcsPoint =
                     new Point3d(
@@ -91,7 +82,6 @@ namespace Correct_test1.QuickRevision.Viewports
                         0);
 
 
-                //--------------------------------
                 // 第四步
                 //
                 // Model DCS → WCS
@@ -103,7 +93,6 @@ namespace Correct_test1.QuickRevision.Viewports
                 // TwistAngle
                 //
                 // 构造DCS和WCS之间的矩阵。
-                //--------------------------------
 
                 Matrix3d dcsToWcs =
                     CreateDcsToWcsMatrix(
@@ -114,9 +103,7 @@ namespace Correct_test1.QuickRevision.Viewports
                         dcsToWcs);
 
 
-                //--------------------------------
                 // 防止异常数值进入后续Resolver
-                //--------------------------------
 
                 if (!IsValidPoint(modelPoint))
                 {
@@ -127,9 +114,7 @@ namespace Correct_test1.QuickRevision.Viewports
                 }
 
 
-                //--------------------------------
                 // 同时保存到Context
-                //--------------------------------
 
                 context.ModelPoint =
                     modelPoint;
@@ -149,7 +134,6 @@ namespace Correct_test1.QuickRevision.Viewports
         /// <summary>
         /// 指定一个Paper Space点，
         /// 转换为Model Space。
-        ///
         /// 这个重载不会要求调用方
         /// 先修改context.PaperPoint。
         /// </summary>
@@ -174,131 +158,16 @@ namespace Correct_test1.QuickRevision.Viewports
 
 
         /// <summary>
-        /// Model Space WCS坐标
-        /// 转换回Paper Space坐标。
-        ///
-        /// 后面如果需要判断一个Model对象
-        /// 在Viewport中实际显示到布局的什么位置，
-        /// 会使用这个方法。
-        /// </summary>
-        public bool TryModelToPaper(
-            ViewportContext context,
-            Point3d modelPoint,
-            out Point3d paperPoint)
-        {
-            paperPoint =
-                Point3d.Origin;
-
-            if (!IsContextValid(context))
-                return false;
-
-            if (!IsValidPoint(modelPoint))
-                return false;
-
-            try
-            {
-                //--------------------------------
-                // DCS → WCS矩阵
-                //--------------------------------
-
-                Matrix3d dcsToWcs =
-                    CreateDcsToWcsMatrix(
-                        context);
-
-
-                //--------------------------------
-                // 反矩阵：
-                //
-                // WCS → DCS
-                //--------------------------------
-
-                Matrix3d wcsToDcs =
-                    dcsToWcs.Inverse();
-
-
-                //--------------------------------
-                // Model WCS → Model DCS
-                //--------------------------------
-
-                Point3d dcsPoint =
-                    modelPoint.TransformBy(
-                        wcsToDcs);
-
-
-                //--------------------------------
-                // 相对于ViewCenter的偏移
-                //--------------------------------
-
-                double modelOffsetX =
-                    dcsPoint.X -
-                    context.ViewCenter.X;
-
-                double modelOffsetY =
-                    dcsPoint.Y -
-                    context.ViewCenter.Y;
-
-
-                //--------------------------------
-                // Model距离 → Paper距离
-                //--------------------------------
-
-                double paperOffsetX =
-                    modelOffsetX *
-                    context.CustomScale;
-
-                double paperOffsetY =
-                    modelOffsetY *
-                    context.CustomScale;
-
-
-                //--------------------------------
-                // 加回Viewport在布局中的中心点
-                //--------------------------------
-
-                paperPoint =
-                    new Point3d(
-                        context.CenterPoint.X +
-                        paperOffsetX,
-
-                        context.CenterPoint.Y +
-                        paperOffsetY,
-
-                        0);
-
-
-                if (!IsValidPoint(paperPoint))
-                {
-                    paperPoint =
-                        Point3d.Origin;
-
-                    return false;
-                }
-
-                return true;
-            }
-            catch (System.Exception)
-            {
-                paperPoint =
-                    Point3d.Origin;
-
-                return false;
-            }
-        }
-
-
-        /// <summary>
         /// 创建Model DCS → WCS转换矩阵。
         /// </summary>
         private static Matrix3d CreateDcsToWcsMatrix(
             ViewportContext context)
         {
-            //--------------------------------
             // Autodesk官方视图坐标转换方式：
             //
             // 1. ViewDirection建立观察平面
             // 2. 移动到ViewTarget
             // 3. 处理View Twist
-            //--------------------------------
 
             Matrix3d matrix =
                 Matrix3d.PlaneToWorld(

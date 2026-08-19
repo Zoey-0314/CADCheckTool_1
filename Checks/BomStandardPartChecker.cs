@@ -23,12 +23,10 @@ namespace Correct_test1.Checks
             if (!StandardPartDatabase.TryEnsureLoaded(
                     out databaseError))
             {
-                //--------------------------------
                 // 数据库不可访问时，
                 // 本次标准件检查跳过。
                 //
                 // 不能把所有件都误判为“未收录”。
-                //--------------------------------
 
                 return results;
             }

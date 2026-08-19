@@ -9,13 +9,10 @@ namespace Correct_test1.Configs
 {
     /// <summary>
     /// CADCheckTool统一路径配置。
-    ///
     /// 配置保存在：
-    ///
     /// %APPDATA%
     /// \Correct_test1
     /// \AppPathSettings.json
-    ///
     /// 不放插件安装目录，
     /// 避免Program Files写权限问题。
     /// </summary>
@@ -30,9 +27,7 @@ namespace Correct_test1.Configs
             _current;
 
 
-        //--------------------------------
         // 默认路径
-        //--------------------------------
 
         public const string
             DefaultNonStandardArchivePath =
@@ -73,7 +68,6 @@ namespace Correct_test1.Configs
 
         /// <summary>
         /// 获取当前配置。
-        ///
         /// 返回副本，避免调用者直接修改内部缓存。
         /// </summary>
         public static AppPathSettings Current
@@ -98,7 +92,6 @@ namespace Correct_test1.Configs
 
         /// <summary>
         /// 插件初始化时调用。
-        ///
         /// 保证配置提前读取。
         /// </summary>
         public static void Initialize()
@@ -187,16 +180,6 @@ namespace Correct_test1.Configs
         }
 
 
-        /// <summary>
-        /// 恢复默认路径。
-        /// </summary>
-        public static void ResetToDefault()
-        {
-            Save(
-                CreateDefault());
-        }
-
-
         private static AppPathSettings
             LoadInternal()
         {
@@ -208,11 +191,9 @@ namespace Correct_test1.Configs
                 ConfigFilePath;
 
 
-            //--------------------------------
             // 第一次运行：
             //
             // 自动生成默认配置文件。
-            //--------------------------------
 
             if (!File.Exists(path))
             {
@@ -284,12 +265,10 @@ namespace Correct_test1.Configs
             }
             catch (Exception ex)
             {
-                //--------------------------------
                 // 配置损坏不能导致插件加载失败。
                 //
                 // 回退的是“默认路径”，
                 // 不是旧标准件Excel文件。
-                //--------------------------------
 
                 AppLogger.Error(
                     ex,

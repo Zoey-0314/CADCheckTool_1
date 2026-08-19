@@ -7,7 +7,6 @@ namespace Correct_test1.Models
 
     /// <summary>
     /// AutoCAD Table 原始数据
-    ///
     /// 只保存表格内容
     /// 不判断业务含义
     /// </summary>
@@ -26,7 +25,6 @@ namespace Correct_test1.Models
         public string SourceLayoutName { get; set; }
         /// <summary>
         /// Table在Layout实际坐标系中的边界。
-        ///
         /// 用于判断BOM右侧是否存在项目号。
         /// </summary>
         public double TableMinX { get; set; }
@@ -53,7 +51,6 @@ namespace Correct_test1.Models
 
         /// <summary>
         /// 单元格数据
-        ///
         /// 第一维: 行
         /// 第二维: 列
         /// </summary>

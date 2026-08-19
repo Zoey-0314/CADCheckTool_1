@@ -11,10 +11,8 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 清理AutoCAD MText格式
-        ///
         /// 输入:
         /// {\Fisocp2,hztxt|c134;螺母}
-        ///
         /// 输出:
         /// 螺母
         /// </summary>

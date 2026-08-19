@@ -5,10 +5,8 @@ namespace Correct_test1.QuickRevision.Models
 {
     /// <summary>
     /// 描述一次Viewport点击所需要的上下文。
-    ///
     /// 用户始终在Paper Space点击，
     /// 不要求用户双击进入Viewport。
-    ///
     /// ViewportResolver找到Viewport之后，
     /// 使用该模型把Viewport相关信息传给
     /// ViewportCoordinateConverter。
@@ -27,7 +25,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// Viewport编号。
-        ///
         /// 通常布局空间本身为1，
         /// 浮动Viewport通常为2及以上。
         /// </summary>
@@ -51,7 +48,6 @@ namespace Correct_test1.QuickRevision.Models
         /// <summary>
         /// Paper Space点击点转换到
         /// Model Space后的坐标。
-        ///
         /// 由ViewportCoordinateConverter负责计算。
         /// </summary>
         public Point3d ModelPoint
@@ -103,7 +99,6 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// Viewport所看到Model Space区域的中心。
-        ///
         /// ViewCenter使用二维坐标。
         /// </summary>
         public Point2d ViewCenter
@@ -125,8 +120,7 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// Viewport观察方向。
-        ///
-        /// 第一版主要针对普通二维机械图，
+        /// 主要针对普通二维机械图，
         /// 但这个字段保留下来，
         /// 避免以后重新改模型。
         /// </summary>
@@ -139,45 +133,13 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// Viewport视图扭转角。
-        ///
-        /// 当前第一版不考虑旋转Viewport，
+        /// 当前不处理旋转Viewport，
         /// 但提前保存这个属性。
         /// </summary>
         public double TwistAngle
         {
             get;
             set;
-        }
-
-
-        /// <summary>
-        /// 当前点击点是否位于该Viewport矩形范围内。
-        /// </summary>
-        public bool ContainsPaperPoint()
-        {
-            double halfWidth =
-                Width / 2.0;
-
-            double halfHeight =
-                Height / 2.0;
-
-            double minX =
-                CenterPoint.X - halfWidth;
-
-            double maxX =
-                CenterPoint.X + halfWidth;
-
-            double minY =
-                CenterPoint.Y - halfHeight;
-
-            double maxY =
-                CenterPoint.Y + halfHeight;
-
-            return
-                PaperPoint.X >= minX &&
-                PaperPoint.X <= maxX &&
-                PaperPoint.Y >= minY &&
-                PaperPoint.Y <= maxY;
         }
 
 

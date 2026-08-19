@@ -14,28 +14,18 @@ namespace Correct_test1.Checks
 {
     /// <summary>
     /// BOM非标件号存在性检查。
-    ///
     /// 支持两种被检查BOM形式：
-    ///
     /// 形式1：
     /// Part No. = NS333H1
-    ///
     /// ↓
-    ///
     /// 图号 = NS333H
     /// 件号 = 1
-    ///
-    ///
     /// 形式2：
     /// Part No. = NS347DH_
     /// P/N      = _999
-    ///
     /// ↓
-    ///
     /// 图号 = NS347DH
     /// 件号 = 999
-    ///
-    ///
     /// 然后根据当前被检查DWG
     /// 是否存在项目号，
     /// 锁定正确的归档DWG。
@@ -68,7 +58,6 @@ namespace Correct_test1.Checks
 
 
 
-            //==================================================
             // 新规则：
             //
             // 是否限制项目号，
@@ -76,7 +65,6 @@ namespace Correct_test1.Checks
             //
             // 只看当前这个BOM右侧
             // 有没有实际显示项目号。
-            //==================================================
 
             bool bomHasProject =
                 !string.IsNullOrWhiteSpace(
@@ -89,9 +77,7 @@ namespace Correct_test1.Checks
                         .Trim()
                         .ToUpperInvariant()
                     : "";
-            //==================================================
             // 检查BOM中的每一个NS件
-            //==================================================
 
             foreach (
                 BomItem item
@@ -103,9 +89,7 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 只检查NS非标件
-                //==================================================
 
                 if (PartNumberTypeClassifier
                         .Classify(
@@ -129,7 +113,6 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 得到基础归档图号
                 //
                 // NS333H1
@@ -139,7 +122,6 @@ namespace Correct_test1.Checks
                 // NS347DH_
                 // ↓
                 // NS347DH
-                //==================================================
 
                 string archiveDrawingNumber =
                     NonStandardArchiveChecker
@@ -154,14 +136,11 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 得到件号
-                //==================================================
 
                 string partSuffix;
 
 
-                //==================================================
                 // 新BOM形式：
                 //
                 // Part No. = NS347DH_
@@ -171,7 +150,6 @@ namespace Correct_test1.Checks
                 //
                 // 图号 = NS347DH
                 // 件号 = 999
-                //==================================================
 
                 if (originalPartNumber
                         .Trim()
@@ -182,14 +160,11 @@ namespace Correct_test1.Checks
                         item.PartNumberSuffix,
                         out partSuffix))
                 {
-                    //--------------------------------
                     // 已从P/N列取得件号
-                    //--------------------------------
                 }
                 else
                 {
-                    //==================================================
-                    // 原有形式：
+                    // 未拆分图号和件号时，从末尾数字提取件号：
                     //
                     // NS333H1
                     //
@@ -197,7 +172,6 @@ namespace Correct_test1.Checks
                     //
                     // 图号 = NS333H
                     // 件号 = 1
-                    //==================================================
 
                     partSuffix =
                         BuildPartSuffix(
@@ -206,10 +180,8 @@ namespace Correct_test1.Checks
                 }
 
 
-                //--------------------------------
                 // 没有件号：
                 // 本次件号检查不处理。
-                //--------------------------------
 
                 if (string.IsNullOrWhiteSpace(
                         partSuffix))
@@ -218,7 +190,6 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 统一生成真正完整件号
                 //
                 // 新格式：
@@ -234,12 +205,10 @@ namespace Correct_test1.Checks
                 // NS333H1
                 //
                 // 后续报告、CSV、提示全部统一使用这个值。
-                //==================================================
 
                 string effectivePartNumber =
                     archiveDrawingNumber
                     + partSuffix;
-                //==================================================
                 // BOM项目号存在歧义时停止本件检查。
                 //
                 // 例如同一个BOM右侧同时出现：
@@ -254,7 +223,6 @@ namespace Correct_test1.Checks
                 // 3. 自动退回通用V版
                 //
                 // 必须明确报告，等待人工确认。
-                //==================================================
 
                 if (bom.ProjectNumberAmbiguous)
                 {
@@ -266,22 +234,16 @@ namespace Correct_test1.Checks
                             archiveDrawingNumber,
                             partSuffix,
 
-                            //==============================
                             // 项目号无法确定
-                            //==============================
 
                             "",
 
-                            //==============================
                             // 没有选归档文件
-                            //==============================
 
                             "",
 
-                            //==============================
                             // 属于检查未能执行，
                             // 不是“归档里真的不存在件号”。
-                            //==============================
 
                             true,
 
@@ -296,15 +258,7 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
-                // 先确认基础归档图号存在
-                //
-                // 如果整个NS333H都不存在，
-                // 原有NonStandardArchiveChecker
-                // 已经会报错。
-                //
-                // 本检查不重复报。
-                //==================================================
+                // 基础归档图号缺失由 NonStandardArchiveChecker 报告，此处不重复报错。
 
                 string anyArchiveFile;
 
@@ -321,7 +275,6 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 归档DWG选择规则
                 //
                 // BOM有项目号：
@@ -330,17 +283,14 @@ namespace Correct_test1.Checks
                 //
                 // BOM无项目号：
                 // 只允许通用无项目号归档
-                //==================================================
 
                 List<string> candidateFiles;
 
 
-                //--------------------------------
                 // 最终选中的归档类型：
                 //
                 // true  = 项目专用版 → 取最高L
                 // false = 通用版     → 取最高V
-                //--------------------------------
 
                 bool selectedProjectSpecific =
                     false;
@@ -348,13 +298,11 @@ namespace Correct_test1.Checks
 
                 if (bomHasProject)
                 {
-                    //==================================================
                     // 第一优先级：
                     //
                     // NS386DY
                     // +
                     // N2607US004
-                    //==================================================
 
                     candidateFiles =
                         archiveIndex
@@ -370,7 +318,6 @@ namespace Correct_test1.Checks
                     }
                     else
                     {
-                        //==================================================
                         // 没有当前项目专用版：
                         //
                         // 再找通用版：
@@ -378,7 +325,6 @@ namespace Correct_test1.Checks
                         // NS386DY
                         // +
                         // 文件名无项目号
-                        //==================================================
 
                         candidateFiles =
                             archiveIndex
@@ -388,11 +334,9 @@ namespace Correct_test1.Checks
                 }
                 else
                 {
-                    //==================================================
                     // BOM右侧没有项目号：
                     //
                     // 只允许通用无项目号归档。
-                    //==================================================
 
                     candidateFiles =
                         archiveIndex
@@ -400,9 +344,7 @@ namespace Correct_test1.Checks
                                 archiveDrawingNumber);
                 }
 
-                //==================================================
                 // 没有找到符合条件的归档DWG
-                //==================================================
 
                 if (candidateFiles.Count == 0)
                 {
@@ -447,7 +389,6 @@ namespace Correct_test1.Checks
                     continue;
                 }
 
-                //==================================================
                 // 多个归档DWG：
                 //
                 // 有项目号：
@@ -455,7 +396,6 @@ namespace Correct_test1.Checks
                 //
                 // 无项目号：
                 // 取最高V版本。
-                //==================================================
 
                 string archiveFile =
     SelectLatestFile(
@@ -490,10 +430,8 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 打开归档DWG，
                 // 检查所有Layout。
-                //==================================================
 
                 bool contains;
 
@@ -510,9 +448,7 @@ namespace Correct_test1.Checks
                             out error);
 
 
-                //==================================================
                 // 归档DWG读取失败
-                //==================================================
 
                 if (!inspected)
                 {
@@ -521,9 +457,7 @@ namespace Correct_test1.Checks
                             bom,
                             item,
 
-                            //==============================
                             // 使用统一完整件号
-                            //==============================
 
                             effectivePartNumber,
 
@@ -540,11 +474,9 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 任意Layout找到件号：
                 //
                 // 正确，不产生错误。
-                //==================================================
 
                 if (contains)
                 {
@@ -552,18 +484,14 @@ namespace Correct_test1.Checks
                 }
 
 
-                //==================================================
                 // 所有Layout都没有找到目标件号
-                //==================================================
 
                 results.Add(
                     CreateResult(
                         bom,
                         item,
 
-                        //==============================
                         // 使用统一完整件号
-                        //==============================
 
                         effectivePartNumber,
 
@@ -589,13 +517,11 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 读取BOM中的P/N列
         //
         // _999
         // ↓
         // 999
-        //==================================================
 
         private static bool TryNormalizeBomPartSuffix(
             string value,
@@ -621,13 +547,11 @@ namespace Correct_test1.Checks
                         "");
 
 
-            //--------------------------------
             // 当前P/N形式必须是：
             //
             // _999
             // _998
             // _1
-            //--------------------------------
 
             if (!cleaned.StartsWith(
                     "_",
@@ -669,13 +593,11 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 从完整BOM件号拆件号
         //
         // NS333H1
         // ↓
         // 1
-        //==================================================
 
         private static string BuildPartSuffix(
             string originalPartNumber,
@@ -725,9 +647,7 @@ namespace Correct_test1.Checks
             }
 
 
-            //--------------------------------
             // 当前件号只接受纯数字
-            //--------------------------------
 
             foreach (
                 char character
@@ -745,7 +665,6 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 多个候选归档DWG：
         //
         // 有项目：
@@ -753,7 +672,6 @@ namespace Correct_test1.Checks
         //
         // 无项目：
         // 取最高V。
-        //==================================================
 
         private static string SelectLatestFile(
     List<string> files,
@@ -801,9 +719,7 @@ namespace Correct_test1.Checks
             return bestFile;
         }
 
-        //==================================================
         // L版本
-        //==================================================
 
         private static int ReadLVersion(
             string filePath)
@@ -814,9 +730,7 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // V版本
-        //==================================================
 
         private static int ReadVVersion(
             string filePath)
@@ -897,9 +811,7 @@ namespace Correct_test1.Checks
         }
 
 
-        //==================================================
         // 决定错误标记放在哪个单元格
-        //==================================================
 
         private static Point3d GetMarkerPosition(
             BomItem item)
@@ -910,7 +822,6 @@ namespace Correct_test1.Checks
             }
 
 
-            //==================================================
             // 新BOM形式：
             //
             // Part No.       P/N
@@ -919,7 +830,6 @@ namespace Correct_test1.Checks
             //
             // 如果件号不存在，
             // 红字应该标在 _999 旁边。
-            //==================================================
 
             if (!string.IsNullOrWhiteSpace(
                     item.PartNumber) &&
@@ -936,7 +846,6 @@ namespace Correct_test1.Checks
             }
 
 
-            //==================================================
             // 旧形式：
             //
             // Part No.
@@ -944,16 +853,13 @@ namespace Correct_test1.Checks
             // NS333H1
             //
             // 标在NS333H1旁边。
-            //==================================================
 
             return
                 item.PartNumberCellPosition;
         }
 
 
-        //==================================================
         // 创建错误结果
-        //==================================================
 
         private static
             NonStandardPartNumberCheckResult
@@ -984,13 +890,11 @@ namespace Correct_test1.Checks
                             ? ""
                             : bom.SourceLayoutName,
 
-                    //--------------------------------
                     // 这里现在保存的已经是
                     // 统一后的完整件号：
                     //
                     // NS347DH999
                     // NS333H1
-                    //--------------------------------
 
                     OriginalPartNumber =
                         originalPartNumber,
@@ -1010,9 +914,7 @@ namespace Correct_test1.Checks
                     InspectionFailed =
                         inspectionFailed,
 
-                    //--------------------------------
                     // 根据BOM格式决定标记位置
-                    //--------------------------------
 
                     MarkerPosition =
                         GetMarkerPosition(

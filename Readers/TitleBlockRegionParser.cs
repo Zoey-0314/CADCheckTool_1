@@ -11,7 +11,6 @@ namespace Correct_test1.Readers
 
     /// <summary>
     /// 标题栏区域解析器
-    ///
     /// 根据固定坐标区域解析标题栏信息
     /// 支持：
     /// 1. 多文字对象

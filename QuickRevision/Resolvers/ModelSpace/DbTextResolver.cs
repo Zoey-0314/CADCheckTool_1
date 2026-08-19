@@ -6,8 +6,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 {
     /// <summary>
     /// 解析Model Space中的DBText。
-    ///
-    /// 当前第一版只处理水平文字。
+    /// 当前仅处理水平文字。
     /// </summary>
     public class DbTextResolver
     {

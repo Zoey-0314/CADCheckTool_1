@@ -60,9 +60,7 @@ namespace Correct_test1.Markers
                 return;
             }
 
-            //--------------------------------
             // 检查坐标
-            //--------------------------------
 
             if (!IsValidPoint(issue.Position))
             {
@@ -74,9 +72,7 @@ namespace Correct_test1.Markers
                 return;
             }
 
-            //--------------------------------
             // 获取目标空间
-            //--------------------------------
 
             BlockTableRecord space =
                 transaction.GetObject(
@@ -87,9 +83,7 @@ namespace Correct_test1.Markers
             if (space == null)
                 return;
 
-            //--------------------------------
             // Marker位置
-            //--------------------------------
 
             Point3d markerPosition =
                 issue.Position +
@@ -98,9 +92,7 @@ namespace Correct_test1.Markers
             if (!IsValidPoint(markerPosition))
                 return;
 
-            //--------------------------------
             // 检查文字高度
-            //--------------------------------
 
             if (double.IsNaN(textHeight) ||
                 double.IsInfinity(textHeight) ||
@@ -109,9 +101,7 @@ namespace Correct_test1.Markers
                 return;
             }
 
-            //--------------------------------
             // 创建MText
-            //--------------------------------
 
             using (MText text = new MText())
             {
@@ -136,9 +126,7 @@ namespace Correct_test1.Markers
                     text,
                     true);
 
-                //--------------------------------
                 // 添加XData
-                //--------------------------------
 
                 using (ResultBuffer xdata =
                     new ResultBuffer(
@@ -156,9 +144,7 @@ namespace Correct_test1.Markers
             }
         }
 
-        //--------------------------------
         // 坐标检查
-        //--------------------------------
 
         private static bool IsValidPoint(
             Point3d point)

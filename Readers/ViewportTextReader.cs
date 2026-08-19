@@ -58,9 +58,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 模型空间文字只扫描一次
-                //==================================================
 
                 List<TitleText> modelTexts =
                     new List<TitleText>();
@@ -107,9 +105,7 @@ namespace Correct_test1.Readers
                 }
 
 
-                //==================================================
                 // 遍历所有Layout
-                //==================================================
 
                 foreach (
                     DBDictionaryEntry entry
@@ -142,9 +138,7 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 尽量取得图纸空间自己的主视口
-                    //==================================================
 
                     ObjectId paperViewportId =
                         ObjectId.Null;
@@ -172,9 +166,7 @@ namespace Correct_test1.Readers
                         false;
 
 
-                    //==================================================
                     // 直接遍历Layout对应PaperSpace里的所有Viewport
-                    //==================================================
 
                     foreach (
                         ObjectId entityId
@@ -203,9 +195,7 @@ namespace Correct_test1.Readers
                         }
 
 
-                        //==================================================
                         // 跳过PaperSpace自己的主视口
-                        //==================================================
 
                         if (!paperViewportId.IsNull &&
                             entityId == paperViewportId)
@@ -214,12 +204,10 @@ namespace Correct_test1.Readers
                         }
 
 
-                        //==================================================
                         // 后台Database中GetViewports可能取不到。
                         //
                         // 此时PaperSpace BTR中的第一个Viewport
                         // 作为主视口跳过。
-                        //==================================================
 
                         if (paperViewportId.IsNull &&
                             !skippedFallbackPaperViewport)
@@ -231,12 +219,10 @@ namespace Correct_test1.Readers
                         }
 
 
-                        //==================================================
                         // 不判断viewport.On。
                         //
                         // 后台批量读取非当前Layout时，
                         // On状态不适合作为是否读取的依据。
-                        //==================================================
 
                         if (viewport.CustomScale <= 0)
                         {
@@ -302,9 +288,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 建立视口对应的模型空间范围
-        //==================================================
 
         private static ModelWindow CreateWindow(
             Viewport viewport)
@@ -347,9 +331,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 读取实体文字
-        //==================================================
 
         private static void CollectEntityText(
             Transaction tr,
@@ -366,9 +348,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 1. DBText
-            //==================================================
 
             DBText dbText =
                 entity as DBText;
@@ -404,9 +384,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 2. MText
-            //==================================================
 
             MText mText =
                 entity as MText;
@@ -442,9 +420,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 3. AutoCAD原生MLeader
-            //==================================================
 
             MLeader mLeader =
                 entity as MLeader;
@@ -534,12 +510,10 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 4. AutoCAD Mechanical AMDTNOTE
             //
             // 单张打开时可能是真实AMDTNOTE，
             // 批量后台Database中可能变成ProxyEntity。
-            //==================================================
 
             if (IsAmdtNote(
                     entity))
@@ -557,9 +531,7 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 5. 嵌套BlockReference
-            //==================================================
 
             if (!includeNestedBlocks)
             {
@@ -680,9 +652,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 判断实体是不是Mechanical AMDTNOTE
-        //==================================================
 
         private static bool IsAmdtNote(
             Entity entity)
@@ -693,10 +663,8 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 后台批量Database：
             // Mechanical对象可能成为ProxyEntity
-            //==================================================
 
             ProxyEntity proxy =
                 entity as ProxyEntity;
@@ -720,10 +688,8 @@ namespace Correct_test1.Readers
             }
 
 
-            //==================================================
             // 正常Document中：
             // 直接读取真实DXF类型
-            //==================================================
 
             try
             {
@@ -751,9 +717,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 分解AMDTNOTE并读取其中的文字
-        //==================================================
 
         private static void CollectAmdtNoteText(
             Transaction tr,
@@ -787,13 +751,11 @@ namespace Correct_test1.Readers
                     }
 
 
-                    //==================================================
                     // 不自己重复判断TEXT/MTEXT。
                     //
                     // 直接重新走统一文字读取流程，
                     // 这样以后即使Explode结果是MLeader、
                     // BlockReference等也可以继续处理。
-                    //==================================================
 
                     CollectEntityText(
                         tr,
@@ -828,9 +790,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 清理文字
-        //==================================================
 
         private static string Clean(
             string text)
@@ -857,9 +817,7 @@ namespace Correct_test1.Readers
         }
 
 
-        //==================================================
         // 视口模型范围
-        //==================================================
 
         private struct ModelWindow
         {

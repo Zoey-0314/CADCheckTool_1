@@ -7,11 +7,9 @@ namespace Correct_test1.QuickRevision.Services
 {
     /// <summary>
     /// 清除QuickRevision生成内容。
-    ///
     /// 只清除：
     /// CADCHECK_REVISION
     /// 图层中的实体。
-    ///
     /// 不清除其他检查标记。
     /// 不删除图层本身。
     /// </summary>
@@ -19,7 +17,6 @@ namespace Correct_test1.QuickRevision.Services
     {
         /// <summary>
         /// 清除当前Document中的所有划改实体。
-        ///
         /// 返回删除数量。
         /// </summary>
         public int Clear(
@@ -51,9 +48,7 @@ namespace Correct_test1.QuickRevision.Services
                             .TransactionManager
                             .StartTransaction())
                 {
-                    //--------------------------------
                     // 查找CADCHECK_REVISION图层
-                    //--------------------------------
 
                     LayerTable layerTable =
                         transaction.GetObject(
@@ -80,13 +75,11 @@ namespace Correct_test1.QuickRevision.Services
                                 .RevisionLayerName];
 
 
-                    //--------------------------------
                     // 遍历所有BlockTableRecord。
                     //
                     // 包括：
                     // Model Space
                     // 所有Paper Space
-                    //--------------------------------
 
                     BlockTable blockTable =
                         transaction.GetObject(
@@ -143,9 +136,7 @@ namespace Correct_test1.QuickRevision.Services
                             }
 
 
-                            //--------------------------------
                             // 只清CADCHECK_REVISION层
-                            //--------------------------------
 
                             if (entity.LayerId !=
                                 revisionLayerId)
@@ -166,10 +157,8 @@ namespace Correct_test1.QuickRevision.Services
                             }
                             catch (System.Exception)
                             {
-                                //--------------------------------
                                 // 单个实体删除失败，
                                 // 不影响其他实体。
-                                //--------------------------------
                             }
                         }
                     }

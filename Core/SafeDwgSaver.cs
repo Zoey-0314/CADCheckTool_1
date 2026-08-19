@@ -8,15 +8,12 @@ namespace Correct_test1.Core
 
     /// <summary>
     /// 安全DWG保存器
-    ///
     /// 功能:
     /// 1. 保存到临时文件
     /// 2. 验证文件有效性
     /// 3. 替换原DWG
-    ///
     /// 避免:
     /// SaveAs异常导致原DWG变0KB
-    ///
     /// </summary>
     public static class SafeDwgSaver
     {
@@ -51,9 +48,7 @@ namespace Correct_test1.Core
 
 
 
-                //--------------------------------
                 // 删除旧临时文件
-                //--------------------------------
 
                 if (File.Exists(tempFile))
                 {
@@ -62,9 +57,7 @@ namespace Correct_test1.Core
 
 
 
-                //--------------------------------
                 // 保存临时DWG
-                //--------------------------------
 
                 AppLogger.Info(
                     $"保存临时文件:{tempFile}",
@@ -96,9 +89,7 @@ namespace Correct_test1.Core
 
 
 
-                //--------------------------------
                 // 检查临时文件
-                //--------------------------------
 
                 ValidateFile(
                     tempFile
@@ -113,9 +104,7 @@ namespace Correct_test1.Core
 
 
 
-                //--------------------------------
                 // 创建备份
-                //--------------------------------
 
                 if (File.Exists(originalFile))
                 {
@@ -136,9 +125,7 @@ namespace Correct_test1.Core
 
 
 
-                //--------------------------------
                 // 替换原文件
-                //--------------------------------
 
                 File.Replace(
                     tempFile,
@@ -156,9 +143,7 @@ namespace Correct_test1.Core
 
 
 
-                //--------------------------------
                 // 删除临时文件
-                //--------------------------------
 
 
                 if (File.Exists(tempFile))

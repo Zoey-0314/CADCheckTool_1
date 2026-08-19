@@ -28,10 +28,9 @@
 
         /// <summary>
         /// true：
-        /// 原来不存在项目号，本次新建。
-        ///
+        /// 修改前不存在项目号，本次新建。
         /// false：
-        /// 找到原有MText并修改。
+        /// 找到现有 MText并修改。
         /// </summary>
         public bool Created
         {

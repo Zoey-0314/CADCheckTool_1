@@ -14,7 +14,6 @@ namespace Correct_test1.VersionCheck.Services
 {
     public class VersionCheckService
     {
-        //==================================================
         // 从当前DWG文件名读取项目号
         //
         // 例如：
@@ -27,7 +26,6 @@ namespace Correct_test1.VersionCheck.Services
         //
         // 版本检查中：
         // 是否存在项目号，是判断标准/非标的唯一依据。
-        //==================================================
 
         private static string ReadProjectNumberFromFileName(
             string filePath)
@@ -74,9 +72,7 @@ namespace Correct_test1.VersionCheck.Services
         }
 
 
-        //==================================================
         // 正式版本检查
-        //==================================================
 
         public List<VersionCheckResult> Check(
             Database database,
@@ -93,7 +89,6 @@ namespace Correct_test1.VersionCheck.Services
             }
 
 
-            //==================================================
             // 1. 从当前DWG文件名读取图号
             //
             // NS452J 安防镜 ...
@@ -101,7 +96,6 @@ namespace Correct_test1.VersionCheck.Services
             // ↓
             //
             // NS452J
-            //==================================================
 
             FileNameDrawingNumberReader
                 drawingNumberReader =
@@ -121,12 +115,10 @@ namespace Correct_test1.VersionCheck.Services
             }
 
 
-            //==================================================
             // 2. 从当前DWG文件名读取项目号
             //
             // 这是版本检查中判断
             // “标准件 / 非标件”的唯一依据。
-            //==================================================
 
             string fileProjectNumber =
                 ReadProjectNumberFromFileName(
@@ -138,9 +130,7 @@ namespace Correct_test1.VersionCheck.Services
                     fileProjectNumber);
 
 
-            //==================================================
             // 3. 读取每个Layout固定版本位置
-            //==================================================
 
             DrawingVersionReader versionReader =
                 new DrawingVersionReader();
@@ -157,9 +147,7 @@ namespace Correct_test1.VersionCheck.Services
             }
 
 
-            //==================================================
             // 4. 每个Layout分别检查
-            //==================================================
 
             foreach (
                 DrawingVersionInfo version
@@ -171,7 +159,6 @@ namespace Correct_test1.VersionCheck.Services
                 }
 
 
-                //==================================================
                 // 非标图纸
                 //
                 // 当前DWG文件名存在项目号。
@@ -184,11 +171,9 @@ namespace Correct_test1.VersionCheck.Services
                 //
                 // 只允许L版本。
                 // V版本全部忽略。
-                //==================================================
 
                 if (fileIsNonStandard)
                 {
-                    //--------------------------------
                     // 非标图纸必须检测到：
                     //
                     // L0
@@ -206,7 +191,6 @@ namespace Correct_test1.VersionCheck.Services
                     //    标准件版本
                     //
                     // 都按“缺少L版本号”处理。
-                    //--------------------------------
 
                     if (!version.HasVersion ||
                         !version.IsNonStandard)
@@ -225,11 +209,9 @@ namespace Correct_test1.VersionCheck.Services
                     }
 
 
-                    //--------------------------------
                     // 版本归档不可用：
                     //
                     // 无法推论最新版本。
-                    //--------------------------------
 
                     if (archiveIndex == null ||
                         !archiveIndex.IsAvailable)
@@ -243,7 +225,6 @@ namespace Correct_test1.VersionCheck.Services
                     string latestFilePath;
 
 
-                    //--------------------------------
                     // 非标最新版本查询
                     //
                     // 注意：
@@ -265,7 +246,6 @@ namespace Correct_test1.VersionCheck.Services
                     // 只检查：
                     //
                     // NS452J + N2604US001 + Lx
-                    //--------------------------------
 
                     bool found =
                         archiveIndex
@@ -276,9 +256,7 @@ namespace Correct_test1.VersionCheck.Services
                                 out latestFilePath);
 
 
-                    //--------------------------------
                     // 归档中没有同项目记录
-                    //--------------------------------
 
                     if (!found)
                     {
@@ -286,9 +264,7 @@ namespace Correct_test1.VersionCheck.Services
                     }
 
 
-                    //--------------------------------
                     // 当前已经是最新版本
-                    //--------------------------------
 
                     if (latestVersion <=
                         version.CurrentVersionNumber)
@@ -297,9 +273,7 @@ namespace Correct_test1.VersionCheck.Services
                     }
 
 
-                    //--------------------------------
                     // 当前版本落后
-                    //--------------------------------
 
                     results.Add(
                         new VersionCheckResult
@@ -341,7 +315,6 @@ namespace Correct_test1.VersionCheck.Services
                 }
 
 
-                //==================================================
                 // 标准件图纸
                 //
                 // 当前DWG文件名没有项目号。
@@ -354,9 +327,7 @@ namespace Correct_test1.VersionCheck.Services
                 // ...
                 //
                 // L版本完全不参与。
-                //==================================================
 
-                //--------------------------------
                 // 标准件必须检测到V版本。
                 //
                 // 如果：
@@ -368,7 +339,6 @@ namespace Correct_test1.VersionCheck.Services
                 // 2. 固定位置出现了项目号+L版本
                 //
                 // 都按“缺少V版本号”处理。
-                //--------------------------------
 
                 if (!version.HasVersion ||
                     version.IsNonStandard)
@@ -387,9 +357,7 @@ namespace Correct_test1.VersionCheck.Services
                 }
 
 
-                //--------------------------------
                 // 归档不可用
-                //--------------------------------
 
                 if (archiveIndex == null ||
                     !archiveIndex.IsAvailable)
@@ -403,11 +371,9 @@ namespace Correct_test1.VersionCheck.Services
                 string latestStandardFilePath;
 
 
-                //--------------------------------
                 // 标准件只检查：
                 //
                 // 同图号 + 最大V
-                //--------------------------------
 
                 bool standardFound =
                     archiveIndex
@@ -423,9 +389,7 @@ namespace Correct_test1.VersionCheck.Services
                 }
 
 
-                //--------------------------------
                 // 当前已经最新
-                //--------------------------------
 
                 if (latestStandardVersion <=
                     version.CurrentVersionNumber)
@@ -434,9 +398,7 @@ namespace Correct_test1.VersionCheck.Services
                 }
 
 
-                //--------------------------------
                 // 当前V版本落后
-                //--------------------------------
 
                 results.Add(
                     new VersionCheckResult
@@ -479,9 +441,7 @@ namespace Correct_test1.VersionCheck.Services
         }
 
 
-        //==================================================
         // 版本号缺失
-        //==================================================
 
         private void HandleMissingVersion(
             List<VersionCheckResult> results,
@@ -514,7 +474,6 @@ namespace Correct_test1.VersionCheck.Services
             string message;
 
 
-            //==================================================
             // 非标图纸
             //
             // 当前DWG文件名有项目号。
@@ -525,11 +484,9 @@ namespace Correct_test1.VersionCheck.Services
             // L1
             // L2
             // ...
-            //==================================================
 
             if (fileIsNonStandard)
             {
-                //--------------------------------
                 // 从归档中寻找：
                 //
                 // 同图号
@@ -537,7 +494,6 @@ namespace Correct_test1.VersionCheck.Services
                 // 同当前文件项目号
                 // +
                 // 最大L版本
-                //--------------------------------
 
                 bool latestFound =
                     archiveIndex != null &&
@@ -550,9 +506,7 @@ namespace Correct_test1.VersionCheck.Services
                             out latestFilePath);
 
 
-                //--------------------------------
                 // 找到了归档最新版本
-                //--------------------------------
 
                 if (latestFound)
                 {
@@ -567,10 +521,8 @@ namespace Correct_test1.VersionCheck.Services
                 }
                 else
                 {
-                    //--------------------------------
                     // 没找到归档版本，
                     // 但当前图纸缺版本本身仍然是错误。
-                    //--------------------------------
 
                     message =
                         "版本号缺失：当前项目号后未检测到 "
@@ -617,7 +569,6 @@ namespace Correct_test1.VersionCheck.Services
             }
 
 
-            //==================================================
             // 标准件图纸
             //
             // 当前文件名没有项目号。
@@ -628,7 +579,6 @@ namespace Correct_test1.VersionCheck.Services
             // V1
             // V2
             // ...
-            //==================================================
 
             bool standardLatestFound =
                 archiveIndex != null &&
@@ -640,9 +590,7 @@ namespace Correct_test1.VersionCheck.Services
                         out latestFilePath);
 
 
-            //--------------------------------
             // 找到了最新V版本
-            //--------------------------------
 
             if (standardLatestFound)
             {

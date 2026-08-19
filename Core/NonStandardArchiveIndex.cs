@@ -10,64 +10,49 @@ namespace Correct_test1.Core
 {
     /// <summary>
     /// 非标归档文件索引。
-    ///
     /// Z盘只递归扫描一次。
-    ///
     /// 建立三套内存索引：
-    ///
     /// 1.
     /// DrawingNumber
     /// ->
     /// 所有归档文件
-    ///
     /// 用于判断基础归档是否存在。
-    ///
-    ///
     /// 2.
     /// DrawingNumber
     /// ->
     /// 无项目号DWG
-    ///
     /// 用于通用V版本。
-    ///
-    ///
     /// 3.
     /// DrawingNumber + ProjectNumber
     /// ->
     /// 项目专用DWG
-    ///
     /// 用于项目L版本。
     /// </summary>
     public class NonStandardArchiveIndex
     {
-        //==================================================
         // 原始完整文件列表
         //
         // 仍然保留。
         //
         // VersionArchiveIndex目前会复用它，
         // 所以不能删除。
-        //==================================================
 
         private readonly
             List<string> _filePaths;
 
 
-        //==================================================
         // 图号 -> 所有文件
         //
         // 包含：
         // DWG / PDF / 其他文件。
         //
-        // 用于原有“归档图是否存在”检查。
-        //==================================================
+        // 用于“归档图是否存在”检查。
 
         private readonly
             Dictionary<string, List<string>>
             _filesByDrawingNumber;
 
 
-        //==================================================
         // 图号 -> 无项目号DWG
         //
         // 例如：
@@ -76,14 +61,12 @@ namespace Correct_test1.Core
         // ->
         // NS386DY-V1.dwg
         // NS386DY-V3.dwg
-        //==================================================
 
         private readonly
             Dictionary<string, List<string>>
             _genericDwgsByDrawingNumber;
 
 
-        //==================================================
         // 图号|项目号 -> 项目专用DWG
         //
         // 例如：
@@ -92,14 +75,12 @@ namespace Correct_test1.Core
         // ->
         // NS386DY-N2607US004-L0.dwg
         // NS386DY-N2607US004-L2.dwg
-        //==================================================
 
         private readonly
             Dictionary<string, List<string>>
             _projectDwgsByKey;
 
 
-        //==================================================
         // 文件名开头的NS归档图号
         //
         // 支持：
@@ -120,7 +101,6 @@ namespace Correct_test1.Core
         //
         // 查询NS386DY
         // 错误匹配NS386DYA
-        //==================================================
 
         private static readonly Regex
             DrawingNumberRegex =
@@ -129,9 +109,7 @@ namespace Correct_test1.Core
                     RegexOptions.IgnoreCase);
 
 
-        //==================================================
         // 项目号
-        //==================================================
 
         private static readonly Regex
             ProjectNumberRegex =
@@ -208,9 +186,7 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 供VersionArchiveIndex继续复用文件列表
-        //==================================================
 
         public List<string> GetFilePathsSnapshot()
         {
@@ -220,9 +196,7 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 默认路径建立索引
-        //==================================================
 
         public static NonStandardArchiveIndex Build()
         {
@@ -237,9 +211,7 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 正式建立索引
-        //==================================================
 
         public static NonStandardArchiveIndex Build(
             string rootPath)
@@ -252,9 +224,7 @@ namespace Correct_test1.Core
                 rootPath ?? "";
 
 
-            //==================================================
             // 根目录不可访问
-            //==================================================
 
             if (string.IsNullOrWhiteSpace(
                     rootPath))
@@ -287,11 +257,9 @@ namespace Correct_test1.Core
             }
 
 
-            //==================================================
             // 手动递归
             //
             // 单个子目录失败不会导致整个Z盘索引失败。
-            //==================================================
 
             Stack<string> directories =
                 new Stack<string>();
@@ -307,9 +275,7 @@ namespace Correct_test1.Core
                     directories.Pop();
 
 
-                //==================================================
                 // 当前目录文件
-                //==================================================
 
                 try
                 {
@@ -332,17 +298,13 @@ namespace Correct_test1.Core
                         }
 
 
-                        //--------------------------------
                         // 原始文件列表
-                        //--------------------------------
 
                         index._filePaths.Add(
                             file);
 
 
-                        //--------------------------------
                         // 同时建立Dictionary索引
-                        //--------------------------------
 
                         index.IndexFile(
                             file);
@@ -363,9 +325,7 @@ namespace Correct_test1.Core
                 }
 
 
-                //==================================================
                 // 子目录
-                //==================================================
 
                 try
                 {
@@ -440,9 +400,7 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 建立单个文件的索引
-        //==================================================
 
         private void IndexFile(
             string filePath)
@@ -476,9 +434,7 @@ namespace Correct_test1.Core
             }
 
 
-            //==================================================
             // 从文件名开头读取基础图号
-            //==================================================
 
             Match drawingMatch =
                 DrawingNumberRegex.Match(
@@ -506,11 +462,9 @@ namespace Correct_test1.Core
             }
 
 
-            //==================================================
             // 所有文件：
             //
             // DrawingNumber -> file
-            //==================================================
 
             AddToIndex(
                 _filesByDrawingNumber,
@@ -518,9 +472,7 @@ namespace Correct_test1.Core
                 filePath);
 
 
-            //==================================================
             // 后面两个索引只处理DWG
-            //==================================================
 
             string extension;
 
@@ -546,9 +498,7 @@ namespace Correct_test1.Core
             }
 
 
-            //==================================================
             // 判断候选DWG自己的项目号
-            //==================================================
 
             Match projectMatch =
                 ProjectNumberRegex.Match(
@@ -557,11 +507,9 @@ namespace Correct_test1.Core
 
             if (!projectMatch.Success)
             {
-                //==================================================
                 // 无项目号：
                 //
                 // 通用DWG
-                //==================================================
 
                 AddToIndex(
                     _genericDwgsByDrawingNumber,
@@ -573,9 +521,7 @@ namespace Correct_test1.Core
             }
 
 
-            //==================================================
             // 项目专用DWG
-            //==================================================
 
             string projectNumber =
                 projectMatch
@@ -597,9 +543,7 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // Dictionary<string,List<string>> 添加
-        //==================================================
 
         private static void AddToIndex(
             Dictionary<string, List<string>> dictionary,
@@ -638,13 +582,11 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 基础归档是否存在
         //
         // 现在是Dictionary O(1)查询。
         //
         // 不再扫描整个_filePaths。
-        //==================================================
 
         public bool Contains(
             string searchKey,
@@ -696,13 +638,11 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 获取通用无项目号DWG
         //
         // DrawingNumber
         // ->
         // List<DWG>
-        //==================================================
 
         public List<string> GetGenericDwgs(
             string drawingNumber)
@@ -735,10 +675,8 @@ namespace Correct_test1.Core
             }
 
 
-            //--------------------------------
             // 返回副本，
             // 防止调用方修改内部索引。
-            //--------------------------------
 
             return
                 new List<string>(
@@ -746,13 +684,11 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // 获取项目专用DWG
         //
         // DrawingNumber + ProjectNumber
         // ->
         // List<DWG>
-        //==================================================
 
         public List<string> GetProjectDwgs(
             string drawingNumber,
@@ -805,9 +741,7 @@ namespace Correct_test1.Core
         }
 
 
-        //==================================================
         // Key
-        //==================================================
 
         private static string BuildProjectKey(
             string drawingNumber,

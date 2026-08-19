@@ -5,7 +5,6 @@ namespace Correct_test1.QuickRevision.Writers
 {
     /// <summary>
     /// QuickRevision生成实体公共辅助类。
-    ///
     /// 所有QuickRevision标记统一为红色。
     /// </summary>
     internal static class RevisionEntityHelper
@@ -19,9 +18,7 @@ namespace Correct_test1.QuickRevision.Writers
 
         private static Color CreateRevisionColor()
         {
-            //--------------------------------
             // AutoCAD ACI 1 = Red
-            //--------------------------------
 
             return Color.FromColorIndex(
                 ColorMethod.ByAci,
@@ -31,7 +28,6 @@ namespace Correct_test1.QuickRevision.Writers
 
         /// <summary>
         /// 获取或创建QuickRevision专用图层。
-        ///
         /// 已存在时也更新为红色。
         /// </summary>
         public static ObjectId EnsureRevisionLayer(
@@ -56,9 +52,7 @@ namespace Correct_test1.QuickRevision.Writers
                 return ObjectId.Null;
 
 
-            //--------------------------------
             // 图层已经存在
-            //--------------------------------
 
             if (layerTable.Has(
                     RevisionLayerName))
@@ -86,9 +80,7 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 创建新图层
-            //--------------------------------
 
             layerTable.UpgradeOpen();
 
@@ -122,7 +114,6 @@ namespace Correct_test1.QuickRevision.Writers
 
         /// <summary>
         /// 给QuickRevision新实体统一设置：
-        ///
         /// 图层
         /// 红色
         /// </summary>
@@ -142,10 +133,8 @@ namespace Correct_test1.QuickRevision.Writers
             }
 
 
-            //--------------------------------
             // 实体本身也明确设红色，
             // 不完全依赖图层颜色。
-            //--------------------------------
 
             entity.Color =
                 CreateRevisionColor();

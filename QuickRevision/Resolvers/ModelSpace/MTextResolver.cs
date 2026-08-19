@@ -6,11 +6,9 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 {
     /// <summary>
     /// Model Space MText解析器。
-    ///
     /// 使用MText的实际显示范围，
     /// 不使用可能包含定义宽度的宽松范围。
-    ///
-    /// 第一版只处理水平文字。
+    /// 仅处理水平文字。
     /// </summary>
     public class MTextResolver
     {
@@ -40,9 +38,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                 return null;
 
 
-            //--------------------------------
             // 显示文字
-            //--------------------------------
 
             string content =
                 TextGeometryHelper.CleanText(
@@ -56,7 +52,6 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
             }
 
 
-            //--------------------------------
             // 关键修改：
             //
             // 不再：
@@ -64,7 +59,6 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
             //
             // 改为：
             // ActualWidth + ActualHeight
-            //--------------------------------
 
             Extents3d extents;
 
@@ -139,9 +133,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
                 topY;
 
 
-            //--------------------------------
             // 删除线穿过实际显示文字中心。
-            //--------------------------------
 
             target.CenterY =
                 (

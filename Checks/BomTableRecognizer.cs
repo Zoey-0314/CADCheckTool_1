@@ -11,9 +11,7 @@ namespace Correct_test1.Checks
 
     /// <summary>
     /// BOM表识别器
-    ///
     /// 一个CadTableData对应一个BOM判断
-    ///
     /// 负责：
     /// 1. 判断是否BOM
     /// 2. 查找表头
@@ -142,9 +140,7 @@ namespace Correct_test1.Checks
                         r,
                         mapping.QuantityColumn);
 
-                //--------------------------------
                 // 可选P/N列
-                //--------------------------------
 
                 if (mapping.PartNumberSuffixColumn >= 0)
                 {
@@ -208,7 +204,6 @@ namespace Correct_test1.Checks
 
         /// <summary>
         /// 查找BOM表头所在行
-        ///
         /// 必须同时包含:
         /// No.
         /// Part No.
@@ -346,9 +341,7 @@ namespace Correct_test1.Checks
                         headerRow,
                         c);
 
-                //--------------------------------
                 // 可选P/N列
-                //--------------------------------
 
                 if (IsPartNumberSuffixHeader(
                         header))
@@ -437,7 +430,6 @@ namespace Correct_test1.Checks
         }
         /// <summary>
         /// 提取图号
-        ///
         /// 在表头之前寻找
         /// 例如:
         /// NS265R1
