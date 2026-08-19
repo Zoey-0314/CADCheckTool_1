@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using Microsoft.Win32;
 using Correct_test1.Core;
@@ -18,12 +18,12 @@ namespace Correct_test1.Installer
         }
 
         /// <summary>
-        /// Îªµ±Ç° Windows ÓÃ»§ÒÑ·¢ÏÖµÄËùÓĞ AutoCAD ²úÆ·ÅäÖÃ×¢²á²å¼ş¡£
+        /// ä¸ºå½“å‰ Windows ç”¨æˆ·å·²å‘ç°çš„æ‰€æœ‰ AutoCAD äº§å“é…ç½®æ³¨å†Œæ’ä»¶ã€‚
         /// </summary>
         public void RegisterPlugin(string dllPath)
         {
             if (string.IsNullOrWhiteSpace(dllPath))
-                throw new ArgumentException("DLL Â·¾¶²»ÄÜÎª¿Õ¡£", nameof(dllPath));
+                throw new ArgumentException("DLL è·¯å¾„ä¸èƒ½ä¸ºç©ºã€‚", nameof(dllPath));
 
             try
             {
@@ -33,7 +33,7 @@ namespace Correct_test1.Installer
                 if (applicationKeys.Count == 0)
                 {
                     throw new InvalidOperationException(
-                        "Î´ÕÒµ½µ±Ç°ÓÃ»§µÄ AutoCAD Applications ×¢²á±íÏî¡£");
+                        "æœªæ‰¾åˆ°å½“å‰ç”¨æˆ·çš„ AutoCAD Applications æ³¨å†Œè¡¨é¡¹ã€‚");
                 }
 
                 foreach (ApplicationKeyLocation location in applicationKeys)
@@ -46,7 +46,7 @@ namespace Correct_test1.Installer
                     {
                         if (pluginKey == null)
                             throw new InvalidOperationException(
-                                "ÎŞ·¨´´½¨ AutoCAD ²å¼ş×¢²á±íÏî¡£");
+                                "æ— æ³•åˆ›å»º AutoCAD æ’ä»¶æ³¨å†Œè¡¨é¡¹ã€‚");
 
                         pluginKey.SetValue("DESCRIPTION", Description, RegistryValueKind.String);
                         pluginKey.SetValue("LOADER", dllPath, RegistryValueKind.String);
@@ -56,7 +56,7 @@ namespace Correct_test1.Installer
                 }
 
                 AppLogger.Info(
-                    "[Installer] ²å¼ş×¢²á³É¹¦",
+                    "[Installer] æ’ä»¶æ³¨å†ŒæˆåŠŸ",
                     "Installer");
             }
             catch (UnauthorizedAccessException ex)
@@ -64,7 +64,7 @@ namespace Correct_test1.Installer
                 AppLogger.Error(
                     ex,
                     "Installer",
-                    message: "[Installer] ×¢²á±íÈ¨ÏŞ±»¾Ü¾ø¡£ÇëÒÔ¹ÜÀíÔ±Éí·İÔËĞĞ°²×°³ÌĞò¡£");
+                    message: "[Installer] æ³¨å†Œè¡¨æƒé™è¢«æ‹’ç»ã€‚è¯·ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œå®‰è£…ç¨‹åºã€‚");
                 throw;
             }
             catch (Exception ex)
@@ -72,13 +72,13 @@ namespace Correct_test1.Installer
                 AppLogger.Error(
                     ex,
                     "Installer",
-                    message: "[Installer] ²å¼ş×¢²áÊ§°Ü");
+                    message: "[Installer] æ’ä»¶æ³¨å†Œå¤±è´¥");
                 throw;
             }
         }
 
         /// <summary>
-        /// ÒÆ³ı±¾²å¼ş´´½¨µÄËùÓĞ AutoCAD ×Ô¶¯¼ÓÔØ×¢²á±íÏî£¬²»Ó°ÏìÆäËû²å¼ş¡£
+        /// ç§»é™¤æœ¬æ’ä»¶åˆ›å»ºçš„æ‰€æœ‰ AutoCAD è‡ªåŠ¨åŠ è½½æ³¨å†Œè¡¨é¡¹ï¼Œä¸å½±å“å…¶ä»–æ’ä»¶ã€‚
         /// </summary>
         public void UnregisterPlugin()
         {
@@ -100,7 +100,7 @@ namespace Correct_test1.Installer
                 }
 
                 AppLogger.Info(
-                    "[Installer] ²å¼şÒÆ³ı³É¹¦",
+                    "[Installer] æ’ä»¶ç§»é™¤æˆåŠŸ",
                     "Installer");
             }
             catch (UnauthorizedAccessException ex)
@@ -108,7 +108,7 @@ namespace Correct_test1.Installer
                 AppLogger.Error(
                     ex,
                     "Installer",
-                    message: "[Installer] ×¢²á±íÈ¨ÏŞ±»¾Ü¾ø¡£ÇëÒÔ¹ÜÀíÔ±Éí·İÔËĞĞ°²×°³ÌĞò¡£");
+                    message: "[Installer] æ³¨å†Œè¡¨æƒé™è¢«æ‹’ç»ã€‚è¯·ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œå®‰è£…ç¨‹åºã€‚");
                 throw;
             }
             catch (Exception ex)
@@ -116,13 +116,13 @@ namespace Correct_test1.Installer
                 AppLogger.Error(
                     ex,
                     "Installer",
-                    message: "[Installer] ²å¼şÒÆ³ıÊ§°Ü");
+                    message: "[Installer] æ’ä»¶ç§»é™¤å¤±è´¥");
                 throw;
             }
         }
 
         /// <summary>
-        /// ¼ì²éÒÑ·¢ÏÖµÄ AutoCAD ²úÆ·ÊÇ·ñ¾ùÒÑ×¢²á´Ë²å¼ş¡£
+        /// æ£€æŸ¥å·²å‘ç°çš„ AutoCAD äº§å“æ˜¯å¦å‡å·²æ³¨å†Œæ­¤æ’ä»¶ã€‚
         /// </summary>
         public bool IsRegistered()
         {
@@ -153,17 +153,17 @@ namespace Correct_test1.Installer
                 AppLogger.Error(
                     ex,
                     "Installer",
-                    message: "[Installer] ×¢²á±íÈ¨ÏŞ±»¾Ü¾ø¡£ÇëÒÔ¹ÜÀíÔ±Éí·İÔËĞĞ°²×°³ÌĞò¡£");
+                    message: "[Installer] æ³¨å†Œè¡¨æƒé™è¢«æ‹’ç»ã€‚è¯·ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œå®‰è£…ç¨‹åºã€‚");
                 return false;
             }
             catch (Exception ex)
             {
-                AppLogger.Error(ex, "Installer", message: "[Installer] ×¢²á±í¼ì²éÊ§°Ü");
+                AppLogger.Error(ex, "Installer", message: "[Installer] æ³¨å†Œè¡¨æ£€æŸ¥å¤±è´¥");
                 return false;
             }
         }
 
-        // µİ¹éÑ°ÕÒÒÑÓĞ Applications ½Úµã£¬Òò´Ë²»»á°Ñ AutoCAD °æ±¾¡¢ÓïÑÔ»ò²úÆ·±àºÅĞ´ËÀÔÚ´úÂëÖĞ¡£
+        // é€’å½’å¯»æ‰¾å·²æœ‰ Applications èŠ‚ç‚¹ï¼Œå› æ­¤ä¸ä¼šæŠŠ AutoCAD ç‰ˆæœ¬ã€è¯­è¨€æˆ–äº§å“ç¼–å·å†™æ­»åœ¨ä»£ç ä¸­ã€‚
         private static List<ApplicationKeyLocation> FindAutoCadApplicationKeys(
             bool createMissingApplicationsKey)
         {
@@ -236,7 +236,7 @@ namespace Correct_test1.Installer
             }
         }
 
-        // Ç¿ÖÆÊ¹ÓÃ 64 Î»×¢²á±íÊÓÍ¼£¬È·±£Óë 64 Î» AutoCAD ¶ÁÈ¡µÄ HKLM Â·¾¶Ò»ÖÂ¡£
+        // å¼ºåˆ¶ä½¿ç”¨ 64 ä½æ³¨å†Œè¡¨è§†å›¾ï¼Œç¡®ä¿ä¸ 64 ä½ AutoCAD è¯»å–çš„ HKLM è·¯å¾„ä¸€è‡´ã€‚
         private static RegistryKey OpenLocalMachine(RegistryView view)
         {
             return RegistryKey.OpenBaseKey(

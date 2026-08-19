@@ -1,16 +1,16 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 
 using Correct_test1.QuickRevision.Models;
 
 namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 {
     /// <summary>
-    /// Model Space MText½âÎöÆ÷¡£
+    /// Model Space MTextè§£æå™¨ã€‚
     ///
-    /// Ê¹ÓÃMTextµÄÊµ¼ÊÏÔÊ¾·¶Î§£¬
-    /// ²»Ê¹ÓÃ¿ÉÄÜ°üº¬¶¨Òå¿í¶ÈµÄ¿íËÉ·¶Î§¡£
+    /// ä½¿ç”¨MTextçš„å®é™…æ˜¾ç¤ºèŒƒå›´ï¼Œ
+    /// ä¸ä½¿ç”¨å¯èƒ½åŒ…å«å®šä¹‰å®½åº¦çš„å®½æ¾èŒƒå›´ã€‚
     ///
-    /// µÚÒ»°æÖ»´¦ÀíË®Æ½ÎÄ×Ö¡£
+    /// ç¬¬ä¸€ç‰ˆåªå¤„ç†æ°´å¹³æ–‡å­—ã€‚
     /// </summary>
     public class MTextResolver
     {
@@ -41,7 +41,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
             //--------------------------------
-            // ÏÔÊ¾ÎÄ×Ö
+            // æ˜¾ç¤ºæ–‡å­—
             //--------------------------------
 
             string content =
@@ -57,12 +57,12 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
             //--------------------------------
-            // ¹Ø¼üĞŞ¸Ä£º
+            // å…³é”®ä¿®æ”¹ï¼š
             //
-            // ²»ÔÙ£º
+            // ä¸å†ï¼š
             // text.GeometricExtents
             //
-            // ¸ÄÎª£º
+            // æ”¹ä¸ºï¼š
             // ActualWidth + ActualHeight
             //--------------------------------
 
@@ -140,7 +140,7 @@ namespace Correct_test1.QuickRevision.Resolvers.ModelSpace
 
 
             //--------------------------------
-            // É¾³ıÏß´©¹ıÊµ¼ÊÏÔÊ¾ÎÄ×ÖÖĞĞÄ¡£
+            // åˆ é™¤çº¿ç©¿è¿‡å®é™…æ˜¾ç¤ºæ–‡å­—ä¸­å¿ƒã€‚
             //--------------------------------
 
             target.CenterY =

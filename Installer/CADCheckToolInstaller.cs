@@ -1,18 +1,18 @@
-using System;
+ï»¿using System;
 using System.IO;
 using Correct_test1.Core;
 
 namespace Correct_test1.Installer
 {
     /// <summary>
-    /// CADCheckTool °²×°²¿ÊğÖúÊÖ¡£
+    /// CADCheckTool å®‰è£…éƒ¨ç½²åŠ©æ‰‹ã€‚
     /// 
-    /// ×¢Òâ£º
-    /// ÎÄ¼ş¸´ÖÆÓÉ Inno Setup Íê³É¡£
-    /// ±¾ÀàÖ»¸ºÔğ£º
-    /// 1. ÑéÖ¤°²×°ÎÄ¼ş
-    /// 2. ×¢²á AutoCAD ×Ô¶¯¼ÓÔØ
-    /// 3. Ğ¶ÔØÊ±ÇåÀí×¢²á²¢±¸·İÓÃ»§Êı¾İ
+    /// æ³¨æ„ï¼š
+    /// æ–‡ä»¶å¤åˆ¶ç”± Inno Setup å®Œæˆã€‚
+    /// æœ¬ç±»åªè´Ÿè´£ï¼š
+    /// 1. éªŒè¯å®‰è£…æ–‡ä»¶
+    /// 2. æ³¨å†Œ AutoCAD è‡ªåŠ¨åŠ è½½
+    /// 3. å¸è½½æ—¶æ¸…ç†æ³¨å†Œå¹¶å¤‡ä»½ç”¨æˆ·æ•°æ®
     /// </summary>
     public sealed class CADCheckToolInstaller
     {
@@ -25,7 +25,7 @@ namespace Correct_test1.Installer
 
 
         /// <summary>
-        /// Ä¬ÈÏ°²×°Ä¿Â¼£º
+        /// é»˜è®¤å®‰è£…ç›®å½•ï¼š
         /// C:\Program Files\CADCheckTool_1
         /// </summary>
         public CADCheckToolInstaller()
@@ -41,14 +41,14 @@ namespace Correct_test1.Installer
 
 
         /// <summary>
-        /// Ö¸¶¨°²×°Ä¿Â¼
+        /// æŒ‡å®šå®‰è£…ç›®å½•
         /// </summary>
         public CADCheckToolInstaller(string installationDirectory)
         {
             if (string.IsNullOrWhiteSpace(installationDirectory))
             {
                 throw new ArgumentException(
-                    "°²×°Ä¿Â¼²»ÄÜÎª¿Õ¡£",
+                    "å®‰è£…ç›®å½•ä¸èƒ½ä¸ºç©ºã€‚",
                     nameof(installationDirectory));
             }
 
@@ -65,10 +65,10 @@ namespace Correct_test1.Installer
 
 
         /// <summary>
-        /// Ö´ĞĞ°²×°ºóµÄ³õÊ¼»¯¡£
+        /// æ‰§è¡Œå®‰è£…åçš„åˆå§‹åŒ–ã€‚
         /// 
-        /// Inno Setup ÒÑ¾­Íê³ÉÎÄ¼ş¸´ÖÆ£¬
-        /// ´Ë´¦Ö»×¢²á AutoCAD¡£
+        /// Inno Setup å·²ç»å®Œæˆæ–‡ä»¶å¤åˆ¶ï¼Œ
+        /// æ­¤å¤„åªæ³¨å†Œ AutoCADã€‚
         /// </summary>
         public void Install()
         {
@@ -85,7 +85,7 @@ namespace Correct_test1.Installer
                 if (!File.Exists(dllPath))
                 {
                     throw new FileNotFoundException(
-                        "°²×°Ä¿Â¼ÖĞ²»´æÔÚ CAD ²å¼ş DLL¡£",
+                        "å®‰è£…ç›®å½•ä¸­ä¸å­˜åœ¨ CAD æ’ä»¶ DLLã€‚",
                         dllPath);
                 }
 
@@ -131,10 +131,10 @@ namespace Correct_test1.Installer
 
 
         /// <summary>
-        /// Ğ¶ÔØ£º
-        /// 1. É¾³ı AutoCAD ×Ô¶¯¼ÓÔØ
-        /// 2. ±¸·İÓÃ»§Êı¾İ
-        /// 3. É¾³ı°²×°Ä¿Â¼
+        /// å¸è½½ï¼š
+        /// 1. åˆ é™¤ AutoCAD è‡ªåŠ¨åŠ è½½
+        /// 2. å¤‡ä»½ç”¨æˆ·æ•°æ®
+        /// 3. åˆ é™¤å®‰è£…ç›®å½•
         /// </summary>
         public void Uninstall()
         {

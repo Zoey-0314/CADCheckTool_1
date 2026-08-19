@@ -1,4 +1,4 @@
-namespace Correct_test1
+ï»¿namespace Correct_test1
 {
     partial class BatchCheckForm
     {
@@ -34,7 +34,7 @@ namespace Correct_test1
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(120, 20);
             this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "ÅúÁ¿Í¼Ö½¼ì²é";
+            this.lblTitle.Text = "æ‰¹é‡å›¾çº¸æ£€æŸ¥";
             // 
             // btnRunBatch
             // 
@@ -42,7 +42,7 @@ namespace Correct_test1
             this.btnRunBatch.Name = "btnRunBatch";
             this.btnRunBatch.Size = new System.Drawing.Size(220, 40);
             this.btnRunBatch.TabIndex = 1;
-            this.btnRunBatch.Text = "Ö´ĞĞÅúÁ¿¼ì²é";
+            this.btnRunBatch.Text = "æ‰§è¡Œæ‰¹é‡æ£€æŸ¥";
             this.btnRunBatch.UseVisualStyleBackColor = true;
             this.btnRunBatch.Click += new System.EventHandler(this.btnRunBatch_Click);
             // 
@@ -52,7 +52,7 @@ namespace Correct_test1
             this.btnOpenReport.Name = "btnOpenReport";
             this.btnOpenReport.Size = new System.Drawing.Size(220, 40);
             this.btnOpenReport.TabIndex = 2;
-            this.btnOpenReport.Text = "´ò¿ªÅúÁ¿¼ì²é±¨¸æ";
+            this.btnOpenReport.Text = "æ‰“å¼€æ‰¹é‡æ£€æŸ¥æŠ¥å‘Š";
             this.btnOpenReport.UseVisualStyleBackColor = true;
             this.btnOpenReport.Click += new System.EventHandler(this.btnOpenReport_Click);
             // 
@@ -62,7 +62,7 @@ namespace Correct_test1
             this.btnClearCurrent.Name = "btnClearCurrent";
             this.btnClearCurrent.Size = new System.Drawing.Size(220, 40);
             this.btnClearCurrent.TabIndex = 3;
-            this.btnClearCurrent.Text = "Çå³ıµ±Ç°Í¼Ö½ĞŞ¸Ä×¢ÊÍ";
+            this.btnClearCurrent.Text = "æ¸…é™¤å½“å‰å›¾çº¸ä¿®æ”¹æ³¨é‡Š";
             this.btnClearCurrent.UseVisualStyleBackColor = true;
             this.btnClearCurrent.Click += new System.EventHandler(this.btnClearCurrent_Click);
             // 
@@ -72,7 +72,7 @@ namespace Correct_test1
             this.btnClearFolder.Name = "btnClearFolder";
             this.btnClearFolder.Size = new System.Drawing.Size(220, 40);
             this.btnClearFolder.TabIndex = 4;
-            this.btnClearFolder.Text = "Çå³ıËùÓĞÍ¼Ö½ĞŞ¸Ä×¢ÊÍ";
+            this.btnClearFolder.Text = "æ¸…é™¤æ‰€æœ‰å›¾çº¸ä¿®æ”¹æ³¨é‡Š";
             this.btnClearFolder.UseVisualStyleBackColor = true;
             this.btnClearFolder.Click += new System.EventHandler(this.btnClearFolder_Click);
             // 
@@ -82,7 +82,7 @@ namespace Correct_test1
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(220, 30);
             this.btnClose.TabIndex = 5;
-            this.btnClose.Text = "¹Ø±Õ";
+            this.btnClose.Text = "å…³é—­";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
@@ -103,7 +103,7 @@ namespace Correct_test1
             this.MinimizeBox = false;
             this.Name = "BatchCheckForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "ÅúÁ¿Í¼Ö½¼ì²é";
+            this.Text = "æ‰¹é‡å›¾çº¸æ£€æŸ¥";
             this.ResumeLayout(false);
             this.PerformLayout();
 

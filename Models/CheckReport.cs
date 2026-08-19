@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 
 using Autodesk.AutoCAD.Geometry;
@@ -60,7 +60,7 @@ namespace Correct_test1.Models
 
 
         //==================================================
-        // ±ê×¼¼ş¼ì²é
+        // æ ‡å‡†ä»¶æ£€æŸ¥
         //==================================================
 
         public List<StandardPartCheckResult>
@@ -74,7 +74,7 @@ namespace Correct_test1.Models
 
 
         //==================================================
-        // ·Ç±ê¹éµµ¼ì²é
+        // éæ ‡å½’æ¡£æ£€æŸ¥
         //==================================================
 
         public List<NonStandardArchiveCheckResult>
@@ -87,7 +87,7 @@ namespace Correct_test1.Models
         new List<NonStandardArchiveCheckResult>();
 
         //==================================================
-        // ·Ç±ê¼şºÅ¼ì²é
+        // éæ ‡ä»¶å·æ£€æŸ¥
         //==================================================
 
         public List<NonStandardPartNumberCheckResult>
@@ -117,7 +117,7 @@ namespace Correct_test1.Models
 
 
         //==================================================
-        // ĞÂÔö£º°æ±¾ºÅ¼ì²é
+        // æ–°å¢ï¼šç‰ˆæœ¬å·æ£€æŸ¥
         //==================================================
 
         public List<VersionCheckResult>
@@ -131,7 +131,7 @@ namespace Correct_test1.Models
 
 
         /// <summary>
-        /// °æ±¾¹éµµÄ¿Â¼±¾´ÎÊÇ·ñ¿ÉÓÃ¡£
+        /// ç‰ˆæœ¬å½’æ¡£ç›®å½•æœ¬æ¬¡æ˜¯å¦å¯ç”¨ã€‚
         /// </summary>
         public bool VersionArchiveAvailable
         {
@@ -141,7 +141,7 @@ namespace Correct_test1.Models
 
 
         /// <summary>
-        /// °æ±¾¹éµµ²»¿ÉÓÃÊ±µÄÔ­Òò¡£
+        /// ç‰ˆæœ¬å½’æ¡£ä¸å¯ç”¨æ—¶çš„åŸå› ã€‚
         /// </summary>
         public string VersionArchiveError
         {
@@ -153,7 +153,7 @@ namespace Correct_test1.Models
 
 
         //==================================================
-        // ±ê×¼¼şÊı¾İ¿â×´Ì¬
+        // æ ‡å‡†ä»¶æ•°æ®åº“çŠ¶æ€
         //==================================================
 
         public bool StandardPartDatabaseAvailable
@@ -173,7 +173,7 @@ namespace Correct_test1.Models
 
 
         //==================================================
-        // BOMĞòºÅ
+        // BOMåºå·
         //==================================================
 
         public BomCalloutResult BomCalloutResult

@@ -1,13 +1,13 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 
 using Correct_test1.QuickRevision.Models;
 
 namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
 {
     /// <summary>
-    /// ½âÎöPaper SpaceÖĞµÄDBText¡£
+    /// è§£æPaper Spaceä¸­çš„DBTextã€‚
     ///
-    /// µÚÒ»°æÖ»´¦ÀíË®Æ½ÎÄ×Ö¡£
+    /// ç¬¬ä¸€ç‰ˆåªå¤„ç†æ°´å¹³æ–‡å­—ã€‚
     /// </summary>
     public class DbTextResolver
     {
@@ -85,13 +85,13 @@ namespace Correct_test1.QuickRevision.Resolvers.PaperSpace
                 content;
 
             //--------------------------------
-            // ÖØÒª£º
+            // é‡è¦ï¼š
             //
-            // PaperSpace²»Ö±½ÓÊ¹ÓÃ
-            // database.CurrentSpaceId¡£
+            // PaperSpaceä¸ç›´æ¥ä½¿ç”¨
+            // database.CurrentSpaceIdã€‚
             //
-            // Ö±½ÓÊ¹ÓÃÔ­ÎÄ×ÖËùÊô¿Õ¼ä£¬
-            // ºóĞøWriter¾ÍÒ»¶¨Ğ´»ØÍ¬Ò»¸öLayout¡£
+            // ç›´æ¥ä½¿ç”¨åŸæ–‡å­—æ‰€å±ç©ºé—´ï¼Œ
+            // åç»­Writerå°±ä¸€å®šå†™å›åŒä¸€ä¸ªLayoutã€‚
             //--------------------------------
 
             target.TargetSpaceId =

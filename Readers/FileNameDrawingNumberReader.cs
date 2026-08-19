@@ -1,10 +1,10 @@
-using System;
+ï»¿using System;
 using System.IO;
 
 namespace Correct_test1.Readers
 {
     /// <summary>
-    /// ´ÓÎÄ¼şÃû¶ÁÈ¡Í¼ºÅ£¨ÎÄ¼şÃûÈ¥µôÀ©Õ¹Ãûºó£¬µÚÒ»¸ö¿Õ¸ñÇ°µÄÄÚÈİ£©
+    /// ä»æ–‡ä»¶åè¯»å–å›¾å·ï¼ˆæ–‡ä»¶åå»æ‰æ‰©å±•ååï¼Œç¬¬ä¸€ä¸ªç©ºæ ¼å‰çš„å†…å®¹ï¼‰
     /// </summary>
     public class FileNameDrawingNumberReader
     {
@@ -21,7 +21,7 @@ namespace Correct_test1.Readers
             int idx = fileName.IndexOf(' ');
             if (idx <= 0)
             {
-                // Èç¹ûÃ»ÓĞ¿Õ¸ñ£¬»òÕß¿Õ¸ñÔÚ¿ªÍ·£¬·µ»ØÕû¸öÎÄ¼şÃû£¨ÈôÎª¿ÕÔò·µ»Ø¿Õ´®£©
+                // å¦‚æœæ²¡æœ‰ç©ºæ ¼ï¼Œæˆ–è€…ç©ºæ ¼åœ¨å¼€å¤´ï¼Œè¿”å›æ•´ä¸ªæ–‡ä»¶åï¼ˆè‹¥ä¸ºç©ºåˆ™è¿”å›ç©ºä¸²ï¼‰
                 return fileName.Trim();
             }
 

@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Colors;
 using Correct_test1.Core;
 
@@ -21,7 +21,7 @@ namespace Correct_test1.Markers
             {
 
                 Correct_test1.Core.AppLogger.Info(
-                    $"LayerÒÑ´æÔÚ:{layerName}",
+                    $"Layerå·²å­˜åœ¨:{layerName}",
                     "MarkerBase"
                 );
 
@@ -38,7 +38,7 @@ namespace Correct_test1.Markers
 
             ObjectId layerId = lt.Add(layer);
             Correct_test1.Core.AppLogger.Info(
-    $"´´½¨Layer:{layerName} Id:{layerId}",
+    $"åˆ›å»ºLayer:{layerName} Id:{layerId}",
     "MarkerBase"
 );
             tr.AddNewlyCreatedDBObject(layer, true);

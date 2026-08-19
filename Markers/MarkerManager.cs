@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.Colors;
+ï»¿using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Configs;
@@ -133,7 +133,7 @@ namespace Correct_test1.Markers
                                         text.Y,
                                         0),
                                     SpaceId = spaceId,
-                                    Message = "ĞòºÅ´íÎó£º²»ÔÚBOMÖĞ"
+                                    Message = "åºå·é”™è¯¯ï¼šä¸åœ¨BOMä¸­"
                                 };
 
                             marker.CreateExtraMarker(
@@ -214,7 +214,7 @@ namespace Correct_test1.Markers
 
 
                         //==================================================
-                        // ÕÒµ½Õâ¸öĞòºÅÕæÕıÊôÓÚÄÄ¸öBOM¡¢ÄÄ¸öLayout
+                        // æ‰¾åˆ°è¿™ä¸ªåºå·çœŸæ­£å±äºå“ªä¸ªBOMã€å“ªä¸ªLayout
                         //==================================================
 
                         foreach (
@@ -288,11 +288,11 @@ namespace Correct_test1.Markers
 
 
                         //==================================================
-                        // ¹Ø¼üĞŞÕı£º
+                        // å…³é”®ä¿®æ­£ï¼š
                         //
-                        // ²»ÔÙÊ¹ÓÃdatabase.CurrentSpaceId¡£
+                        // ä¸å†ä½¿ç”¨database.CurrentSpaceIdã€‚
                         //
-                        // Ê¹ÓÃÕâ¸öBOMÕæÕıËùÊôµÄLayout¡£
+                        // ä½¿ç”¨è¿™ä¸ªBOMçœŸæ­£æ‰€å±çš„Layoutã€‚
                         //==================================================
 
                         ObjectId spaceId =
@@ -320,7 +320,7 @@ namespace Correct_test1.Markers
                                         .SourceLayoutName,
 
                                 Message =
-                                    "Í¼ÖĞÈ±ÉÙĞòºÅ£º"
+                                    "å›¾ä¸­ç¼ºå°‘åºå·ï¼š"
                                     + missingNumber
                             };
 
@@ -439,9 +439,9 @@ namespace Correct_test1.Markers
 
 
                         //==================================================
-                        // ¹Ø¼ü£º
+                        // å…³é”®ï¼š
                         //
-                        // Ã¿Ò»¸ö´íÎó¶¼ÕÒµ½ËüÕæÕıËùÊôLayout
+                        // æ¯ä¸€ä¸ªé”™è¯¯éƒ½æ‰¾åˆ°å®ƒçœŸæ­£æ‰€å±Layout
                         //==================================================
 
                         ObjectId spaceId =
@@ -480,7 +480,7 @@ namespace Correct_test1.Markers
                         bool isDrawingNumberIssue =
                             issue.Message != null &&
                             issue.Message.StartsWith(
-                                "Í¼ºÅÎÄ×Ö¸ß¶È´íÎó",
+                                "å›¾å·æ–‡å­—é«˜åº¦é”™è¯¯",
                                 System.StringComparison.Ordinal);
 
 
@@ -498,7 +498,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ±£ÁôÄãÔ­À´µÄ´íÎ»´¦Àí
+                        // ä¿ç•™ä½ åŸæ¥çš„é”™ä½å¤„ç†
                         //--------------------------------
 
                         if (isDrawingNumberIssue &&
@@ -544,7 +544,7 @@ namespace Correct_test1.Markers
 
 
                         //==================================================
-                        // Ğ´½øÕâ¸öissue×Ô¼ºµÄLayout
+                        // å†™è¿›è¿™ä¸ªissueè‡ªå·±çš„Layout
                         //==================================================
 
                         space.AppendEntity(
@@ -599,8 +599,8 @@ namespace Correct_test1.Markers
             }
         }
         //==================================================
-        // ĞÂ°æ£º
-        // ¸ù¾İÒÑ¾­°ó¶¨LayoutµÄIssue»æÖÆÈ±ÉÙĞòºÅMarker¡£
+        // æ–°ç‰ˆï¼š
+        // æ ¹æ®å·²ç»ç»‘å®šLayoutçš„Issueç»˜åˆ¶ç¼ºå°‘åºå·Markerã€‚
         //==================================================
 
         public void CreateMissingCalloutMarkers(
@@ -693,11 +693,11 @@ namespace Correct_test1.Markers
             }
         }
         //==================================================
-        // ĞÂ°æ£º
-        // Í¼ÖĞ¶àÓàĞòºÅÒÑ¾­°ó¶¨ËùÊôLayoutºÍÎ»ÖÃ¡£
+        // æ–°ç‰ˆï¼š
+        // å›¾ä¸­å¤šä½™åºå·å·²ç»ç»‘å®šæ‰€å±Layoutå’Œä½ç½®ã€‚
         //
-        // ÊµÌå±¾ÉíÎ»ÓÚModelSpace£¬
-        // ËùÒÔMarkerÈÔÈ»»­µ½ModelSpace¡£
+        // å®ä½“æœ¬èº«ä½äºModelSpaceï¼Œ
+        // æ‰€ä»¥Markerä»ç„¶ç”»åˆ°ModelSpaceã€‚
         //==================================================
 
         public void CreateExtraCalloutMarkers(
@@ -829,26 +829,26 @@ namespace Correct_test1.Markers
             switch (result.Status)
             {
                 case StandardPartCheckStatus.FormatDifference:
-                    return "¸ñÊ½´íÎó  Ó¦¸ÃÎª: " + (result.CorrectPartNumber ?? "");
+                    return "æ ¼å¼é”™è¯¯  åº”è¯¥ä¸º: " + (result.CorrectPartNumber ?? "");
                 case StandardPartCheckStatus.NameError:
-                    return "Ãû³Æ´íÎó  Ó¦¸ÃÎª: " + (result.CorrectName ?? "");
+                    return "åç§°é”™è¯¯  åº”è¯¥ä¸º: " + (result.CorrectName ?? "");
                 case StandardPartCheckStatus.NotRegistered:
-                    return "±ê×¼¼şÎ´ÊÕÂ¼";
+                    return "æ ‡å‡†ä»¶æœªæ”¶å½•";
                 case StandardPartCheckStatus.MultipleMatch:
-                    return "´æÔÚ¶à¸öÆ¥Åä±ê×¼¼ş£¬ÇëÈ·ÈÏ";
+                    return "å­˜åœ¨å¤šä¸ªåŒ¹é…æ ‡å‡†ä»¶ï¼Œè¯·ç¡®è®¤";
                 default:
                     return "";
             }
         }
 
         /// <summary>
-        /// Îª¡°¹éµµÖĞ²»´æÔÚ¡±µÄNS·Ç±ê¼ş´´½¨±ê¼Ç¡£
+        /// ä¸ºâ€œå½’æ¡£ä¸­ä¸å­˜åœ¨â€çš„NSéæ ‡ä»¶åˆ›å»ºæ ‡è®°ã€‚
         ///
-        /// ¼ÌĞøÊ¹ÓÃ£º
+        /// ç»§ç»­ä½¿ç”¨ï¼š
         /// CADCHECK_MARKER
         ///
-        /// Òò´ËÔ­ÓĞ¡°Çå³ı¼ì²é±ê¼Ç¡±
-        /// ¿ÉÒÔÍ³Ò»Çå³ıÕâĞ©±ê¼Ç¡£
+        /// å› æ­¤åŸæœ‰â€œæ¸…é™¤æ£€æŸ¥æ ‡è®°â€
+        /// å¯ä»¥ç»Ÿä¸€æ¸…é™¤è¿™äº›æ ‡è®°ã€‚
         /// </summary>
         public void CreateNonStandardArchiveMarkers(
             Database database,
@@ -902,7 +902,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ±ê¼Ç·ÅÔÚPart No.µ¥Ôª¸ñÅÔ±ß
+                        // æ ‡è®°æ”¾åœ¨Part No.å•å…ƒæ ¼æ—è¾¹
                         //--------------------------------
 
                         MarkerInfo info =
@@ -919,7 +919,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ÕÒµ½Õâ¸öBOMÕæÕıËùÔÚµÄLayout
+                        // æ‰¾åˆ°è¿™ä¸ªBOMçœŸæ­£æ‰€åœ¨çš„Layout
                         //--------------------------------
 
                         ObjectId spaceId =
@@ -930,9 +930,9 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ¸´ÓÃStandardPartMarker»æÍ¼¡£
+                        // å¤ç”¨StandardPartMarkerç»˜å›¾ã€‚
                         //
-                        // Ö»¸Ä±äXDataÀàĞÍ¡£
+                        // åªæ”¹å˜XDataç±»å‹ã€‚
                         //--------------------------------
 
                         marker.Create(
@@ -957,18 +957,18 @@ namespace Correct_test1.Markers
         }
 
         /// <summary>
-        /// Îª¡°·Ç±ê¼şºÅ²»´æÔÚ¡±´´½¨¼ì²é±ê¼Ç¡£
+        /// ä¸ºâ€œéæ ‡ä»¶å·ä¸å­˜åœ¨â€åˆ›å»ºæ£€æŸ¥æ ‡è®°ã€‚
         ///
-        /// ÀıÈçBOM£º
+        /// ä¾‹å¦‚BOMï¼š
         /// NS333T1
         ///
-        /// ¹éµµÍ¼Ö½ÖĞÃ»ÓĞ£º
+        /// å½’æ¡£å›¾çº¸ä¸­æ²¡æœ‰ï¼š
         /// NS333T + _1
         ///
-        /// ÔòÔÚµ±Ç°BOMµÄNS333T1ÅÔ±ßÌáÊ¾¡£
+        /// åˆ™åœ¨å½“å‰BOMçš„NS333T1æ—è¾¹æç¤ºã€‚
         ///
-        /// ¼ÌĞøÊ¹ÓÃCADCHECK_MARKER£¬
-        /// ËùÒÔÔ­ÓĞÇå³ı¼ì²é±ê¼Ç¹¦ÄÜ¿ÉÒÔÒ»ÆğÇå³ı¡£
+        /// ç»§ç»­ä½¿ç”¨CADCHECK_MARKERï¼Œ
+        /// æ‰€ä»¥åŸæœ‰æ¸…é™¤æ£€æŸ¥æ ‡è®°åŠŸèƒ½å¯ä»¥ä¸€èµ·æ¸…é™¤ã€‚
         /// </summary>
         public void CreateNonStandardPartNumberMarkers(
             Database database,
@@ -1022,7 +1022,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ÌáÊ¾·ÅÔÚµ±Ç°BOM¼şºÅÅÔ±ß
+                        // æç¤ºæ”¾åœ¨å½“å‰BOMä»¶å·æ—è¾¹
                         //--------------------------------
 
                         MarkerInfo info =
@@ -1037,7 +1037,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // Ğ´µ½µ±Ç°BOMÕæÕıËùÔÚLayout
+                        // å†™åˆ°å½“å‰BOMçœŸæ­£æ‰€åœ¨Layout
                         //--------------------------------
 
                         ObjectId spaceId =
@@ -1048,7 +1048,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ¼ÌĞø¸´ÓÃÏÖÓĞºìÉ«MText±ê¼Ç
+                        // ç»§ç»­å¤ç”¨ç°æœ‰çº¢è‰²MTextæ ‡è®°
                         //--------------------------------
 
                         marker.Create(
@@ -1073,13 +1073,13 @@ namespace Correct_test1.Markers
         }
 
         /// <summary>
-        /// ´´½¨°æ±¾ºÅ¼ì²éÌáÊ¾¡£
+        /// åˆ›å»ºç‰ˆæœ¬å·æ£€æŸ¥æç¤ºã€‚
         ///
-        /// ¼ÌĞøÊ¹ÓÃ£º
+        /// ç»§ç»­ä½¿ç”¨ï¼š
         /// CADCHECK_MARKER
         ///
-        /// ËùÒÔÔ­ÓĞ¡°Çå³ı¼ì²é±ê¼Ç¡±
-        /// ¿ÉÒÔÖ±½ÓÇå³ı¡£
+        /// æ‰€ä»¥åŸæœ‰â€œæ¸…é™¤æ£€æŸ¥æ ‡è®°â€
+        /// å¯ä»¥ç›´æ¥æ¸…é™¤ã€‚
         /// </summary>
         public void CreateVersionMarkers(
             Database database,
@@ -1118,7 +1118,7 @@ namespace Correct_test1.Markers
 
 
                     //--------------------------------
-                    // Ö±½Ó¸´ÓÃÏÖÓĞMTextÌáÊ¾»æÖÆÆ÷
+                    // ç›´æ¥å¤ç”¨ç°æœ‰MTextæç¤ºç»˜åˆ¶å™¨
                     //--------------------------------
 
                     StandardPartMarker marker =
@@ -1145,7 +1145,7 @@ namespace Correct_test1.Markers
 
 
                         //--------------------------------
-                        // ±ØĞëĞ´µ½°æ±¾ºÅËùÔÚLayout
+                        // å¿…é¡»å†™åˆ°ç‰ˆæœ¬å·æ‰€åœ¨Layout
                         //--------------------------------
 
                         ObjectId spaceId =
@@ -1203,17 +1203,17 @@ namespace Correct_test1.Markers
 
 
             //==================================================
-            // LayoutÀ´Ô´²»Ã÷È·£º
+            // Layoutæ¥æºä¸æ˜ç¡®ï¼š
             //
-            // Äş¿É²»»­£¬
-            // Ò²¾ø¶Ô²»ÄÜ»­µ½µ±Ç°Layout¡£
+            // å®å¯ä¸ç”»ï¼Œ
+            // ä¹Ÿç»å¯¹ä¸èƒ½ç”»åˆ°å½“å‰Layoutã€‚
             //==================================================
 
             if (string.IsNullOrWhiteSpace(
                     layoutName))
             {
                 AppLogger.Info(
-                    "Ìø¹ı±ê¼Ç£ºLayoutNameÎª¿Õ",
+                    "è·³è¿‡æ ‡è®°ï¼šLayoutNameä¸ºç©º",
                     "MarkerManager.GetLayoutSpaceId");
 
                 return ObjectId.Null;
@@ -1262,17 +1262,17 @@ namespace Correct_test1.Markers
 
 
             AppLogger.Info(
-                "Ìø¹ı±ê¼Ç£ºÕÒ²»µ½Layout£º"
+                "è·³è¿‡æ ‡è®°ï¼šæ‰¾ä¸åˆ°Layoutï¼š"
                 + layoutName,
                 "MarkerManager.GetLayoutSpaceId");
 
 
             //==================================================
-            // Ô­À´ÕâÀïÊÇ£º
+            // åŸæ¥è¿™é‡Œæ˜¯ï¼š
             //
             // return database.CurrentSpaceId;
             //
-            // Õâ¾ÍÊÇ²¼¾Ö´®Î»µÄÖØÒªÀ´Ô´¡£
+            // è¿™å°±æ˜¯å¸ƒå±€ä¸²ä½çš„é‡è¦æ¥æºã€‚
             //==================================================
 
             return ObjectId.Null;

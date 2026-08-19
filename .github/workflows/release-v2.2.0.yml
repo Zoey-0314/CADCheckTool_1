@@ -8,9 +8,11 @@ on:
     branches:
       - master
     paths:
+      - "**/*.cs"
       - "Correct_test1.csproj"
       - "Properties/AssemblyInfo.cs"
       - "Installer/**"
+      - ".editorconfig"
       - ".github/workflows/release-v2.2.0.yml"
   workflow_dispatch:
 
@@ -24,6 +26,44 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
+      - name: Validate source text encoding
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strictUtf8 = New-Object System.Text.UTF8Encoding($false, $true)
+          $invalidFiles = [System.Collections.Generic.List[string]]::new()
+
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -File -Filter '*.cs' | ForEach-Object {
+            try {
+              $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
+              [void]$strictUtf8.GetString($bytes)
+            }
+            catch {
+              $invalidFiles.Add($_.FullName)
+            }
+          }
+
+          if ($invalidFiles.Count -gt 0) {
+            throw "C# source files must be valid UTF-8:`n$($invalidFiles -join "`n")"
+          }
+
+          @(
+            'Installer\CADCheckTool_v2.2.0.iss',
+            'Installer\INSTALLATION_GUIDE_v2.2.0.txt'
+          ) | ForEach-Object {
+            $path = Join-Path $env:GITHUB_WORKSPACE $_
+            $bytes = [System.IO.File]::ReadAllBytes($path)
+            $hasUtf8Bom =
+              $bytes.Length -ge 3 -and
+              $bytes[0] -eq 0xEF -and
+              $bytes[1] -eq 0xBB -and
+              $bytes[2] -eq 0xBF
+
+            if (-not $hasUtf8Bom) {
+              throw "Release text file must use UTF-8 BOM: $_"
+            }
+          }
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -138,6 +178,43 @@ jobs:
             throw "Unexpected assembly version: $version"
           }
 
+          function Test-ByteSequence {
+            param(
+              [byte[]]$Buffer,
+              [byte[]]$Pattern
+            )
+
+            for ($offset = 0; $offset -le $Buffer.Length - $Pattern.Length; $offset++) {
+              $matches = $true
+              for ($index = 0; $index -lt $Pattern.Length; $index++) {
+                if ($Buffer[$offset + $index] -ne $Pattern[$index]) {
+                  $matches = $false
+                  break
+                }
+              }
+
+              if ($matches) {
+                return $true
+              }
+            }
+
+            return $false
+          }
+
+          $assemblyBytes = [System.IO.File]::ReadAllBytes($mainDll)
+          @(
+            '单张检查',
+            '批量检查',
+            '当前没有打开CAD图纸。',
+            '标准件库未收录',
+            '序号错误：不在BOM中'
+          ) | ForEach-Object {
+            $expectedBytes = [System.Text.Encoding]::Unicode.GetBytes($_)
+            if (-not (Test-ByteSequence -Buffer $assemblyBytes -Pattern $expectedBytes)) {
+              throw "Compiled plug-in is missing expected Chinese text: $_"
+            }
+          }
+
           Get-ChildItem -Path (Split-Path $pluginDir -Parent) -Recurse | Select-Object FullName, Length
 
       - name: Compile Inno Setup installer
@@ -199,6 +276,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh release view v2.2.0 *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release delete v2.2.0 --cleanup-tag --yes
+            if ($LASTEXITCODE -ne 0) {
+              throw 'Unable to remove the previous v2.2.0 release and tag.'
+            }
+          }
+
           gh release create v2.2.0 `
             artifacts/release/CADCheckTool_1_Setup_v2.2.0.exe `
             artifacts/release/CADCheckTool_1_v2.2.0_Windows_x64.zip `

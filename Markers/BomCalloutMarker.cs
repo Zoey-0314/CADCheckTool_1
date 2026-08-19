@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+ï»¿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Configs;
 using Correct_test1.Core;
@@ -61,13 +61,13 @@ namespace Correct_test1.Markers
             }
 
             //--------------------------------
-            // ¼ì²é×ø±ê
+            // æ£€æŸ¥åæ ‡
             //--------------------------------
 
             if (!IsValidPoint(issue.Position))
             {
                 AppLogger.Info(
-                    "Ìø¹ıBomCalloutMarker£º×ø±êÎŞĞ§£¬ĞòºÅ=" +
+                    "è·³è¿‡BomCalloutMarkerï¼šåæ ‡æ— æ•ˆï¼Œåºå·=" +
                     issue.Number,
                     "BomCalloutMarker");
 
@@ -75,7 +75,7 @@ namespace Correct_test1.Markers
             }
 
             //--------------------------------
-            // »ñÈ¡Ä¿±ê¿Õ¼ä
+            // è·å–ç›®æ ‡ç©ºé—´
             //--------------------------------
 
             BlockTableRecord space =
@@ -88,7 +88,7 @@ namespace Correct_test1.Markers
                 return;
 
             //--------------------------------
-            // MarkerÎ»ÖÃ
+            // Markerä½ç½®
             //--------------------------------
 
             Point3d markerPosition =
@@ -99,7 +99,7 @@ namespace Correct_test1.Markers
                 return;
 
             //--------------------------------
-            // ¼ì²éÎÄ×Ö¸ß¶È
+            // æ£€æŸ¥æ–‡å­—é«˜åº¦
             //--------------------------------
 
             if (double.IsNaN(textHeight) ||
@@ -110,7 +110,7 @@ namespace Correct_test1.Markers
             }
 
             //--------------------------------
-            // ´´½¨MText
+            // åˆ›å»ºMText
             //--------------------------------
 
             using (MText text = new MText())
@@ -137,7 +137,7 @@ namespace Correct_test1.Markers
                     true);
 
                 //--------------------------------
-                // Ìí¼ÓXData
+                // æ·»åŠ XData
                 //--------------------------------
 
                 using (ResultBuffer xdata =
@@ -157,7 +157,7 @@ namespace Correct_test1.Markers
         }
 
         //--------------------------------
-        // ×ø±ê¼ì²é
+        // åæ ‡æ£€æŸ¥
         //--------------------------------
 
         private static bool IsValidPoint(

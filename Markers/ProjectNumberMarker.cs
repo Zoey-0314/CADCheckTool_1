@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.Colors;
+ï»¿using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Correct_test1.Models;
@@ -23,7 +23,7 @@ namespace Correct_test1.Markers
             MText text = new MText();
             text.Location = location.Position + Vector3d.YAxis * -5.0;
             text.TextHeight = 3.5;
-            text.Contents = "ÏîÄ¿ºÅ²»Ò»ÖÂ  Ó¦¸ÃÎª: " + expectedProject;
+            text.Contents = "é¡¹ç›®å·ä¸ä¸€è‡´  åº”è¯¥ä¸º: " + expectedProject;
             text.LayerId = layerId;
             text.Color = Color.FromRgb(0, 255, 0);
 

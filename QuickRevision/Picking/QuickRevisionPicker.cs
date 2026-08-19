@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.ApplicationServices;
+ï»¿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -9,19 +9,19 @@ using Correct_test1.QuickRevision.Resolvers;
 namespace Correct_test1.QuickRevision.Picking
 {
     /// <summary>
-    /// QuickRevisionÓÃ»§µã»÷Èë¿Ú¡£
+    /// QuickRevisionç”¨æˆ·ç‚¹å‡»å…¥å£ã€‚
     ///
-    /// ¸ºÔğ£º
+    /// è´Ÿè´£ï¼š
     ///
-    /// 1. ±£Ö¤´¦ÓÚPaper Space
-    /// 2. »ñÈ¡ÓÃ»§µã»÷Î»ÖÃ
-    /// 3. µ÷ÓÃRevisionTargetResolver
-    /// 4. ·µ»ØRevisionTarget
+    /// 1. ä¿è¯å¤„äºPaper Space
+    /// 2. è·å–ç”¨æˆ·ç‚¹å‡»ä½ç½®
+    /// 3. è°ƒç”¨RevisionTargetResolver
+    /// 4. è¿”å›RevisionTarget
     ///
-    /// ²»¸ºÔğ£º
-    /// »æÖÆ
-    /// ÊäÈë¿ò
-    /// TransactionĞ´Èë
+    /// ä¸è´Ÿè´£ï¼š
+    /// ç»˜åˆ¶
+    /// è¾“å…¥æ¡†
+    /// Transactionå†™å…¥
     /// </summary>
     public class QuickRevisionPicker
     {
@@ -37,7 +37,7 @@ namespace Correct_test1.QuickRevision.Picking
 
 
         /// <summary>
-        /// ¼æÈİÔ­À´µÄµ¥´Îµ÷ÓÃ¡£
+        /// å…¼å®¹åŸæ¥çš„å•æ¬¡è°ƒç”¨ã€‚
         /// </summary>
         public RevisionTarget Pick(
             Document document)
@@ -51,13 +51,13 @@ namespace Correct_test1.QuickRevision.Picking
 
 
         /// <summary>
-        /// Á¬ĞøÄ£Ê½Ê¹ÓÃ¡£
+        /// è¿ç»­æ¨¡å¼ä½¿ç”¨ã€‚
         ///
-        /// cancelled = true£º
-        /// ÓÃ»§°´Esc/È¡Ïû£¬Ó¦ÍË³öÁ¬ĞøÄ£Ê½¡£
+        /// cancelled = trueï¼š
+        /// ç”¨æˆ·æŒ‰Esc/å–æ¶ˆï¼Œåº”é€€å‡ºè¿ç»­æ¨¡å¼ã€‚
         ///
-        /// cancelled = false + target=null£º
-        /// Ö»ÊÇÃ»ÓĞÊ¶±ğµ½¶ÔÏó£¬Á¬ĞøÄ£Ê½¼ÌĞø¡£
+        /// cancelled = false + target=nullï¼š
+        /// åªæ˜¯æ²¡æœ‰è¯†åˆ«åˆ°å¯¹è±¡ï¼Œè¿ç»­æ¨¡å¼ç»§ç»­ã€‚
         /// </summary>
         public RevisionTarget Pick(
             Document document,
@@ -95,13 +95,13 @@ namespace Correct_test1.QuickRevision.Picking
 
 
             //--------------------------------
-            // Ö»Ö§³ÖLayout
+            // åªæ”¯æŒLayout
             //--------------------------------
 
             if (database.TileMode)
             {
                 editor.WriteMessage(
-                    "\n¿ìËÙ»®¸ÄÄ¿Ç°Ö»Ö§³ÖÔÚ²¼¾ÖÖĞÊ¹ÓÃ¡£");
+                    "\nå¿«é€Ÿåˆ’æ”¹ç›®å‰åªæ”¯æŒåœ¨å¸ƒå±€ä¸­ä½¿ç”¨ã€‚");
 
 
                 cancelled =
@@ -112,15 +112,15 @@ namespace Correct_test1.QuickRevision.Picking
 
 
             //--------------------------------
-            // Èç¹ûÓÃ»§µ±Ç°´¦ÔÚViewportÄÚ²¿£¬
-            // ×Ô¶¯ÍË»ØPaper Space¡£
+            // å¦‚æœç”¨æˆ·å½“å‰å¤„åœ¨Viewportå†…éƒ¨ï¼Œ
+            // è‡ªåŠ¨é€€å›Paper Spaceã€‚
             //--------------------------------
 
             if (!EnsurePaperSpace(
                     editor))
             {
                 editor.WriteMessage(
-                    "\nÎŞ·¨ÇĞ»»µ½²¼¾Ö¿Õ¼ä¡£");
+                    "\næ— æ³•åˆ‡æ¢åˆ°å¸ƒå±€ç©ºé—´ã€‚");
 
 
                 cancelled =
@@ -131,12 +131,12 @@ namespace Correct_test1.QuickRevision.Picking
 
 
             //--------------------------------
-            // »ñÈ¡µã»÷µã
+            // è·å–ç‚¹å‡»ç‚¹
             //--------------------------------
 
             PromptPointOptions options =
                 new PromptPointOptions(
-                    "\nÇëÑ¡ÔñĞèÒª»®¸ÄµÄÎÄ×Ö¡¢³ß´ç»òBOMÄÚÈİ <EscÍË³ö>£º");
+                    "\nè¯·é€‰æ‹©éœ€è¦åˆ’æ”¹çš„æ–‡å­—ã€å°ºå¯¸æˆ–BOMå†…å®¹ <Escé€€å‡º>ï¼š");
 
 
             PromptPointResult result =
@@ -173,7 +173,7 @@ namespace Correct_test1.QuickRevision.Picking
 
 
             //--------------------------------
-            // ×ªWCS
+            // è½¬WCS
             //--------------------------------
 
             Point3d paperPoint;
@@ -193,7 +193,7 @@ namespace Correct_test1.QuickRevision.Picking
 
 
             //--------------------------------
-            // ResolverÖ»¶Á
+            // Resolveråªè¯»
             //--------------------------------
 
             using (
@@ -213,16 +213,16 @@ namespace Correct_test1.QuickRevision.Picking
 
 
                 //--------------------------------
-                // µãµ½¿Õ°×/²»Ö§³Ö¶ÔÏó
+                // ç‚¹åˆ°ç©ºç™½/ä¸æ”¯æŒå¯¹è±¡
                 //
-                // ×¢Òâ£º
-                // ÕâÀïcancelledÈÔÈ»ÊÇfalse¡£
+                // æ³¨æ„ï¼š
+                // è¿™é‡Œcancelledä»ç„¶æ˜¯falseã€‚
                 //--------------------------------
 
                 if (target == null)
                 {
                     editor.WriteMessage(
-                        "\nµ±Ç°Î»ÖÃÃ»ÓĞÊ¶±ğµ½¿É»®¸Ä¶ÔÏó£¬Çë¼ÌĞøÑ¡Ôñ¡£");
+                        "\nå½“å‰ä½ç½®æ²¡æœ‰è¯†åˆ«åˆ°å¯åˆ’æ”¹å¯¹è±¡ï¼Œè¯·ç»§ç»­é€‰æ‹©ã€‚");
 
                     return null;
                 }
@@ -231,7 +231,7 @@ namespace Correct_test1.QuickRevision.Picking
                 if (!target.IsValid())
                 {
                     editor.WriteMessage(
-                        "\nÊ¶±ğµ½¶ÔÏó£¬µ«Ä¿±êÊı¾İÎŞĞ§£¬Çë¼ÌĞøÑ¡Ôñ¡£");
+                        "\nè¯†åˆ«åˆ°å¯¹è±¡ï¼Œä½†ç›®æ ‡æ•°æ®æ— æ•ˆï¼Œè¯·ç»§ç»­é€‰æ‹©ã€‚");
 
                     return null;
                 }

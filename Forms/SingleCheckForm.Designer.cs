@@ -1,4 +1,4 @@
-namespace Correct_test1
+ï»¿namespace Correct_test1
 {
     partial class SingleCheckForm
     {
@@ -78,7 +78,7 @@ namespace Correct_test1
                 0;
 
             this.lblTitle.Text =
-                "µ¥ÕÅÍ¼Ö½¼ì²é";
+                "å•å¼ å›¾çº¸æ£€æŸ¥";
 
 
             //==================================================
@@ -102,7 +102,7 @@ namespace Correct_test1
                 1;
 
             this.btnCheck.Text =
-                "¼ì²éµ±Ç°Í¼Ö½";
+                "æ£€æŸ¥å½“å‰å›¾çº¸";
 
             this.btnCheck.UseVisualStyleBackColor =
                 true;
@@ -133,7 +133,7 @@ namespace Correct_test1
                 2;
 
             this.btnClear.Text =
-                "Çå³ı¼ì²é±ê¼Ç";
+                "æ¸…é™¤æ£€æŸ¥æ ‡è®°";
 
             this.btnClear.UseVisualStyleBackColor =
                 true;
@@ -164,7 +164,7 @@ namespace Correct_test1
                 3;
 
             this.btnQuickRevision.Text =
-                "¿ìËÙ»®¸Ä";
+                "å¿«é€Ÿåˆ’æ”¹";
 
             this.btnQuickRevision.UseVisualStyleBackColor =
                 true;
@@ -195,7 +195,7 @@ namespace Correct_test1
                 4;
 
             this.btnClearQuickRevision.Text =
-                "Çå³ı»®¸Ä";
+                "æ¸…é™¤åˆ’æ”¹";
 
             this.btnClearQuickRevision.UseVisualStyleBackColor =
                 true;
@@ -226,7 +226,7 @@ namespace Correct_test1
                 5;
 
             this.btnClose.Text =
-                "¹Ø±Õ";
+                "å…³é—­";
 
             this.btnClose.UseVisualStyleBackColor =
                 true;
@@ -294,8 +294,8 @@ namespace Correct_test1
 
 
             //--------------------------------
-            // ÏÖÔÚÕâÊÇModeless´°¿Ú£¬
-            // Ê¹ÓÃCenterScreen¸üºÏÊÊ¡£
+            // ç°åœ¨è¿™æ˜¯Modelessçª—å£ï¼Œ
+            // ä½¿ç”¨CenterScreenæ›´åˆé€‚ã€‚
             //--------------------------------
 
             this.StartPosition =
@@ -305,12 +305,12 @@ namespace Correct_test1
 
 
             this.Text =
-                "µ¥ÕÅÍ¼Ö½¼ì²é";
+                "å•å¼ å›¾çº¸æ£€æŸ¥";
 
 
             //--------------------------------
-            // ÎŞÂÛ¹Ø±Õ°´Å¥»¹ÊÇÓÒÉÏ½ÇX£¬
-            // ¶¼¼ì²éÊÇ·ñĞèÒªÍË³öQREVMODE¡£
+            // æ— è®ºå…³é—­æŒ‰é’®è¿˜æ˜¯å³ä¸Šè§’Xï¼Œ
+            // éƒ½æ£€æŸ¥æ˜¯å¦éœ€è¦é€€å‡ºQREVMODEã€‚
             //--------------------------------
 
             this.FormClosing +=
