@@ -525,13 +525,14 @@ namespace Correct_test1.Checks
                     //==================================================
                     // 当前Layout图中实际序号
                     //==================================================
+                    List<TitleText> acceptedLayoutTexts;
 
                     HashSet<int> layoutDrawingNumbers =
                         layoutReader
                             .IdentifyDrawingBomNumbers(
                                 layoutTexts,
-                                layoutLines);
-
+                                layoutLines,
+                                out acceptedLayoutTexts);
 
                     //==================================================
                     // 保留总集合，
@@ -557,7 +558,7 @@ namespace Correct_test1.Checks
                             layoutName,
                             layoutBoms,
                             layoutDrawingNumbers,
-                            layoutTexts);
+                            acceptedLayoutTexts);
 
 
                     //==================================================

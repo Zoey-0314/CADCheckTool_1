@@ -69,17 +69,34 @@ namespace Correct_test1.Readers
         }
 
         public HashSet<int> IdentifyDrawingBomNumbers(
+    List<TitleText> texts,
+    List<CadLineInfo> lines)
+        {
+            List<TitleText> acceptedTexts;
+
+            return IdentifyDrawingBomNumbers(
+                texts,
+                lines,
+                out acceptedTexts);
+        }
+
+
+        public HashSet<int> IdentifyDrawingBomNumbers(
             List<TitleText> texts,
-            List<CadLineInfo> lines)
+            List<CadLineInfo> lines,
+            out List<TitleText> acceptedTexts)
         {
             HashSet<int> result =
                 new HashSet<int>();
+
+            acceptedTexts =
+                new List<TitleText>();
 
             if (texts == null)
                 return result;
 
             Dictionary<ObjectId, List<CadLineInfo>> linesByViewport =
-     new Dictionary<ObjectId, List<CadLineInfo>>();
+                new Dictionary<ObjectId, List<CadLineInfo>>();
 
             if (lines != null)
             {
@@ -140,15 +157,45 @@ namespace Correct_test1.Readers
                     {
                         continue;
                     }
+                    if (number == 6)
+                    {
+                        Autodesk.AutoCAD.ApplicationServices.Document document =
+                            Autodesk.AutoCAD.ApplicationServices.Application
+                                .DocumentManager
+                                .MdiActiveDocument;
 
-                    // >=100 的序号直接确认，不做焊接符号判断
+                        if (document != null)
+                        {
+                            document.Editor.WriteMessage(
+                                "\n[BOM6] 实际判断坐标：X="
+                                + text.X.ToString("0.0000")
+                                + "，Y="
+                                + text.Y.ToString("0.0000")
+                                + "，ViewportId="
+                                + (text.ViewportId.IsNull
+                                    ? "Null"
+                                    : text.ViewportId.Handle.ToString())
+                                + "，同视口线数量="
+                                + (viewportLines == null
+                                    ? "Null"
+                                    : viewportLines.Count.ToString()));
+                        }
+                    }
+
+                    // >=100 保留原有判断逻辑
                     if (number >= 100)
                     {
                         result.Add(number);
+
+                        if (!acceptedTexts.Contains(text))
+                        {
+                            acceptedTexts.Add(text);
+                        }
+
                         continue;
                     }
 
-                    // 1~99 排除焊接符号
+                    // 1~99 保留原有焊接符号判断逻辑
                     bool isWelding =
                         viewportLines != null &&
                         IsWeldingCandidateByRange(
@@ -157,16 +204,22 @@ namespace Correct_test1.Readers
 
                     if (isWelding)
                     {
+                        // 焊接符号既不加入数字集合，
+                        // 也不加入后续错误标记位置集合
                         continue;
                     }
 
                     result.Add(number);
+
+                    if (!acceptedTexts.Contains(text))
+                    {
+                        acceptedTexts.Add(text);
+                    }
                 }
             }
 
             return result;
         }
-
 
         public static IEnumerable<string> SplitNumericTexts(
             string text)
@@ -251,6 +304,11 @@ namespace Correct_test1.Readers
                         line.StartPoint.X -
                         line.EndPoint.X) <= 0.5;
 
+                bool isHorizontal =
+    Math.Abs(
+        line.StartPoint.Y -
+        line.EndPoint.Y) <= 0.5;
+
                 if (!hasSideLine &&
                     line.IsBlue &&
                     isVertical &&
@@ -279,12 +337,23 @@ namespace Correct_test1.Readers
                 }
 
 
-                // 数字上方是否存在横跨数字位置的线
+                // 数字中心正上方是否存在横线
+                // 横线必须明显跨过数字中心，
+                // 不能只是横线端点轻微擦过文字中心。
+                double centerInset =
+                    Math.Max(
+                        0.5,
+                        text.Height * 0.1);
+
+                bool crossesTextCenter =
+                    text.X >= minX + centerInset &&
+                    text.X <= maxX - centerInset;
+
                 if (!hasUpperLine &&
-                    minY > text.Y &&
-                    minY - text.Y <= 50 &&
-                    text.X >= minX - 10 &&
-                    text.X <= maxX + 10)
+    isHorizontal &&
+    minY > text.Y &&
+    minY - text.Y <= 50 &&
+    crossesTextCenter)
                 {
                     hasUpperLine = true;
                 }
@@ -299,8 +368,8 @@ namespace Correct_test1.Readers
 
 
             return
-                hasSideLine &&
-                !hasUpperLine;
+    hasSideLine &&
+    !hasUpperLine;
         }
 
 

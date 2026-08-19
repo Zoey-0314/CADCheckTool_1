@@ -32,7 +32,15 @@
         public string LayoutName { get; set; }
 
 
+        public double MinX { get; set; }
 
+        public double MaxX { get; set; }
+
+        public double MinY { get; set; }
+
+        public double MaxY { get; set; }
+
+        public bool HasBounds { get; set; }
         public Autodesk.AutoCAD.DatabaseServices.ObjectId ViewportId
         {
             get;
