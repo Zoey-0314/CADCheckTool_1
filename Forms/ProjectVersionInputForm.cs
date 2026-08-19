@@ -9,7 +9,7 @@ namespace Correct_test1
         /// <summary>
         /// 用户输入的完整项目号+版本号。
         /// 例如：
-        /// N2604US001-L0
+        /// P2026AB003-L0
         /// </summary>
         public string ProjectVersionText
         {

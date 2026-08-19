@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// 非标件归档检查结果。
-    /// 当前只会为“归档不存在”的NS件生成结果。
+    /// 当前只会为“归档不存在”的AB件生成结果。
     /// </summary>
     public class NonStandardArchiveCheckResult
     {
@@ -39,7 +39,7 @@
         /// <summary>
         /// BOM原始非标件号。
         /// 例如：
-        /// NS452J101
+        /// AB452J101
         /// </summary>
         public string OriginalPartNumber
         {
@@ -51,7 +51,7 @@
         /// <summary>
         /// 删除末尾数字后的搜索关键字。
         /// 例如：
-        /// NS452J
+        /// AB452J
         /// </summary>
         public string SearchKey
         {

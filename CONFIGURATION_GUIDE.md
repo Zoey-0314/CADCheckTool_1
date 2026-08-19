@@ -10,19 +10,19 @@
 
 ```json
 {
-  "NonStandardArchivePath": "Z:\\归档图纸",
-  "StandardPartDatabasePath": "Z:\\图号管理\\诺升标准件统一命名.xlsx",
-  "VersionArchivePath": "Z:\\归档图纸"
+  "NonStandardArchivePath": "（所查图纸范围）",
+  "StandardPartDatabasePath": "（标准件比对库）",
+  "VersionArchivePath": "（所查图纸范围）"
 }
 ```
 
 | 字段 | 用途 | 默认值 |
 | --- | --- | --- |
-| `NonStandardArchivePath` | 非标归档图纸根目录 | `Z:\归档图纸` |
-| `StandardPartDatabasePath` | 标准件 Excel 数据库 | `Z:\图号管理\诺升标准件统一命名.xlsx` |
-| `VersionArchivePath` | 最新版本检查的归档目录 | `Z:\归档图纸` |
+| `NonStandardArchivePath` | 非标归档图纸根目录 | `（所查图纸范围）`，必须改为真实目录 |
+| `StandardPartDatabasePath` | 标准件 Excel 数据库 | `（标准件比对库）`，必须改为真实 `.xlsx` 文件 |
+| `VersionArchivePath` | 最新版本检查的归档目录 | `（所查图纸范围）`，必须改为真实目录 |
 
-推荐在 `CHECKDRAWING` 主界面的“路径设置”中修改。直接编辑 JSON 时必须保持合法 JSON 和 UTF-8 编码；保存后重新打开插件界面或重启 AutoCAD。
+推荐在 `CHECKDRAWING` 主界面的“路径设置”中修改。占位值不是有效路径，仅用于防止源码和首次配置泄露具体服务器、盘符或文件名。直接编辑 JSON 时必须保持合法 JSON 和 UTF-8 编码；保存后重新打开插件界面或重启 AutoCAD。
 
 ## 外部数据要求
 
@@ -51,6 +51,8 @@
 | `Configs/TitleBlockVerticalConfig.cs` | 纵向标题栏区域与字段规则 |
 
 不要在交付后直接修改 DLL 或 `PackageContents.xml` 来调整业务规则。
+
+完整的模板、命名和判断规则修改位置见 [通用化接入指南](GENERALIZATION_GUIDE.md)。
 
 ## 日志
 

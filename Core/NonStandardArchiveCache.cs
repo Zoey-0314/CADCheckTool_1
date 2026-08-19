@@ -6,7 +6,7 @@ namespace Correct_test1.Core
     /// <summary>
     /// 非标归档索引的AutoCAD会话级缓存。
     /// AutoCAD / 插件生命周期内：
-    /// Z盘只需要建立一次索引。
+    /// 归档目录只需要建立一次索引。
     /// PluginInitializer负责提前后台加载，
     /// CheckService和BatchCheckerManager只取缓存。
     /// </summary>
@@ -33,7 +33,7 @@ namespace Correct_test1.Core
         /// <summary>
         /// 当前是否已经有索引。
         /// 注意：
-        /// 有索引不代表Z盘一定可用。
+        /// 有索引不代表归档目录一定可用。
         /// 还需要判断Index.IsAvailable。
         /// </summary>
         public static bool HasSnapshot
@@ -50,7 +50,7 @@ namespace Correct_test1.Core
 
 
         /// <summary>
-        /// 当前是否正在后台扫描Z盘。
+        /// 当前是否正在后台扫描归档目录。
         /// </summary>
         public static bool IsLoading
         {
@@ -83,7 +83,7 @@ namespace Correct_test1.Core
 
         /// <summary>
         /// 插件启动时调用。
-        /// 后台预热Z盘索引。
+        /// 后台预热归档目录索引。
         /// 此方法立即返回，
         /// 不阻塞AutoCAD启动。
         /// </summary>
@@ -133,7 +133,7 @@ namespace Correct_test1.Core
 
                 if (_currentIndex != null)
                 {
-                    // 如果启动时Z盘暂时不可用，
+                    // 如果启动时归档目录暂时不可用，
                     // 后续检查时在后台悄悄重试。
                     //
                     // 本次仍返回当前不可用状态，

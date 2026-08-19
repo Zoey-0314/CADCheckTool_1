@@ -160,11 +160,11 @@ namespace Correct_test1.Readers
             //
             // 例如默认值可能写着：
             //
-            // N2607US004
+            // P2026AB001
             //
             // 但实际块实例AttributeReference可能已经改成：
             //
-            // N2608US001
+            // P2026AB002
             //
             // 所以不能把AttributeDefinition当成真实项目号。
 
@@ -482,7 +482,7 @@ namespace Correct_test1.Readers
 
             return Regex.IsMatch(
                 text,
-                @"N\d{4}[A-Z]{2}\d{3}(-[A-Z0-9]+)?");
+                @"P\d{4}[A-Z]{2}\d{3}(-[A-Z0-9]+)?");
         }
 
 
@@ -499,7 +499,7 @@ namespace Correct_test1.Readers
             Match match =
                 Regex.Match(
                     text.ToUpper(),
-                    @"N\d{4}[A-Z]{2}\d{3}");
+                    @"P\d{4}[A-Z]{2}\d{3}");
 
 
             return match.Success

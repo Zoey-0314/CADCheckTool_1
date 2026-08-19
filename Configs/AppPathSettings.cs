@@ -16,7 +16,7 @@
 
 
         /// <summary>
-        /// 诺升标准件Excel数据库。
+        /// 通用标准件Excel数据库。
         /// </summary>
         public string StandardPartDatabasePath
         {

@@ -30,27 +30,27 @@ namespace Correct_test1.Readers
     {
         // 完整项目号：
         //
-        // N2607US004
-        // N2607US004-L0
-        // N2607US004-PE1
+        // P2026AB001
+        // P2026AB001-L0
+        // P2026AB001-PE1
 
         private static readonly Regex
             ProjectRegex =
                 new Regex(
-                    @"N\d{4}[A-Z]{2}\d{3}(?:-[A-Z0-9]+)?",
+                    @"P\d{4}[A-Z]{2}\d{3}(?:-[A-Z0-9]+)?",
                     RegexOptions.IgnoreCase);
 
 
         // 基础项目号：
         //
-        // N2607US004-L0
+        // P2026AB001-L0
         // ↓
-        // N2607US004
+        // P2026AB001
 
         private static readonly Regex
             BaseProjectRegex =
                 new Regex(
-                    @"N\d{4}[A-Z]{2}\d{3}",
+                    @"P\d{4}[A-Z]{2}\d{3}",
                     RegexOptions.IgnoreCase);
 
 
@@ -90,7 +90,7 @@ namespace Correct_test1.Readers
         /// <summary>
         /// 读取一个BOM右侧的项目号。
         /// 找到：
-        /// 返回 N2607US004
+        /// 返回 P2026AB001
         /// 没找到：
         /// 返回 ""
         /// </summary>
@@ -263,7 +263,7 @@ namespace Correct_test1.Readers
             // 相同项目号可能出现多次。
             //
             // 例如：
-            // 同一个BOM划改了多个NS件，
+            // 同一个BOM划改了多个AB件，
             // 每一行右侧都生成了同一个项目号。
             //
             // 这种情况是正常的。
@@ -459,9 +459,9 @@ namespace Correct_test1.Readers
         }
 
 
-        // N2607US004-L0
+        // P2026AB001-L0
         // ↓
-        // N2607US004
+        // P2026AB001
 
         private static string NormalizeProjectNumber(
             string value)

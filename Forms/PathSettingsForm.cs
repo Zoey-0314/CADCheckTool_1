@@ -88,7 +88,7 @@ namespace Correct_test1
                     new OpenFileDialog())
             {
                 dialog.Title =
-                    "请选择诺升标准件数据库";
+                    "请选择通用标准件数据库";
 
 
                 dialog.Filter =

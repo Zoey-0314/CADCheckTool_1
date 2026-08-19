@@ -828,7 +828,7 @@ namespace Correct_test1.Markers
         }
 
         /// <summary>
-        /// 为“归档中不存在”的NS非标件创建标记。
+        /// 为“归档中不存在”的AB非标件创建标记。
         /// 继续使用：
         /// CADCHECK_MARKER
         /// 因此“清除检查标记”
@@ -937,10 +937,10 @@ namespace Correct_test1.Markers
         /// <summary>
         /// 为“非标件号不存在”创建检查标记。
         /// 例如BOM：
-        /// NS333T1
+        /// AB333T1
         /// 归档图纸中没有：
-        /// NS333T + _1
-        /// 则在当前BOM的NS333T1旁边提示。
+        /// AB333T + _1
+        /// 则在当前BOM的AB333T1旁边提示。
         /// 继续使用CADCHECK_MARKER，
         /// 所以清除检查标记功能可以一起清除。
         /// </summary>

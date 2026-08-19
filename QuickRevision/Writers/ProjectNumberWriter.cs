@@ -6,10 +6,10 @@ using Correct_test1.QuickRevision.Models;
 namespace Correct_test1.QuickRevision.Writers
 {
     /// <summary>
-    /// BOM中的NS内容被快速划改后，
+    /// BOM中的AB内容被快速划改后，
     /// 在该BOM行最右侧外部生成项目号。
     /// 本类只负责写入。
-    /// 不负责判断NS。
+    /// 不负责判断AB。
     /// 不负责从文件名读取项目号。
     /// </summary>
     public class ProjectNumberWriter

@@ -1,7 +1,6 @@
 ﻿#define MyAppName "CADCheckTool"
 #define MyAppVersion "2.2.0"
-#define MyAppPublisher "Zoey-0314"
-#define MyAppURL "https://github.com/Zoey-0314/CADCheckTool_1"
+#define MyAppPublisher "CADCheckTool Maintainers"
 #define MyAppId "{{DE764F27-CF1C-420B-918A-D2F5DC66807C}"
 
 [Setup]
@@ -10,9 +9,6 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}/issues
-AppUpdatesURL={#MyAppURL}/releases
 DefaultDirName={code:GetDefaultDirName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes

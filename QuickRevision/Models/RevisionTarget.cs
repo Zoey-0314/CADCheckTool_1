@@ -40,7 +40,7 @@ namespace Correct_test1.QuickRevision.Models
 
         /// <summary>
         /// 用户修改前看到的内容。
-        /// NS项目号判断也使用这个原始内容，
+        /// AB项目号判断也使用这个原始内容，
         /// 而不是用户输入的新内容。
         /// </summary>
         public string Text
@@ -207,7 +207,7 @@ namespace Correct_test1.QuickRevision.Models
         /// 当前目标是否满足：
         /// TableCell
         /// +
-        /// 原内容NS开头
+        /// 原内容AB开头
         /// 后续Service直接使用这个属性判断
         /// 是否需要自动生成项目号。
         /// </summary>
@@ -229,7 +229,7 @@ namespace Correct_test1.QuickRevision.Models
                 return
                     Text.Trim()
                         .StartsWith(
-                            "NS",
+                            "AB",
                             System.StringComparison
                                 .OrdinalIgnoreCase);
             }

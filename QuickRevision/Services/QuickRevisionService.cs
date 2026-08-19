@@ -23,7 +23,7 @@ namespace Correct_test1.QuickRevision.Services
     /// 删除线
     /// ↓
     /// 新文字
-    /// BOM中原内容NS开头：
+    /// BOM中原内容AB开头：
     /// 识别目标
     /// ↓
     /// 从DWG文件名读取项目号
@@ -154,7 +154,7 @@ namespace Correct_test1.QuickRevision.Services
             //
             // TableCell
             // +
-            // 原内容NS开头
+            // 原内容AB开头
 
             bool shouldWriteProjectNumber =
                 target.ShouldWriteProjectNumber;
@@ -164,7 +164,7 @@ namespace Correct_test1.QuickRevision.Services
                 "";
 
 
-            // 如果是NS BOM项，
+            // 如果是AB BOM项，
             // 在真正修改图纸之前先读取文件名项目号。
 
             if (shouldWriteProjectNumber)
@@ -174,7 +174,7 @@ namespace Correct_test1.QuickRevision.Services
                         document);
 
 
-                // NS划改要求必须同时生成项目号。
+                // AB划改要求必须同时生成项目号。
                 //
                 // 如果文件名无法获得项目号，
                 // 本次操作直接取消，
@@ -185,7 +185,7 @@ namespace Correct_test1.QuickRevision.Services
                 {
                     MessageBox.Show(
                         "当前DWG文件名中没有找到符合规则的项目号。\n\n"
-                        + "该BOM内容以NS开头，因此本次快速划改已取消。",
+                        + "该BOM内容以AB开头，因此本次快速划改已取消。",
                         "快速划改",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -274,7 +274,7 @@ namespace Correct_test1.QuickRevision.Services
         /// 从当前DWG文件名读取项目号。
         /// 直接复用已有FileNameProjectReader。
         /// 返回例如：
-        /// N2607US004
+        /// P2026AB001
         /// 不包含版本号。
         /// </summary>
         private static string ReadProjectNumberFromDocument(
@@ -350,7 +350,7 @@ namespace Correct_test1.QuickRevision.Services
         /// 删除线
         /// +
         /// 新文字
-        /// NS BOM目标：
+        /// AB BOM目标：
         /// 删除线
         /// +
         /// 新文字
@@ -400,7 +400,7 @@ namespace Correct_test1.QuickRevision.Services
                     }
 
 
-                    // NS目标还要再次检查TableContext
+                    // AB目标还要再次检查TableContext
 
                     if (shouldWriteProjectNumber)
                     {
@@ -465,7 +465,7 @@ namespace Correct_test1.QuickRevision.Services
                     }
 
 
-                    // 3. NS开头的BOM内容
+                    // 3. AB开头的BOM内容
                     //
                     // 在当前行BOM右边生成项目号。
 
@@ -706,7 +706,7 @@ namespace Correct_test1.QuickRevision.Services
                     //
                     // 可能点空白
                     // 可能写入失败
-                    // 可能NS项目号读取失败
+                    // 可能AB项目号读取失败
                     //
                     // 继续下一次选择。
                 }
@@ -786,7 +786,7 @@ namespace Correct_test1.QuickRevision.Services
             }
 
 
-            // 2. 判断NS BOM项目号
+            // 2. 判断AB BOM项目号
 
             bool shouldWriteProjectNumber =
                 target.ShouldWriteProjectNumber;

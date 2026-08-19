@@ -9,7 +9,7 @@ using Correct_test1.Core;
 [assembly: AssemblyTitle("CADCheckTool_1")]
 [assembly: AssemblyDescription("AutoCAD 2024 engineering drawing inspection tool")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Zoey-0314")]
+[assembly: AssemblyCompany("CADCheckTool Maintainers")]
 [assembly: AssemblyProduct("CADCheckTool_1")]
 [assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]

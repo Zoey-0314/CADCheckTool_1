@@ -20,7 +20,7 @@ namespace Correct_test1.ProjectVersion.Writers
         private static readonly Regex
             ProjectNumberRegex =
                 new Regex(
-                    @"^N\d{4}[A-Z]{2}\d{3}(?:-[A-Z0-9]+)?$",
+                    @"^P\d{4}[A-Z]{2}\d{3}(?:-[A-Z0-9]+)?$",
                     RegexOptions.IgnoreCase);
 
 

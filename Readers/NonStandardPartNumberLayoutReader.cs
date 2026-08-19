@@ -13,11 +13,11 @@ namespace Correct_test1.Readers
     /// 从归档非标DWG中读取：
     /// 图号 + 件号
     /// 例如：
-    /// NS333T    _1
+    /// AB333T    _1
     /// 重量
     /// 备注
     /// 表示：
-    /// NS333T1
+    /// AB333T1
     /// 存在。
     /// </summary>
     public class NonStandardPartNumberLayoutReader
@@ -26,8 +26,8 @@ namespace Correct_test1.Readers
         /// 读取一张归档DWG中
         /// 所有Layout存在的“图号+件号”组合。
         /// 返回Key：
-        /// NS333T|1
-        /// NS333T|2
+        /// AB333T|1
+        /// AB333T|2
         /// ...
         /// </summary>
         public HashSet<string> ReadPartKeys(
@@ -113,11 +113,11 @@ namespace Correct_test1.Readers
             //
             // 完整件号直接写在一个单元格里
             //
-            // 件号 | NS333H1
+            // 件号 | AB333H1
             //
             // ↓
             //
-            // NS333H|1
+            // AB333H|1
 
             foreach (
                 TitleText text
@@ -163,11 +163,11 @@ namespace Correct_test1.Readers
 
             // 第二种 / 第三种格式：
             //
-            // NS333T    _1
+            // AB333T    _1
             //
             // 或：
             //
-            // NS333D_   _999  _998  _997 ...
+            // AB333D_   _999  _998  _997 ...
             //
             // 只把“同一行”的件号配给这个图号。
 
@@ -292,11 +292,11 @@ namespace Correct_test1.Readers
                     }
 
 
-                    // NS333D_ + _999
+                    // AB333D_ + _999
                     //
                     // ↓
                     //
-                    // NS333D|999
+                    // AB333D|999
 
                     result.Add(
                         BuildKey(
@@ -345,12 +345,12 @@ namespace Correct_test1.Readers
 
                 // 必须是真正的基础图号：
                 //
-                // NS333T
-                // NS333D_
+                // AB333T
+                // AB333D_
                 //
                 // 不能是：
                 //
-                // NS333T1
+                // AB333T1
 
                 if (!IsBaseDrawingNumber(
                         drawingValue))
@@ -475,9 +475,9 @@ namespace Correct_test1.Readers
                     //
                     // 防止：
                     //
-                    // NS333D_  _999
+                    // AB333D_  _999
                     //
-                    // NS386E_  _1
+                    // AB386E_  _1
                     //
                     // 被交叉组合。
 
@@ -758,10 +758,10 @@ namespace Correct_test1.Readers
                     .ToUpperInvariant();
 
 
-            // 必须是NS开头
+            // 必须是AB开头
 
             if (!cleaned.StartsWith(
-                    "NS",
+                    "AB",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return false;
@@ -770,9 +770,9 @@ namespace Correct_test1.Readers
 
             // 直接复用现有归档图号规则。
             //
-            // NS333H1
+            // AB333H1
             // ↓
-            // NS333H
+            // AB333H
 
             string baseDrawingNumber =
                 NonStandardArchiveChecker
@@ -789,9 +789,9 @@ namespace Correct_test1.Readers
 
             // 如果没有被截掉任何东西：
             //
-            // NS333H
+            // AB333H
             // ↓
-            // NS333H
+            // AB333H
             //
             // 说明它只有图号，没有件号。
 
@@ -804,7 +804,7 @@ namespace Correct_test1.Readers
 
             // 取剩余部分。
             //
-            // NS333H1
+            // AB333H1
             //       ↓
             //       1
 
@@ -874,7 +874,7 @@ namespace Correct_test1.Readers
 
 
             if (!cleaned.StartsWith(
-                    "NS",
+                    "AB",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return false;
@@ -887,9 +887,9 @@ namespace Correct_test1.Readers
             }
 
 
-            // NS333D_
+            // AB333D_
             // ↓
-            // NS333D
+            // AB333D
 
             string withoutUnderscore =
                 cleaned.TrimEnd(
@@ -904,7 +904,7 @@ namespace Correct_test1.Readers
 
             // 如果最后还是数字：
             //
-            // NS333H1
+            // AB333H1
             //
             // 说明它是完整件号，
             // 不是基础图号。

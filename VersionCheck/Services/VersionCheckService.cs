@@ -18,11 +18,11 @@ namespace Correct_test1.VersionCheck.Services
         //
         // 例如：
         //
-        // NS452J 安防镜 N2604US001-L0.dwg
+        // AB452J 安防镜 P2026AB003-L0.dwg
         //
         // ↓
         //
-        // N2604US001
+        // P2026AB003
         //
         // 版本检查中：
         // 是否存在项目号，是判断标准/非标的唯一依据。
@@ -62,7 +62,7 @@ namespace Correct_test1.VersionCheck.Services
             Match match =
                 Regex.Match(
                     fileName,
-                    @"N\d{4}[A-Z]{2}\d{3}",
+                    @"P\d{4}[A-Z]{2}\d{3}",
                     RegexOptions.IgnoreCase);
 
 
@@ -91,11 +91,11 @@ namespace Correct_test1.VersionCheck.Services
 
             // 1. 从当前DWG文件名读取图号
             //
-            // NS452J 安防镜 ...
+            // AB452J 安防镜 ...
             //
             // ↓
             //
-            // NS452J
+            // AB452J
 
             FileNameDrawingNumberReader
                 drawingNumberReader =
@@ -165,7 +165,7 @@ namespace Correct_test1.VersionCheck.Services
                 //
                 // 例如：
                 //
-                // NS452J 安防镜 N2604US001-L0.dwg
+                // AB452J 安防镜 P2026AB003-L0.dwg
                 //
                 // 从这里开始：
                 //
@@ -238,14 +238,14 @@ namespace Correct_test1.VersionCheck.Services
                     // 例如：
                     //
                     // 图号：
-                    // NS452J
+                    // AB452J
                     //
                     // 当前项目：
-                    // N2604US001
+                    // P2026AB003
                     //
                     // 只检查：
                     //
-                    // NS452J + N2604US001 + Lx
+                    // AB452J + P2026AB003 + Lx
 
                     bool found =
                         archiveIndex

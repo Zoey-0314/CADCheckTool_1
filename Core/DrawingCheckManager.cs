@@ -110,7 +110,7 @@ namespace Correct_test1.Core
                     //
                     // Key：
                     //
-                    // Layout1|N2607US004
+                    // Layout1|P2026AB001
 
                     HashSet<string> reportedIssues =
                         new HashSet<string>(

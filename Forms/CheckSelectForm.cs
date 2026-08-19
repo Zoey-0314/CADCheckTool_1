@@ -651,7 +651,7 @@ namespace Correct_test1
         /// 打开路径设置窗口。
         /// 可以修改：
         /// 1. 非标归档图纸目录
-        /// 2. 诺升标准件数据库Excel路径
+        /// 2. 通用标准件数据库Excel路径
         /// </summary>
         private void btnPathSettings_Click(
             object sender,

@@ -55,6 +55,7 @@ PR 检查通过后再合并。不要绕过失败的 Windows 构建直接创建 R
 - `CADCheckTool_1_v2.2.0_Windows_x64.zip`
 - `CADCheckTool_1_v2.2.0_SHA256.txt`
 - `INSTALLATION_GUIDE.md`
+- `GENERALIZATION_GUIDE.md`
 
 发布后下载 ZIP 做最终抽检：核对哈希、解压文件白名单、中文显示、普通用户安装、管理员所有用户安装、AutoCAD 2024 自动加载和卸载。
 

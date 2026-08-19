@@ -258,13 +258,13 @@ namespace Correct_test1.Checks
                     }
 
 
-                    // NS非标归档存在性检查
+                    // AB非标归档存在性检查
                     //
                     // 例如：
                     //
-                    // NS333T1
+                    // AB333T1
                     // ↓
-                    // 检查Z盘是否存在NS333T对应归档文件
+                    // 检查归档目录是否存在AB333T对应归档文件
 
                     if (report
                         .NonStandardArchiveAvailable)
@@ -279,17 +279,17 @@ namespace Correct_test1.Checks
                     }
 
 
-                    // NS非标件号存在性检查
+                    // AB非标件号存在性检查
                     //
                     // 例如：
                     //
                     // BOM：
-                    // NS333T1
+                    // AB333T1
                     //
                     // ↓
                     //
                     // 找：
-                    // NS333T + 当前项目号 的归档DWG
+                    // AB333T + 当前项目号 的归档DWG
                     //
                     // ↓
                     //
@@ -299,7 +299,7 @@ namespace Correct_test1.Checks
                     //
                     // 查找：
                     //
-                    // NS333T    _1
+                    // AB333T    _1
                     // 重量
                     // 备注
 

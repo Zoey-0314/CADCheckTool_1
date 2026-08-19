@@ -12,13 +12,13 @@ namespace Correct_test1.Models
         /// <summary>
         /// 图号
         /// 例如:
-        /// NS282Z_
+        /// AB282Z_
         /// </summary>
         public string DrawingNumber { get; set; }
         /// <summary>
         /// 当前BOM右侧实际显示的项目号。
         /// 例如：
-        /// N2607US004
+        /// P2026AB001
         /// 注意：
         /// 不保存-L0等版本后缀。
         /// 如果BOM右侧没有项目号：

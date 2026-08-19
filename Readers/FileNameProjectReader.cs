@@ -14,7 +14,7 @@ namespace Correct_test1.Readers
         {
 
             //项目号
-            //例如 N2607US004
+            //例如 P2026AB001
             public string ProjectNumber { get; set; }
 
 
@@ -59,7 +59,7 @@ namespace Correct_test1.Readers
 
             例如：
 
-            N2607US004
+            P2026AB001
 
 
             后面版本：
@@ -76,7 +76,7 @@ namespace Correct_test1.Readers
 
 
             string pattern =
-                @"N\d{4}[A-Z]{2}\d{3}(?:-[A-Z0-9]+)?";
+                @"P\d{4}[A-Z]{2}\d{3}(?:-[A-Z0-9]+)?";
 
 
 
@@ -118,11 +118,11 @@ namespace Correct_test1.Readers
              
             提取项目号
 
-            N2607US004-L0
+            P2026AB001-L0
 
             ↓
 
-            N2607US004
+            P2026AB001
 
             */
 
@@ -139,7 +139,7 @@ namespace Correct_test1.Readers
              
             提取版本号
 
-            N2607US004-L0
+            P2026AB001-L0
 
             ↓
 

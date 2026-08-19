@@ -253,7 +253,7 @@ namespace Correct_test1
                         report.Results);
 
 
-                    // NS非标件归档缺失标记
+                    // AB非标件归档缺失标记
 
                     markerManager
                         .CreateNonStandardArchiveMarkers(
@@ -301,9 +301,9 @@ namespace Correct_test1
                     "检查完成，详细问题已标注在图纸中。";
 
 
-                // Z盘不可用时：
+                // 归档目录不可用时：
                 //
-                // 不把NS件误报成“归档不存在”，
+                // 不把AB件误报成“归档不存在”，
                 // 但明确告诉用户这一项没有检查。
 
                 if (report != null &&

@@ -6,7 +6,7 @@ namespace Correct_test1.QuickRevision.Models
     /// Table单元格快速划改的附加上下文。
     /// 只有目标来自AutoCAD Table时才存在。
     /// 用于后续：
-    /// NS开头BOM内容被划改后，
+    /// AB开头BOM内容被划改后，
     /// 在该行最右侧表格外生成项目号。
     /// </summary>
     public class TableRevisionContext

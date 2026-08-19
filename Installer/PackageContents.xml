@@ -4,13 +4,11 @@
   AutodeskProduct="AutoCAD"
   ProductType="Application"
   Name="CADCheckTool"
-  Author="Zoey-0314"
+  Author="CADCheckTool Maintainers"
   Description="AutoCAD engineering drawing inspection tool"
   AppVersion="2.2.0"
   ProductCode="{DE764F27-CF1C-420B-918A-D2F5DC66807C}">
-  <CompanyDetails
-    Name="Zoey-0314"
-    Url="https://github.com/Zoey-0314/CADCheckTool_1" />
+  <CompanyDetails Name="CADCheckTool Maintainers" />
   <Components>
     <RuntimeRequirements
       OS="Win64"

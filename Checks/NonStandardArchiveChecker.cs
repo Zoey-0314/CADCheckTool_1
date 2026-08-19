@@ -14,7 +14,7 @@ namespace Correct_test1.Checks
         /// <summary>
         /// 检查一个BOM。
         /// 只返回：
-        /// 在归档目录中不存在的NS非标件。
+        /// 在归档目录中不存在的AB非标件。
         /// 已存在的不返回结果。
         /// </summary>
         public List<NonStandardArchiveCheckResult>
@@ -36,7 +36,7 @@ namespace Correct_test1.Checks
 
             // 归档目录不可用：
             //
-            // 不把任何NS误判为不存在。
+            // 不把任何AB件误判为不存在。
 
             if (archiveIndex == null ||
                 !archiveIndex.IsAvailable)
@@ -53,9 +53,9 @@ namespace Correct_test1.Checks
                     continue;
 
 
-                // 直接复用现有NS分类器。
+                // 直接复用现有AB件分类器。
                 //
-                // 不重新写StartsWith("NS")规则。
+                // 不重新写StartsWith("AB")规则。
 
                 if (PartNumberTypeClassifier
                         .Classify(
@@ -74,8 +74,8 @@ namespace Correct_test1.Checks
                         item.PartNumber);
 
 
-                // 无效NS图号不参与搜索，
-                // 防止出现只剩"NS"然后大范围误匹配。
+                // 无效AB图号不参与搜索，
+                // 防止出现只剩"AB"然后大范围误匹配。
 
                 if (string.IsNullOrWhiteSpace(
                         searchKey))
@@ -151,14 +151,14 @@ namespace Correct_test1.Checks
 
 
         /// <summary>
-        /// 将BOM中的NS件号转换为归档搜索关键字。
+        /// 将BOM中的AB件号转换为归档搜索关键字。
         /// 规则：
-        /// NS452J101
-        /// -> NS452J
-        /// NS452CA123
-        /// -> NS452CA
-        /// NS452CA
-        /// -> NS452CA
+        /// AB452J101
+        /// -> AB452J
+        /// AB452CA123
+        /// -> AB452CA
+        /// AB452CA
+        /// -> AB452CA
         /// 只删除末尾连续数字。
         /// 中间数字保持不变。
         /// </summary>
@@ -190,7 +190,7 @@ namespace Correct_test1.Checks
                 value.Trim();
 
 
-            // 必须是真正的NS非标件
+            // 必须是真正的AB非标件
 
             if (PartNumberTypeClassifier
                     .Classify(
@@ -243,16 +243,16 @@ namespace Correct_test1.Checks
 
             // 防止：
             //
-            // NS123
-            // -> NS
+            // AB123
+            // -> AB
             //
             // 这种错误数据导致搜索整个归档中
-            // 所有包含NS的文件。
+            // 所有包含AB的文件。
 
             if (result.Length <= 2 ||
                 string.Equals(
                     result,
-                    "NS",
+                    "AB",
                     StringComparison.OrdinalIgnoreCase))
             {
                 return "";

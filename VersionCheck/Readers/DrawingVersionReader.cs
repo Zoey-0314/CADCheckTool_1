@@ -29,12 +29,12 @@ namespace Correct_test1.VersionCheck.Readers
 
 
         // 项目号：
-        // N2604US003
+        // P2026AB004
 
         private static readonly Regex
             ProjectRegex =
                 new Regex(
-                    @"N\d{4}[A-Z]{2}\d{3}",
+                    @"P\d{4}[A-Z]{2}\d{3}",
                     RegexOptions.IgnoreCase);
 
 
@@ -48,8 +48,8 @@ namespace Correct_test1.VersionCheck.Readers
         //
         // 因此：
         //
-        // N2604US003-PE1-L0
-        // N2604US003-PE1 L0
+        // P2026AB004-PE1-L0
+        // P2026AB004-PE1 L0
         //
         // 都可以识别。
 

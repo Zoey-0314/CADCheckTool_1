@@ -1044,11 +1044,11 @@ namespace Correct_test1.Checks
                 return true;
 
             // 允许：
-            // NS282Z
-            // NS282Z1
-            // NS282Z001
-            // NS282Z_
-            // NS282Z_001
+            // AB282Z
+            // AB282Z1
+            // AB282Z001
+            // AB282Z_
+            // AB282Z_001
 
             if (suffix == "_")
             {

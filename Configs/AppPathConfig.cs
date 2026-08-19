@@ -31,16 +31,16 @@ namespace Correct_test1.Configs
 
         public const string
             DefaultNonStandardArchivePath =
-                @"Z:\归档图纸";
+                @"（所查图纸范围）";
 
 
         public const string
             DefaultStandardPartDatabasePath =
-                @"Z:\图号管理\诺升标准件统一命名.xlsx";
+                @"（标准件比对库）";
 
         public const string
             DefaultVersionArchivePath =
-                @"Z:\归档图纸";
+                @"（所查图纸范围）";
 
 
         /// <summary>

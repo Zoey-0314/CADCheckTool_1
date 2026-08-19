@@ -16,15 +16,15 @@ namespace Correct_test1.Checks
     /// BOM非标件号存在性检查。
     /// 支持两种被检查BOM形式：
     /// 形式1：
-    /// Part No. = NS333H1
+    /// Part No. = AB333H1
     /// ↓
-    /// 图号 = NS333H
+    /// 图号 = AB333H
     /// 件号 = 1
     /// 形式2：
-    /// Part No. = NS347DH_
+    /// Part No. = AB347DH_
     /// P/N      = _999
     /// ↓
-    /// 图号 = NS347DH
+    /// 图号 = AB347DH
     /// 件号 = 999
     /// 然后根据当前被检查DWG
     /// 是否存在项目号，
@@ -77,7 +77,7 @@ namespace Correct_test1.Checks
                         .Trim()
                         .ToUpperInvariant()
                     : "";
-            // 检查BOM中的每一个NS件
+            // 检查BOM中的每一个AB件
 
             foreach (
                 BomItem item
@@ -89,7 +89,7 @@ namespace Correct_test1.Checks
                 }
 
 
-                // 只检查NS非标件
+                // 只检查AB非标件
 
                 if (PartNumberTypeClassifier
                         .Classify(
@@ -115,13 +115,13 @@ namespace Correct_test1.Checks
 
                 // 得到基础归档图号
                 //
-                // NS333H1
+                // AB333H1
                 // ↓
-                // NS333H
+                // AB333H
                 //
-                // NS347DH_
+                // AB347DH_
                 // ↓
-                // NS347DH
+                // AB347DH
 
                 string archiveDrawingNumber =
                     NonStandardArchiveChecker
@@ -143,12 +143,12 @@ namespace Correct_test1.Checks
 
                 // 新BOM形式：
                 //
-                // Part No. = NS347DH_
+                // Part No. = AB347DH_
                 // P/N      = _999
                 //
                 // ↓
                 //
-                // 图号 = NS347DH
+                // 图号 = AB347DH
                 // 件号 = 999
 
                 if (originalPartNumber
@@ -166,11 +166,11 @@ namespace Correct_test1.Checks
                 {
                     // 未拆分图号和件号时，从末尾数字提取件号：
                     //
-                    // NS333H1
+                    // AB333H1
                     //
                     // ↓
                     //
-                    // 图号 = NS333H
+                    // 图号 = AB333H
                     // 件号 = 1
 
                     partSuffix =
@@ -194,15 +194,15 @@ namespace Correct_test1.Checks
                 //
                 // 新格式：
                 //
-                // NS347DH_ + _999
+                // AB347DH_ + _999
                 // ↓
-                // NS347DH999
+                // AB347DH999
                 //
                 // 旧格式：
                 //
-                // NS333H1
+                // AB333H1
                 // ↓
-                // NS333H1
+                // AB333H1
                 //
                 // 后续报告、CSV、提示全部统一使用这个值。
 
@@ -213,8 +213,8 @@ namespace Correct_test1.Checks
                 //
                 // 例如同一个BOM右侧同时出现：
                 //
-                // N2607US004-L0
-                // N2608US001-L1
+                // P2026AB001-L0
+                // P2026AB002-L1
                 //
                 // 此时不能：
                 //
@@ -300,9 +300,9 @@ namespace Correct_test1.Checks
                 {
                     // 第一优先级：
                     //
-                    // NS386DY
+                    // AB386DY
                     // +
-                    // N2607US004
+                    // P2026AB001
 
                     candidateFiles =
                         archiveIndex
@@ -322,7 +322,7 @@ namespace Correct_test1.Checks
                         //
                         // 再找通用版：
                         //
-                        // NS386DY
+                        // AB386DY
                         // +
                         // 文件名无项目号
 
@@ -595,7 +595,7 @@ namespace Correct_test1.Checks
 
         // 从完整BOM件号拆件号
         //
-        // NS333H1
+        // AB333H1
         // ↓
         // 1
 
@@ -826,7 +826,7 @@ namespace Correct_test1.Checks
             //
             // Part No.       P/N
             //
-            // NS347DH_       _999
+            // AB347DH_       _999
             //
             // 如果件号不存在，
             // 红字应该标在 _999 旁边。
@@ -850,9 +850,9 @@ namespace Correct_test1.Checks
             //
             // Part No.
             //
-            // NS333H1
+            // AB333H1
             //
-            // 标在NS333H1旁边。
+            // 标在AB333H1旁边。
 
             return
                 item.PartNumberCellPosition;
@@ -893,8 +893,8 @@ namespace Correct_test1.Checks
                     // 这里现在保存的已经是
                     // 统一后的完整件号：
                     //
-                    // NS347DH999
-                    // NS333H1
+                    // AB347DH999
+                    // AB333H1
 
                     OriginalPartNumber =
                         originalPartNumber,

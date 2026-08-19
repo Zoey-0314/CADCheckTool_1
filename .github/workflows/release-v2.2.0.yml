@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [master]
   push:
-    branches: [master]
+    branches: [master, generalized-tool]
     paths:
       - "**/*.cs"
       - "**/*.md"
@@ -84,7 +84,8 @@ jobs:
             'README.md',
             'ARCHITECTURE.md',
             'CONFIGURATION_GUIDE.md',
-            'DEVELOPMENT_WORKFLOW.md'
+            'DEVELOPMENT_WORKFLOW.md',
+            'GENERALIZATION_GUIDE.md'
           ) | ForEach-Object {
             $path = Join-Path $env:GITHUB_WORKSPACE $_
             $bytes = [System.IO.File]::ReadAllBytes($path)

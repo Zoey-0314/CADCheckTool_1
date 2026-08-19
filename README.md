@@ -1,6 +1,8 @@
-﻿# CADCheckTool 2.2.0
+﻿# CADCheckTool 2.2.0（通用化示例分支）
 
-CADCheckTool 是面向 AutoCAD 2024 的工程图纸检查与快速划改插件。正式交付物为一个 Inno Setup 安装程序；安装后由 AutoCAD ApplicationPlugins 机制自动加载，无需 `NETLOAD`，也无需手动写注册表。
+CADCheckTool 是面向 AutoCAD 2024 的工程图纸检查与快速划改插件。本分支保留 2.2.0 的检查、批处理、安全保存和自动加载机制，并用中性示例替换了公司专用前缀、项目号示例、默认路径和发布者信息。
+
+本分支不是下载后即可适配任意图纸模板的成品。首次部署前必须按 [通用化接入指南](GENERALIZATION_GUIDE.md) 核对标题栏、BOM、图号、项目号、版本号、修改记录表、图层及标准件 Excel 格式。未经适配和样图回归，不应直接用于生产图纸。
 
 ## 运行环境
 
@@ -13,7 +15,7 @@ CADCheckTool 是面向 AutoCAD 2024 的工程图纸检查与快速划改插件�
 
 ## 安装
 
-从 [v2.2.0 Release](https://github.com/Zoey-0314/CADCheckTool_1/releases/tag/v2.2.0) 下载 `CADCheckTool_1_v2.2.0_Windows_x64.zip`，核对 SHA-256 后解压并运行 `CADCheckTool_1_Setup_v2.2.0.exe`。
+由维护者按 [开发流程](DEVELOPMENT_WORKFLOW.md) 构建安装包，核对 SHA-256 后解压并运行 `CADCheckTool_1_Setup_v2.2.0.exe`。
 
 安装程序提供两种模式：
 
@@ -51,7 +53,7 @@ CADCheckTool 是面向 AutoCAD 2024 的工程图纸检查与快速划改插件�
 - 配置：`%APPDATA%\Correct_test1\AppPathSettings.json`
 - 日志：`%APPDATA%\Correct_test1\Logs\yyyy-MM-dd.log`
 
-路径配置可在插件界面中修改。字段说明见 [配置指南](CONFIGURATION_GUIDE.md)。
+本分支的默认路径是说明性占位值，首次运行后必须在插件界面中设置真实路径。字段说明见 [配置指南](CONFIGURATION_GUIDE.md)。
 
 ## 开发
 
@@ -62,7 +64,7 @@ CADCheckTool 是面向 AutoCAD 2024 的工程图纸检查与快速划改插件�
 - NuGet 依赖通过 `packages.config` 还原
 - 安装包由 Inno Setup 6 构建
 
-解决方案只包含插件项目 `Correct_test1.csproj`。发布流水线会检查 UTF-8 编码、依赖完整性、中文字符串、包内文件白名单和安装器构建结果。架构与发布要求分别见 [架构说明](ARCHITECTURE.md) 和 [开发流程](DEVELOPMENT_WORKFLOW.md)。
+解决方案只包含插件项目 `Correct_test1.csproj`。发布流水线会检查 UTF-8 编码、依赖完整性、中文字符串、包内文件白名单和安装器构建结果。架构、模板接入与发布要求分别见 [架构说明](ARCHITECTURE.md)、[通用化接入指南](GENERALIZATION_GUIDE.md) 和 [开发流程](DEVELOPMENT_WORKFLOW.md)。
 
 ## 版本
 

@@ -184,7 +184,7 @@ namespace Correct_test1.VersionCheck.Core
             // 两套路径完全相同：
             //
             // 直接使用已有归档扫描结果。
-            // 不再访问一遍Z盘。
+            // 不再访问一遍归档目录。
 
             if (PathsEqual(
                     settings.VersionArchivePath,

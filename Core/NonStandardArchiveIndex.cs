@@ -10,7 +10,7 @@ namespace Correct_test1.Core
 {
     /// <summary>
     /// 非标归档文件索引。
-    /// Z盘只递归扫描一次。
+    /// 归档目录只递归扫描一次。
     /// 建立三套内存索引：
     /// 1.
     /// DrawingNumber
@@ -57,10 +57,10 @@ namespace Correct_test1.Core
         //
         // 例如：
         //
-        // NS386DY
+        // AB386DY
         // ->
-        // NS386DY-V1.dwg
-        // NS386DY-V3.dwg
+        // AB386DY-V1.dwg
+        // AB386DY-V3.dwg
 
         private readonly
             Dictionary<string, List<string>>
@@ -71,24 +71,24 @@ namespace Correct_test1.Core
         //
         // 例如：
         //
-        // NS386DY|N2607US004
+        // AB386DY|P2026AB001
         // ->
-        // NS386DY-N2607US004-L0.dwg
-        // NS386DY-N2607US004-L2.dwg
+        // AB386DY-P2026AB001-L0.dwg
+        // AB386DY-P2026AB001-L2.dwg
 
         private readonly
             Dictionary<string, List<string>>
             _projectDwgsByKey;
 
 
-        // 文件名开头的NS归档图号
+        // 文件名开头的AB归档图号
         //
         // 支持：
         //
-        // NS386DY
-        // NS386DY-V2
-        // NS386DY_N2607US004-L0
-        // NS386DY N2607US004-L0
+        // AB386DY
+        // AB386DY-V2
+        // AB386DY_P2026AB001-L0
+        // AB386DY P2026AB001-L0
         //
         // 图号后面必须：
         //
@@ -99,13 +99,13 @@ namespace Correct_test1.Core
         //
         // 防止：
         //
-        // 查询NS386DY
-        // 错误匹配NS386DYA
+        // 查询AB386DY
+        // 错误匹配AB386DYA
 
         private static readonly Regex
             DrawingNumberRegex =
                 new Regex(
-                    @"^\s*(?<drawing>NS[0-9A-Z]+)(?=$|[-_\s])",
+                    @"^\s*(?<drawing>AB[0-9A-Z]+)(?=$|[-_\s])",
                     RegexOptions.IgnoreCase);
 
 
@@ -114,7 +114,7 @@ namespace Correct_test1.Core
         private static readonly Regex
             ProjectNumberRegex =
                 new Regex(
-                    @"N\d{4}[A-Z]{2}\d{3}",
+                    @"P\d{4}[A-Z]{2}\d{3}",
                     RegexOptions.IgnoreCase);
 
 
@@ -259,7 +259,7 @@ namespace Correct_test1.Core
 
             // 手动递归
             //
-            // 单个子目录失败不会导致整个Z盘索引失败。
+            // 单个子目录失败不会导致整个归档目录索引失败。
 
             Stack<string> directories =
                 new Stack<string>();

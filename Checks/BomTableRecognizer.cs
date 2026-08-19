@@ -432,8 +432,8 @@ namespace Correct_test1.Checks
         /// 提取图号
         /// 在表头之前寻找
         /// 例如:
-        /// NS265R1
-        /// NS135H_
+        /// AB265R1
+        /// AB135H_
         /// </summary>
         private string FindDrawingNumber(
     CadTableData table,

@@ -184,7 +184,7 @@ namespace Correct_test1.VersionCheck.Core
         /// <summary>
         /// 直接用已有文件列表建立版本索引。
         /// 用于复用NonStandardArchiveIndex，
-        /// 避免重复扫描Z盘。
+        /// 避免重复扫描归档目录。
         /// </summary>
         public static VersionArchiveIndex
             BuildFromFilePaths(
@@ -302,9 +302,9 @@ namespace Correct_test1.VersionCheck.Core
             //
             // 文件名第一个字段。
             //
-            // NS103AK 加强筋 ...
+            // AB103AK 加强筋 ...
             // ↓
-            // NS103AK
+            // AB103AK
 
             Match drawingMatch =
                 Regex.Match(
@@ -336,7 +336,7 @@ namespace Correct_test1.VersionCheck.Core
             Match projectMatch =
                 Regex.Match(
                     fileName,
-                    @"N\d{4}[A-Z]{2}\d{3}",
+                    @"P\d{4}[A-Z]{2}\d{3}",
                     RegexOptions.IgnoreCase);
 
 
@@ -361,11 +361,11 @@ namespace Correct_test1.VersionCheck.Core
 
                 // 支持：
                 //
-                // N2604US003-L1
-                // N2604US003 L1
-                // N2604US003-PE1-L1
-                // N2604US003-PE1 L1
-                // N2604US003_PE1_L1
+                // P2026AB004-L1
+                // P2026AB004 L1
+                // P2026AB004-PE1-L1
+                // P2026AB004-PE1 L1
+                // P2026AB004_PE1_L1
                 //
                 // 并允许L1后面继续有其他文字。
 

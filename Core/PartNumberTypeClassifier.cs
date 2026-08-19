@@ -14,7 +14,7 @@ namespace Correct_test1.Core
 
             string value = partNumber.Trim().ToUpper();
 
-            if (value.StartsWith("NS", StringComparison.Ordinal))
+            if (value.StartsWith("AB", StringComparison.Ordinal))
             {
                 return PartNumberType.NonStandardPart;
             }

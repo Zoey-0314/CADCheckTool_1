@@ -120,7 +120,7 @@
                     92);
 
             this.lblStandardPart.Text =
-                "诺升标准件数据库：";
+                "通用标准件数据库：";
 
 
             this.txtStandardPartPath.Location =

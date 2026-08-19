@@ -89,7 +89,7 @@
                 1;
 
             this.lblExample.Text =
-                "例如：N2604US001-L0";
+                "例如：P2026AB003-L0";
 
 
             // txtProjectVersion
