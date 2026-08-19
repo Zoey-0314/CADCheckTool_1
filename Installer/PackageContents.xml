@@ -19,9 +19,11 @@
       SeriesMax="R24.3" />
     <ComponentEntry
       AppName="CADCheckTool"
+      AppType=".Net"
       ModuleName="./Contents/Windows/CADCheckTool_1.dll"
       AppDescription="AutoCAD engineering drawing inspection tool"
-      LoadReasons="LoadOnAutoCADStartup">
+      LoadOnCommandInvocation="True"
+      LoadOnAutoCADStartup="False">
       <Commands GroupName="CADCheckTool">
         <Command Global="CHECKDRAWING" Local="CHECKDRAWING" />
         <Command Global="QREV" Local="QREV" />

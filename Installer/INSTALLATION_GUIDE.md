@@ -27,7 +27,7 @@
 2. 在命令行输入 `CHECKDRAWING`。
 3. 打开“路径设置”，确认非标归档、标准件 Excel 和版本归档路径。
 
-正常情况下无需执行 `NETLOAD`。若命令不存在，先重新启动 AutoCAD，再检查安装目录中是否存在 `CADCheckTool.bundle\PackageContents.xml`。
+正常情况下无需执行 `NETLOAD`。AutoCAD 会先注册清单中的命令，并在首次输入命令时加载 DLL。若命令不存在，先重新启动 AutoCAD，再检查安装目录中是否存在 `CADCheckTool.bundle\PackageContents.xml`。
 
 ## 升级与模式切换
 
