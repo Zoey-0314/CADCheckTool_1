@@ -14,7 +14,10 @@ namespace Correct_test1.Markers
     ObjectId spaceId,
     ObjectId layerId,
     MarkerInfo info,
-    string markerType = "StandardPart")
+    string markerType = "StandardPart",
+    double xOffset = 5.0,
+    double textHeight = 3.0,
+    bool moveRightByOwnWidth = false)
         {
             if (database == null ||
                 transaction == null ||
@@ -39,13 +42,15 @@ namespace Correct_test1.Markers
             BlockTableRecord space =
                 transaction.GetObject(
                     spaceId,
-                    OpenMode.ForWrite) as BlockTableRecord;
+                    OpenMode.ForWrite)
+                as BlockTableRecord;
 
             if (space == null)
                 return;
 
             Point3d markerPosition =
-                info.Position + Vector3d.XAxis * 5.0;
+                info.Position +
+                Vector3d.XAxis * xOffset;
 
             if (!IsValidPoint(markerPosition))
                 return;
@@ -53,14 +58,26 @@ namespace Correct_test1.Markers
             string markerText =
                 info.Text ?? "";
 
+            double finalTextHeight =
+                textHeight > 0
+                    ? textHeight
+                    : 3.0;
+
             using (MText text = new MText())
             {
                 text.SetDatabaseDefaults(database);
 
-                text.Location = markerPosition;
-                text.TextHeight = 3.0;
-                text.Contents = markerText;
-                text.LayerId = layerId;
+                text.Location =
+                    markerPosition;
+
+                text.TextHeight =
+                    finalTextHeight;
+
+                text.Contents =
+                    markerText;
+
+                text.LayerId =
+                    layerId;
 
                 space.AppendEntity(text);
 
@@ -68,18 +85,42 @@ namespace Correct_test1.Markers
                     text,
                     true);
 
-                using (ResultBuffer xdata =
-                    new ResultBuffer(
-                        new TypedValue(
-                            (int)DxfCode.ExtendedDataRegAppName,
-                            MarkerManager.XDataAppName),
-                        new TypedValue(
-    (int)DxfCode.ExtendedDataAsciiString,
-    string.IsNullOrWhiteSpace(markerType)
-        ? "StandardPart"
-        : markerType)))
+                // 只在调用方明确要求时，
+                // 再向右移动一个提示文字的实际宽度。
+                if (moveRightByOwnWidth)
                 {
-                    text.XData = xdata;
+                    double textWidth =
+                        text.ActualWidth;
+
+                    if (IsValidNumber(textWidth) &&
+                        textWidth > 0)
+                    {
+                        text.Location =
+                            markerPosition +
+                            Vector3d.XAxis * textWidth;
+                    }
+                }
+
+                using (
+                    ResultBuffer xdata =
+                        new ResultBuffer(
+                            new TypedValue(
+                                (int)
+                                DxfCode.ExtendedDataRegAppName,
+                                MarkerManager.XDataAppName),
+
+                            new TypedValue(
+                                (int)
+                                DxfCode.ExtendedDataAsciiString,
+
+                                string.IsNullOrWhiteSpace(
+                                    markerType)
+
+                                    ? "StandardPart"
+                                    : markerType)))
+                {
+                    text.XData =
+                        xdata;
                 }
             }
         }
