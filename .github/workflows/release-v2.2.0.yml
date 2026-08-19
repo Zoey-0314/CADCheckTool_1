@@ -324,15 +324,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v2.2.0 GitHub Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      - name: Publish generalized v2.2.0 pre-release
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/generalized-tool' && github.event.head_commit.message == 'Publish generalized v2.2.0 release' }}
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view v2.2.0 *> $null
-          if ($LASTEXITCODE -eq 0) {
-            gh release delete v2.2.0 --cleanup-tag --yes
-            if ($LASTEXITCODE -ne 0) { throw 'Unable to remove the previous v2.2.0 release and tag.' }
-          }
-          gh release create v2.2.0 artifacts/release/CADCheckTool_1_Setup_v2.2.0.exe artifacts/release/CADCheckTool_1_v2.2.0_Windows_x64.zip artifacts/release/CADCheckTool_1_v2.2.0_SHA256.txt Installer/INSTALLATION_GUIDE.md --target "$env:GITHUB_SHA" --title "CADCheckTool v2.2.0" --notes-file "Installer\RELEASE_NOTES_v2.2.0.md"
+          gh release create v2.2.0-generalized artifacts/release/CADCheckTool_1_Setup_v2.2.0.exe artifacts/release/CADCheckTool_1_v2.2.0_Windows_x64.zip artifacts/release/CADCheckTool_1_v2.2.0_SHA256.txt Installer/INSTALLATION_GUIDE.md --target "$env:GITHUB_SHA" --title "CADCheckTool v2.2.0 Generalized" --notes-file "Installer\RELEASE_NOTES_v2.2.0.md" --prerelease
