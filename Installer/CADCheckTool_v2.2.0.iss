@@ -100,7 +100,7 @@ begin
 end;
 
 procedure RemoveLegacyRegistrationRecursive(
-  RootKey: HKEY;
+  RootKey: Integer;
   const KeyPath: String);
 var
   SubKeyNames: TArrayOfString;
