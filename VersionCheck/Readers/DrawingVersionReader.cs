@@ -122,18 +122,41 @@ namespace Correct_test1.VersionCheck.Readers
 
 
                 //--------------------------------
-                // 复用原横竖版判断
+                // A3 / A4 直接决定横竖版，
+                // 并用同一基准点偏移版本号查找区域。
                 //--------------------------------
 
-                bool isHorizontal =
+                TitleBlockAnchorInfo anchorInfo;
+
+                bool hasAnchor =
                     TitleBlockOrientationDetector
-                        .IsHorizontal(
-                            titleTexts);
+                        .TryResolveAnchor(
+                            titleTexts,
+                            out anchorInfo);
+
+                bool isHorizontal =
+                    hasAnchor
+                        ? anchorInfo.IsHorizontal
+                        : TitleBlockOrientationDetector
+                            .IsHorizontal(
+                                titleTexts);
+
+                double offsetX =
+                    hasAnchor
+                        ? anchorInfo.OffsetX
+                        : 0.0;
+
+                double offsetY =
+                    hasAnchor
+                        ? anchorInfo.OffsetY
+                        : 0.0;
 
 
                 ProjectVersionTemplate template =
                     ProjectVersionConfig.Get(
-                        isHorizontal);
+                        isHorizontal,
+                        offsetX,
+                        offsetY);
 
 
                 DrawingVersionInfo info =

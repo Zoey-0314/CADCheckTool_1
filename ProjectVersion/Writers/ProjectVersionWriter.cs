@@ -29,7 +29,9 @@ namespace Correct_test1.ProjectVersion.Writers
             Database database,
             LayoutInfo layout,
             string value,
-            bool isHorizontal)
+            bool isHorizontal,
+            double offsetX = 0.0,
+            double offsetY = 0.0)
         {
             ProjectVersionLayoutResult result =
                 new ProjectVersionLayoutResult();
@@ -71,7 +73,9 @@ namespace Correct_test1.ProjectVersion.Writers
 
             ProjectVersionTemplate template =
                 ProjectVersionConfig.Get(
-                    isHorizontal);
+                    isHorizontal,
+                    offsetX,
+                    offsetY);
 
 
             try

@@ -108,14 +108,42 @@ namespace Correct_test1.Checks
 
 
             //--------------------------------
-            // 判断横竖版
-            // 保持原有逻辑
+            // A3 / A4 直接决定横竖版。
+            // 同时由图幅文字计算整张标题栏的平移偏移。
             //--------------------------------
 
-            bool isHorizontal =
+            TitleBlockAnchorInfo anchorInfo;
+
+            bool hasAnchor =
                 TitleBlockOrientationDetector
-                    .IsHorizontal(
-                        texts);
+                    .TryResolveAnchor(
+                        texts,
+                        out anchorInfo);
+
+            bool isHorizontal =
+                hasAnchor
+                    ? anchorInfo.IsHorizontal
+                    : TitleBlockOrientationDetector
+                        .IsHorizontal(
+                            texts);
+
+            double offsetX =
+                hasAnchor
+                    ? anchorInfo.OffsetX
+                    : 0.0;
+
+            double offsetY =
+                hasAnchor
+                    ? anchorInfo.OffsetY
+                    : 0.0;
+
+            List<TitleText> parseTexts =
+                hasAnchor
+                    ? TitleBlockOrientationDetector
+                        .NormalizeToBaseline(
+                            texts,
+                            anchorInfo)
+                    : texts;
 
 
 
@@ -125,7 +153,7 @@ namespace Correct_test1.Checks
 
             DrawingInfo info =
                 parser.Parse(
-                    texts,
+                    parseTexts,
                     isHorizontal
                 );
 
@@ -147,7 +175,11 @@ namespace Correct_test1.Checks
                 isHorizontal;
 
             List<TextHeightIssue> textHeightIssues =
-                CheckTextHeights(texts, isHorizontal);
+                CheckTextHeights(
+                    texts,
+                    isHorizontal,
+                    offsetX,
+                    offsetY);
 
             if (drawMarker)
             {
@@ -276,7 +308,9 @@ namespace Correct_test1.Checks
                         layout.LayoutName,
                         info.IsHorizontal,
                         result.ObjectName,
-                        "标题栏" + result.ObjectName + "未填写");
+                        "标题栏" + result.ObjectName + "未填写",
+                        offsetX,
+                        offsetY);
                 }
 
                 if (!string.IsNullOrEmpty(pageMessage))
@@ -286,7 +320,9 @@ namespace Correct_test1.Checks
                         layout.LayoutName,
                         info.IsHorizontal,
                         "PageNumber",
-                        pageMessage);
+                        pageMessage,
+                        offsetX,
+                        offsetY);
                 }
             }
 
@@ -360,7 +396,10 @@ namespace Correct_test1.Checks
                             db,
                             layout.LayoutName,
                             info.IsHorizontal,
-                            fileDrawingNumber
+                            fileDrawingNumber,
+                            default(Autodesk.AutoCAD.Geometry.Point3d),
+                            offsetX,
+                            offsetY
                         );
                     }
 
@@ -1100,7 +1139,9 @@ namespace Correct_test1.Checks
 
         private List<TextHeightIssue> CheckTextHeights(
             List<TitleText> texts,
-            bool isHorizontal)
+            bool isHorizontal,
+            double offsetX,
+            double offsetY)
         {
             List<TextHeightIssue> issues = new List<TextHeightIssue>();
             List<TitleFieldRegion> regions = isHorizontal
@@ -1112,14 +1153,18 @@ namespace Correct_test1.Checks
                 regions.Find(x => x.FieldName == "DrawingName"),
                 5.0,
                 "名称文字高度错误",
-                issues);
+                issues,
+                offsetX,
+                offsetY);
 
             AddRegionHeightIssues(
                 texts,
                 regions.Find(x => x.FieldName == "DrawingNumber"),
                 3.5,
                 "图号文字高度错误",
-                issues);
+                issues,
+                offsetX,
+                offsetY);
 
             TitleText technicalTitle = texts.Find(x =>
                 (x.Text ?? "").Contains("技术要求"));
@@ -1159,14 +1204,18 @@ namespace Correct_test1.Checks
             TitleFieldRegion region,
             double expectedHeight,
             string message,
-            List<TextHeightIssue> issues)
+            List<TextHeightIssue> issues,
+            double offsetX,
+            double offsetY)
         {
             if (region == null)
                 return;
 
             foreach (TitleText text in texts)
             {
-                if (region.Contains(text.X, text.Y))
+                if (region.Contains(
+                        text.X - offsetX,
+                        text.Y - offsetY))
                 {
                     AddHeightIssue(text, expectedHeight, message, issues);
                 }

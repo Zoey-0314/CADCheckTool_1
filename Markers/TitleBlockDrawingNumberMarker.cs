@@ -59,7 +59,11 @@ namespace Correct_test1.Markers
 
             string correctNumber,
 
-            Point3d textPosition = default(Point3d)
+            Point3d textPosition = default(Point3d),
+
+            double offsetX = 0.0,
+
+            double offsetY = 0.0
 
         )
         {
@@ -167,11 +171,11 @@ namespace Correct_test1.Markers
                     }
 
 
-                    double x1 = region.MinX;
-                    double x2 = region.MaxX;
+                    double x1 = region.MinX + offsetX;
+                    double x2 = region.MaxX + offsetX;
 
-                    double y1 = region.MinY;
-                    double y2 = region.MaxY;
+                    double y1 = region.MinY + offsetY;
+                    double y2 = region.MaxY + offsetY;
 
 
                     bool isBomMarker =

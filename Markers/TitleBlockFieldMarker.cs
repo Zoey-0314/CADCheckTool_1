@@ -1,4 +1,4 @@
-using System;
+锘縰sing System;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -15,7 +15,9 @@ namespace Correct_test1.Markers
             string layoutName,
             bool isHorizontal,
             string fieldName,
-            string message)
+            string message,
+            double offsetX = 0.0,
+            double offsetY = 0.0)
         {
             using (Transaction transaction = db.TransactionManager.StartTransaction())
             {
@@ -29,11 +31,13 @@ namespace Correct_test1.Markers
                 Layout layout = transaction.GetObject(
                     layouts.GetAt(layoutName),
                     OpenMode.ForRead) as Layout;
+
                 BlockTableRecord space = transaction.GetObject(
                     layout.BlockTableRecordId,
                     OpenMode.ForWrite) as BlockTableRecord;
 
                 string regionName = ToRegionName(fieldName);
+
                 TitleFieldRegion region = (isHorizontal
                     ? TitleBlockHorizontalConfig.Regions
                     : TitleBlockVerticalConfig.Regions)
@@ -42,6 +46,11 @@ namespace Correct_test1.Markers
                 if (space == null || region == null)
                     return;
 
+                double minX = region.MinX + offsetX;
+                double maxX = region.MaxX + offsetX;
+                double minY = region.MinY + offsetY;
+                double maxY = region.MaxY + offsetY;
+
                 ObjectId layerId = EnsureLayer(
                     db,
                     transaction,
@@ -49,18 +58,19 @@ namespace Correct_test1.Markers
                     Color.FromRgb(0, 255, 0));
 
                 Polyline rectangle = new Polyline();
-                rectangle.AddVertexAt(0, new Point2d(region.MinX, region.MinY), 0, 0, 0);
-                rectangle.AddVertexAt(1, new Point2d(region.MaxX, region.MinY), 0, 0, 0);
-                rectangle.AddVertexAt(2, new Point2d(region.MaxX, region.MaxY), 0, 0, 0);
-                rectangle.AddVertexAt(3, new Point2d(region.MinX, region.MaxY), 0, 0, 0);
+                rectangle.AddVertexAt(0, new Point2d(minX, minY), 0, 0, 0);
+                rectangle.AddVertexAt(1, new Point2d(maxX, minY), 0, 0, 0);
+                rectangle.AddVertexAt(2, new Point2d(maxX, maxY), 0, 0, 0);
+                rectangle.AddVertexAt(3, new Point2d(minX, maxY), 0, 0, 0);
                 rectangle.Closed = true;
                 rectangle.LayerId = layerId;
                 rectangle.Color = Color.FromRgb(0, 255, 0);
+
                 space.AppendEntity(rectangle);
                 transaction.AddNewlyCreatedDBObject(rectangle, true);
 
                 double textHeight = MarkerConfig.TextHeight;
-                double textY = region.MaxY;
+                double textY = maxY;
 
                 if (regionName == "DrawingNumber")
                 {
@@ -74,8 +84,8 @@ namespace Correct_test1.Markers
 
                         if (existingText != null &&
                             existingText.Layer == MarkerConfig.TitleBlockLayerName &&
-                            Math.Abs(existingText.Position.X - (region.MaxX + 5)) < 0.001 &&
-                            existingText.Position.Y >= region.MaxY - 0.001)
+                            Math.Abs(existingText.Position.X - (maxX + 5)) < 0.001 &&
+                            existingText.Position.Y >= maxY - 0.001)
                         {
                             hasExistingText = true;
                             break;
@@ -89,12 +99,14 @@ namespace Correct_test1.Markers
                 DBText text = new DBText
                 {
                     TextString = message,
-                    Position = new Point3d(region.MaxX + 5, region.MaxY, 0),
+                    Position = new Point3d(maxX + 5, maxY, 0),
                     Height = textHeight,
                     LayerId = layerId,
                     Color = Color.FromRgb(0, 255, 0)
                 };
-                text.Position = new Point3d(region.MaxX + 5, textY, 0);
+
+                text.Position = new Point3d(maxX + 5, textY, 0);
+
                 space.AppendEntity(text);
                 transaction.AddNewlyCreatedDBObject(text, true);
 
@@ -106,17 +118,17 @@ namespace Correct_test1.Markers
         {
             switch (fieldName)
             {
-                case "图号": return "DrawingNumber";
-                case "图纸名称": return "DrawingName";
-                case "材料": return "Material";
-                case "规格": return "Specification";
-                case "表面处理": return "SurfaceTreatment";
-                case "制图": return "Designer";
-                case "校对": return "Checker";
-                case "标审": return "Reviewer";
-                case "批准": return "Approver";
-                case "日期": return "TitleDate";
-                case "页码": return "PageNumber";
+                case "鍥惧彿": return "DrawingNumber";
+                case "鍥剧焊鍚嶇О": return "DrawingName";
+                case "鏉愭枡": return "Material";
+                case "瑙勬牸": return "Specification";
+                case "琛ㄩ潰澶勭悊": return "SurfaceTreatment";
+                case "鍒跺浘": return "Designer";
+                case "鏍″": return "Checker";
+                case "鏍囧": return "Reviewer";
+                case "鎵瑰噯": return "Approver";
+                case "鏃ユ湡": return "TitleDate";
+                case "椤电爜": return "PageNumber";
                 default: return fieldName;
             }
         }
