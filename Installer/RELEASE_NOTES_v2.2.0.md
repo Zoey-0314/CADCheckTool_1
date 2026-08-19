@@ -6,6 +6,7 @@
 - 提供单一 Inno Setup 安装器。
 - 支持当前用户免管理员安装和所有用户管理员安装。
 - 使用 Autodesk ApplicationPlugins 自动加载，不要求 `NETLOAD` 或手工注册表配置。
+- 使用 AutoCAD 标准的 `.Net` 命令按需加载声明，确保安装后可以直接识别 `CHECKDRAWING` 等命令。
 
 ## 功能
 
