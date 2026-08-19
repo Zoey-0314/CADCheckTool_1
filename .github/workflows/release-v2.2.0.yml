@@ -213,6 +213,16 @@ jobs:
           if ($requirements.SeriesMin -ne 'R24.3' -or $requirements.SeriesMax -ne 'R24.3') {
             throw 'PackageContents.xml must target AutoCAD 2024 (R24.3) only.'
           }
+          $component = $manifest.ApplicationPackage.Components.ComponentEntry
+          if ($component.AppType -ne '.Net') {
+            throw 'PackageContents.xml must explicitly declare the managed .Net component type.'
+          }
+          if ($component.LoadOnCommandInvocation -ne 'True' -or $component.LoadOnAutoCADStartup -ne 'False') {
+            throw 'PackageContents.xml must register commands for on-demand loading.'
+          }
+          if ($component.HasAttribute('LoadReasons')) {
+            throw 'PackageContents.xml must not use the unsupported LoadReasons attribute.'
+          }
           $version = [Reflection.AssemblyName]::GetAssemblyName($mainDll).Version.ToString()
           if ($version -ne '2.2.0.0') { throw "Unexpected assembly version: $version" }
 
