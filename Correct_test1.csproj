@@ -10,6 +10,7 @@
     <RootNamespace>Correct_test1</RootNamespace>
     <AssemblyName>CADCheckTool_1</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AutoCADApiDir Condition="'$(AutoCADApiDir)' == ''">D:\Programs\Autodesk\AutoCAD 2024</AutoCADApiDir>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -50,13 +51,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
+      <HintPath>$(AutoCADApiDir)\AcCoreMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
+      <HintPath>$(AutoCADApiDir)\AcDbMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>D:\Programs\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
+      <HintPath>$(AutoCADApiDir)\AcMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="EPPlus">
       <HintPath>packages\EPPlus.5.8.0\lib\net45\EPPlus.dll</HintPath>

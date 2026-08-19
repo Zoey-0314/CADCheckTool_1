@@ -1,0 +1,208 @@
+name: Build CADCheckTool v2.2.0
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+    paths:
+      - "Correct_test1.csproj"
+      - "Properties/AssemblyInfo.cs"
+      - "Installer/**"
+      - ".github/workflows/release-v2.2.0.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-installer:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet dependencies
+        shell: pwsh
+        run: |
+          nuget restore packages.config -PackagesDirectory packages -NonInteractive
+
+      - name: Download AutoCAD 2024 build references
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packageRoot = Join-Path $env:RUNNER_TEMP 'autocad-packages'
+          $apiDir = Join-Path $env:GITHUB_WORKSPACE '.autocad-api'
+
+          New-Item -ItemType Directory -Force -Path $packageRoot | Out-Null
+          New-Item -ItemType Directory -Force -Path $apiDir | Out-Null
+
+          nuget install AutoCAD.NET -Version 24.3.0 -OutputDirectory $packageRoot -ExcludeVersion -NonInteractive
+          nuget install AutoCAD.NET.Model -Version 24.3.0 -OutputDirectory $packageRoot -ExcludeVersion -NonInteractive
+
+          Copy-Item (Join-Path $packageRoot 'AutoCAD.NET\lib\net47\AcMgd.dll') $apiDir
+          Copy-Item (Join-Path $packageRoot 'AutoCAD.NET.Core\lib\net47\AcCoreMgd.dll') $apiDir
+          Copy-Item (Join-Path $packageRoot 'AutoCAD.NET.Model\lib\net47\AcDbMgd.dll') $apiDir
+
+          @('AcMgd.dll', 'AcCoreMgd.dll', 'AcDbMgd.dll') | ForEach-Object {
+            $path = Join-Path $apiDir $_
+            if (-not (Test-Path $path)) {
+              throw "Missing AutoCAD build reference: $path"
+            }
+          }
+
+      - name: Build Release x64 plugin
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $apiDir = Join-Path $env:GITHUB_WORKSPACE '.autocad-api'
+
+          msbuild Correct_test1.csproj `
+            /m `
+            /t:Rebuild `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:AutoCADApiDir="$apiDir"
+
+      - name: Assemble AutoCAD bundle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $outputDir = Join-Path $env:GITHUB_WORKSPACE 'bin\x64\Release'
+          $bundleRoot = Join-Path $env:GITHUB_WORKSPACE 'artifacts\bundle\CADCheckTool.bundle'
+          $pluginDir = Join-Path $bundleRoot 'Contents\Windows'
+          $docsDir = Join-Path $bundleRoot 'Contents\Docs'
+
+          New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null
+          New-Item -ItemType Directory -Force -Path $docsDir | Out-Null
+
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\PackageContents.xml') $bundleRoot
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\INSTALLATION_GUIDE_v2.2.0.txt') $docsDir
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'LICENSE') $docsDir
+
+          Get-ChildItem -Path $outputDir -File | ForEach-Object {
+            if ($_.Name -notin @('AcMgd.dll', 'AcDbMgd.dll', 'AcCoreMgd.dll')) {
+              Copy-Item $_.FullName $pluginDir
+            }
+          }
+
+          $configDir = Join-Path $pluginDir 'Configs'
+          New-Item -ItemType Directory -Force -Path $configDir | Out-Null
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Configs\StandardPartConfig.json') $configDir
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'app.config') (Join-Path $pluginDir 'CADCheckTool_1.dll.config')
+
+      - name: Validate bundle contents
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pluginDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts\bundle\CADCheckTool.bundle\Contents\Windows'
+          $mainDll = Join-Path $pluginDir 'CADCheckTool_1.dll'
+
+          $requiredFiles = @(
+            'CADCheckTool_1.dll',
+            'CADCheckTool_1.dll.config',
+            'EPPlus.dll',
+            'Microsoft.IO.RecyclableMemoryStream.dll',
+            'System.Buffers.dll',
+            'System.ComponentModel.Annotations.dll',
+            'System.Memory.dll',
+            'System.Numerics.Vectors.dll',
+            'System.Runtime.CompilerServices.Unsafe.dll',
+            'System.Security.Cryptography.Xml.dll',
+            'Configs\StandardPartConfig.json'
+          )
+
+          foreach ($file in $requiredFiles) {
+            $path = Join-Path $pluginDir $file
+            if (-not (Test-Path $path)) {
+              throw "Release dependency is missing: $file"
+            }
+          }
+
+          foreach ($file in @('AcMgd.dll', 'AcDbMgd.dll', 'AcCoreMgd.dll')) {
+            if (Test-Path (Join-Path $pluginDir $file)) {
+              throw "AutoCAD host assembly must not be packaged: $file"
+            }
+          }
+
+          [xml](Get-Content (Join-Path $env:GITHUB_WORKSPACE 'artifacts\bundle\CADCheckTool.bundle\PackageContents.xml')) | Out-Null
+
+          $version = [Reflection.AssemblyName]::GetAssemblyName($mainDll).Version.ToString()
+          if ($version -ne '2.2.0.0') {
+            throw "Unexpected assembly version: $version"
+          }
+
+          Get-ChildItem -Path (Split-Path $pluginDir -Parent) -Recurse | Select-Object FullName, Length
+
+      - name: Compile Inno Setup installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          choco install innosetup --no-progress -y
+          $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'
+
+          if (-not (Test-Path $iscc)) {
+            throw "Inno Setup compiler not found: $iscc"
+          }
+
+          & $iscc (Join-Path $env:GITHUB_WORKSPACE 'Installer\CADCheckTool_v2.2.0.iss')
+
+      - name: Create release ZIP and checksums
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts\release'
+          $packageDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts\release-package'
+          $setupPath = Join-Path $releaseDir 'CADCheckTool_1_Setup_v2.2.0.exe'
+          $zipPath = Join-Path $releaseDir 'CADCheckTool_1_v2.2.0_Windows_x64.zip'
+          $checksumPath = Join-Path $releaseDir 'SHA256SUMS.txt'
+
+          if (-not (Test-Path $setupPath)) {
+            throw 'Inno Setup output is missing.'
+          }
+
+          New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
+          Copy-Item $setupPath $packageDir
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\INSTALLATION_GUIDE_v2.2.0.txt') $packageDir
+
+          $setupHash = (Get-FileHash $setupPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$setupHash  CADCheckTool_1_Setup_v2.2.0.exe" | Set-Content -Path $checksumPath -Encoding ascii
+          Copy-Item $checksumPath $packageDir
+
+          Compress-Archive -Path (Join-Path $packageDir '*') -DestinationPath $zipPath -CompressionLevel Optimal -Force
+
+          $zipHash = (Get-FileHash $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          Add-Content -Path $checksumPath -Value "$zipHash  CADCheckTool_1_v2.2.0_Windows_x64.zip" -Encoding ascii
+
+          Get-ChildItem $releaseDir | Select-Object Name, Length
+
+      - name: Upload validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CADCheckTool_1-v2.2.0-release
+          path: |
+            artifacts/release/CADCheckTool_1_Setup_v2.2.0.exe
+            artifacts/release/CADCheckTool_1_v2.2.0_Windows_x64.zip
+            artifacts/release/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish v2.2.0 GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v2.2.0 `
+            artifacts/release/CADCheckTool_1_Setup_v2.2.0.exe `
+            artifacts/release/CADCheckTool_1_v2.2.0_Windows_x64.zip `
+            artifacts/release/SHA256SUMS.txt `
+            --target "$env:GITHUB_SHA" `
+            --title "CADCheckTool v2.2.0" `
+            --notes-file "Installer\RELEASE_NOTES_v2.2.0.md"

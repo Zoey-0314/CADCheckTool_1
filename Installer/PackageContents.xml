@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage
+  SchemaVersion="1.0"
+  AutodeskProduct="AutoCAD"
+  ProductType="Application"
+  Name="CADCheckTool"
+  Author="Zoey-0314"
+  Description="AutoCAD engineering drawing inspection tool"
+  AppVersion="2.2.0"
+  ProductCode="{DE764F27-CF1C-420B-918A-D2F5DC66807C}">
+  <CompanyDetails
+    Name="Zoey-0314"
+    Url="https://github.com/Zoey-0314/CADCheckTool_1" />
+  <Components>
+    <RuntimeRequirements
+      OS="Win64"
+      Platform="AutoCAD*"
+      SeriesMin="R24.3"
+      SeriesMax="R24.3" />
+    <ComponentEntry
+      AppName="CADCheckTool"
+      ModuleName="./Contents/Windows/CADCheckTool_1.dll"
+      AppDescription="AutoCAD engineering drawing inspection tool"
+      LoadReasons="LoadOnAutoCADStartup">
+      <Commands GroupName="CADCheckTool">
+        <Command Global="CHECKDRAWING" Local="CHECKDRAWING" />
+        <Command Global="QREV" Local="QREV" />
+        <Command Global="QREVMODE" Local="QREVMODE" />
+        <Command Global="QREVCLEAR" Local="QREVCLEAR" />
+      </Commands>
+    </ComponentEntry>
+  </Components>
+</ApplicationPackage>
