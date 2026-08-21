@@ -2,7 +2,7 @@ name: Build CADCheckTool v2.2.0
 
 on:
   pull_request:
-    branches: [master]
+    branches: [master, company-maintenance-v2.2.0]
   push:
     branches: [master]
     paths:
@@ -185,6 +185,7 @@ jobs:
           $bundleRoot = Join-Path $env:GITHUB_WORKSPACE 'artifacts\bundle\CADCheckTool.bundle'
           $pluginDir = Join-Path $bundleRoot 'Contents\Windows'
           $mainDll = Join-Path $pluginDir 'CADCheckTool_1.dll'
+          $recyclableStreamDll = Join-Path $pluginDir 'Microsoft.IO.RecyclableMemoryStream.dll'
           $expectedFiles = @(
             'PackageContents.xml',
             'Docs\INSTALLATION_GUIDE.md',
@@ -206,6 +207,12 @@ jobs:
           $difference = Compare-Object ($expectedFiles | Sort-Object) ($actualFiles | Sort-Object)
           if ($difference) {
             throw ('Bundle file whitelist mismatch:' + [Environment]::NewLine + ($difference | Out-String))
+          }
+
+          $recyclableStreamVersion =
+            [Reflection.AssemblyName]::GetAssemblyName($recyclableStreamDll).Version.ToString()
+          if ($recyclableStreamVersion -ne '1.4.1.0') {
+            throw "Microsoft.IO.RecyclableMemoryStream must be assembly version 1.4.1.0 for EPPlus 5.8.0; actual: $recyclableStreamVersion"
           }
 
           [xml]$manifest = Get-Content (Join-Path $bundleRoot 'PackageContents.xml') -Raw
