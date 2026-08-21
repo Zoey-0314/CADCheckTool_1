@@ -2,6 +2,8 @@
 
 ## 交付范围
 
+- 公司维护版只通过 `company-maintenance-v2.2.0` 的 GitHub Actions artifact 分发，不创建公开 Release。
+- 公开 Release 中的 `v2.2.0-generalized` 是通用化 pre-release，不适用于公司生产图纸。
 - 兼容 AutoCAD 2024（R24.3），Windows x64，.NET Framework 4.8。
 - 提供单一 Inno Setup 安装器。
 - 支持当前用户免管理员安装和所有用户管理员安装。
