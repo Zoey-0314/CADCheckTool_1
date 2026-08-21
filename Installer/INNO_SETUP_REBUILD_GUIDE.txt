@@ -1,0 +1,49 @@
+CADCheckTool 2.2.0 公司版 Inno Setup 重新打包说明
+
+一、准备环境
+
+1. Windows 电脑安装 Inno Setup 6。
+2. 将整个 CADCheckTool_1_v2.2.0_InnoSetup_Source.zip 解压到本地文件夹。
+3. 不要只复制 Installer 文件夹；artifacts 文件夹也是打包所需内容。
+
+二、替换插件文件
+
+插件运行文件位于：
+
+artifacts\bundle\CADCheckTool.bundle\Contents\Windows\
+
+更新插件时，建议用同一次 Release x64 构建生成的完整文件集替换该目录。至少必须保留以下文件：
+
+- CADCheckTool_1.dll
+- CADCheckTool_1.dll.config
+- EPPlus.dll
+- Microsoft.IO.RecyclableMemoryStream.dll
+- System.Buffers.dll
+- System.ComponentModel.Annotations.dll
+- System.Memory.dll
+- System.Numerics.Vectors.dll
+- System.Runtime.CompilerServices.Unsafe.dll
+- System.Security.Cryptography.Xml.dll
+
+EPPlus 5.8.0 要求此包中的 Microsoft.IO.RecyclableMemoryStream.dll 程序集版本为 1.4.1.0。不要用 3.x DLL 替换，否则公司版标准件 Excel 检查可能无法加载。
+
+三、生成安装 EXE
+
+双击：
+
+Installer\BUILD_INSTALLER.cmd
+
+脚本会先检查 DLL 是否齐全以及 RecyclableMemoryStream 版本是否正确，然后调用 Inno Setup 6 编译。
+
+生成结果位于：
+
+artifacts\release\CADCheckTool_1_Setup_v2.2.0.exe
+
+也可以使用 Inno Setup Compiler 打开 Installer\CADCheckTool_v2.2.0.iss，点击 Compile 手动生成。
+
+四、测试
+
+1. 保存图纸并完全关闭 AutoCAD。
+2. 运行新生成的安装程序。
+3. 启动 AutoCAD 2024，输入 CHECKDRAWING。
+4. 使用公司标准件库验证标准件格式错误能够正常标注。
