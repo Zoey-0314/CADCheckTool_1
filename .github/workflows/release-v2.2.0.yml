@@ -272,18 +272,24 @@ jobs:
           & $iscc (Join-Path $env:GITHUB_WORKSPACE 'Installer\CADCheckTool_v2.2.0.iss')
           if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed.' }
 
-      - name: Create release ZIP and checksums
+      - name: Create release and Inno Setup source ZIPs
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $releaseDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts\release'
           $packageDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts\release-package'
+          $sourcePackageDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts\inno-setup-source'
+          $sourceInstallerDir = Join-Path $sourcePackageDir 'Installer'
+          $sourceBundleParent = Join-Path $sourcePackageDir 'artifacts\bundle'
           $setupName = 'CADCheckTool_1_Setup_v2.2.0.exe'
           $zipName = 'CADCheckTool_1_v2.2.0_Windows_x64.zip'
+          $sourceZipName = 'CADCheckTool_1_v2.2.0_InnoSetup_Source.zip'
           $checksumName = 'CADCheckTool_1_v2.2.0_SHA256.txt'
           $setupPath = Join-Path $releaseDir $setupName
           $zipPath = Join-Path $releaseDir $zipName
+          $sourceZipPath = Join-Path $releaseDir $sourceZipName
           $checksumPath = Join-Path $releaseDir $checksumName
+          $bundleRoot = Join-Path $env:GITHUB_WORKSPACE 'artifacts\bundle\CADCheckTool.bundle'
           if (-not (Test-Path $setupPath)) { throw 'Inno Setup output is missing.' }
 
           New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
@@ -302,6 +308,45 @@ jobs:
           $zipHash = (Get-FileHash $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
           Add-Content -Path $checksumPath -Value "$zipHash  $zipName" -Encoding ascii
 
+          New-Item -ItemType Directory -Force -Path $sourceInstallerDir | Out-Null
+          New-Item -ItemType Directory -Force -Path $sourceBundleParent | Out-Null
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\CADCheckTool_v2.2.0.iss') $sourceInstallerDir
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\BUILD_INSTALLER.ps1') $sourceInstallerDir
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\BUILD_INSTALLER.cmd') $sourceInstallerDir
+          Copy-Item (Join-Path $env:GITHUB_WORKSPACE 'Installer\INNO_SETUP_REBUILD_GUIDE.txt') $sourceInstallerDir
+          Copy-Item $bundleRoot $sourceBundleParent -Recurse
+
+          $expectedSourceFiles = @(
+            'Installer\CADCheckTool_v2.2.0.iss',
+            'Installer\BUILD_INSTALLER.ps1',
+            'Installer\BUILD_INSTALLER.cmd',
+            'Installer\INNO_SETUP_REBUILD_GUIDE.txt',
+            'artifacts\bundle\CADCheckTool.bundle\PackageContents.xml',
+            'artifacts\bundle\CADCheckTool.bundle\Docs\INSTALLATION_GUIDE.md',
+            'artifacts\bundle\CADCheckTool.bundle\Docs\LICENSE',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\CADCheckTool_1.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\CADCheckTool_1.dll.config',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\EPPlus.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\Microsoft.IO.RecyclableMemoryStream.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\System.Buffers.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\System.ComponentModel.Annotations.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\System.Memory.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\System.Numerics.Vectors.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\System.Runtime.CompilerServices.Unsafe.dll',
+            'artifacts\bundle\CADCheckTool.bundle\Contents\Windows\System.Security.Cryptography.Xml.dll'
+          )
+          $actualSourceFiles = Get-ChildItem $sourcePackageDir -Recurse -File | ForEach-Object {
+            $_.FullName.Substring($sourcePackageDir.Length + 1)
+          }
+          $sourceDifference = Compare-Object ($expectedSourceFiles | Sort-Object) ($actualSourceFiles | Sort-Object)
+          if ($sourceDifference) {
+            throw ('Inno Setup source package whitelist mismatch:' + [Environment]::NewLine + ($sourceDifference | Out-String))
+          }
+
+          Compress-Archive -Path (Join-Path $sourcePackageDir '*') -DestinationPath $sourceZipPath -CompressionLevel Optimal -Force
+          $sourceZipHash = (Get-FileHash $sourceZipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          Add-Content -Path $checksumPath -Value "$sourceZipHash  $sourceZipName" -Encoding ascii
+
       - name: Upload validation artifact
         uses: actions/upload-artifact@v4
         with:
@@ -309,6 +354,7 @@ jobs:
           path: |
             artifacts/release/CADCheckTool_1_Setup_v2.2.0.exe
             artifacts/release/CADCheckTool_1_v2.2.0_Windows_x64.zip
+            artifacts/release/CADCheckTool_1_v2.2.0_InnoSetup_Source.zip
             artifacts/release/CADCheckTool_1_v2.2.0_SHA256.txt
             Installer/INSTALLATION_GUIDE.md
           if-no-files-found: error
