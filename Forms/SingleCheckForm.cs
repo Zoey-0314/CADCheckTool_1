@@ -301,6 +301,26 @@ namespace Correct_test1
                     "检查完成，详细问题已标注在图纸中。";
 
 
+                // 标准件数据库不可用时必须明确提示。
+                // 不能让用户误以为标准件检查已经执行。
+
+                if (report != null &&
+                    !report.StandardPartDatabaseAvailable)
+                {
+                    completeMessage +=
+                        "\n\n注意：标准件检查未执行。";
+
+
+                    if (!string.IsNullOrWhiteSpace(
+                            report.StandardPartDatabaseError))
+                    {
+                        completeMessage +=
+                            "\n"
+                            + report.StandardPartDatabaseError;
+                    }
+                }
+
+
                 // Z盘不可用时：
                 //
                 // 不把NS件误报成“归档不存在”，

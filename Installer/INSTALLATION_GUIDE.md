@@ -5,7 +5,9 @@
 1. 确认电脑已安装 64 位 AutoCAD 2024。
 2. 确认系统已启用 .NET Framework 4.8。
 3. 保存图纸并完全关闭所有 AutoCAD 进程。
-4. 从 GitHub Release 下载 ZIP，核对 `CADCheckTool_1_v2.2.0_SHA256.txt` 后解压。
+4. 从 [公司维护构建工作流](https://github.com/Zoey-0314/CADCheckTool_1/actions/workflows/release-v2.2.0.yml) 下载 `company-maintenance-v2.2.0` 最新成功运行中的 `CADCheckTool_1-v2.2.0-company-build`，核对 `CADCheckTool_1_v2.2.0_SHA256.txt` 后解压。不要下载公开 Release 中的 `v2.2.0-generalized`，它是通用化 pre-release。
+
+需要替换 DLL 后自行生成安装程序时，使用同一构建产物中的 `CADCheckTool_1_v2.2.0_InnoSetup_Source.zip`。不要从安装器 EXE 中单独提取文件，也不要混用不同构建生成的 DLL。
 
 ## 选择安装模式
 
@@ -47,7 +49,7 @@
 
 ### 中文显示为乱码
 
-只使用 v2.2.0 Release 中的正式安装器，不要混用旧 DLL 或手工复制的历史包。仍有问题时提供安装器文件哈希和截图。
+只使用公司维护构建工作流生成的完整安装器，不要使用通用化 pre-release、旧 DLL 或手工复制的历史包。仍有问题时提供安装器文件哈希和截图。
 
 ### AutoCAD 正在运行
 

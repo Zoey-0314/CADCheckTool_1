@@ -112,6 +112,28 @@ namespace Correct_test1.Batch
             }
 
 
+            string standardPartError;
+
+
+            if (!StandardPartDatabase.TryEnsureLoaded(
+                    out standardPartError))
+            {
+                results.Add(
+                    new CheckResult
+                    {
+                        FilePath = "",
+                        FileName = "",
+                        Type = "标准件检查",
+                        ObjectName = "标准件数据库",
+                        ExpectedValue = "标准件数据库可读取",
+                        Message =
+                            "标准件检查未执行："
+                            + (standardPartError ?? ""),
+                        IsError = true
+                    });
+            }
+
+
             Document hostDocument =
                 EnsureHostDocument();
 

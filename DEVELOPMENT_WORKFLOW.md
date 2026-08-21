@@ -11,7 +11,7 @@
 
 ## 修改流程
 
-1. 从最新 `master` 创建短期分支。
+1. 从最新 `company-maintenance-v2.2.0` 创建公司版短期分支。
 2. 只修改当前任务需要的代码；不得提交 `bin`、`obj`、`packages`、临时补丁、调试命令或测试图纸。
 3. 搜索调用关系后再删除代码。AutoCAD 命令入口、接口方法和反射入口不能仅按“引用次数少”判断为未使用。
 4. 业务规则修改需要更新对应中文维护注释，删除历史叙述、分隔线和被注释掉的旧代码。
@@ -45,18 +45,20 @@ GitHub Actions 在 Windows 上执行：
 6. Inno Setup 编译及安装包内容检查。
 7. ZIP、安装器和 SHA-256 文件生成。
 
-PR 检查通过后再合并。不要绕过失败的 Windows 构建直接创建 Release。
+PR 检查通过后再合并。不要绕过失败的 Windows 构建直接分发安装包。
 
-## v2.2.0 发布
+## v2.2.0 公司维护构建
 
-`master` 的发布流水线会以通过检查的提交重新创建 `v2.2.0` tag 和 Release，并上传：
+`company-maintenance-v2.2.0` 的构建流水线只生成 GitHub Actions artifact，不创建公开 tag 或 Release。artifact 名称为 `CADCheckTool_1-v2.2.0-company-build`，包含：
 
 - `CADCheckTool_1_Setup_v2.2.0.exe`
 - `CADCheckTool_1_v2.2.0_Windows_x64.zip`
 - `CADCheckTool_1_v2.2.0_SHA256.txt`
 - `INSTALLATION_GUIDE.md`
 
-发布后下载 ZIP 做最终抽检：核对哈希、解压文件白名单、中文显示、普通用户安装、管理员所有用户安装、AutoCAD 2024 自动加载和卸载。
+构建后下载 artifact 做最终抽检：核对哈希、解压文件白名单、中文显示、普通用户安装、管理员所有用户安装、AutoCAD 2024 自动加载和卸载。
+
+公开 Release 页面中的 `v2.2.0-generalized` 仅为通用化 pre-release。公司维护版不得引用或分发该安装包。
 
 ## 后续版本
 

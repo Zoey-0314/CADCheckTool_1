@@ -13,7 +13,9 @@ CADCheckTool 是面向 AutoCAD 2024 的工程图纸检查与快速划改插件�
 
 ## 安装
 
-从 [v2.2.0 Release](https://github.com/Zoey-0314/CADCheckTool_1/releases/tag/v2.2.0) 下载 `CADCheckTool_1_v2.2.0_Windows_x64.zip`，核对 SHA-256 后解压并运行 `CADCheckTool_1_Setup_v2.2.0.exe`。
+公司维护版不再发布到公开 Release。请从 [公司维护构建工作流](https://github.com/Zoey-0314/CADCheckTool_1/actions/workflows/release-v2.2.0.yml) 下载 `company-maintenance-v2.2.0` 最新成功运行中的 `CADCheckTool_1-v2.2.0-company-build`，核对 SHA-256 后解压并运行 `CADCheckTool_1_Setup_v2.2.0.exe`。
+
+公开 Release 页面中的 `v2.2.0-generalized` 是通用化 pre-release，不是公司维护版，不得用于公司生产图纸。
 
 安装程序提供两种模式：
 

@@ -2,8 +2,11 @@
 
 ## 交付范围
 
+- 公司维护版只通过 `company-maintenance-v2.2.0` 的 GitHub Actions artifact 分发，不创建公开 Release。
+- 公开 Release 中的 `v2.2.0-generalized` 是通用化 pre-release，不适用于公司生产图纸。
 - 兼容 AutoCAD 2024（R24.3），Windows x64，.NET Framework 4.8。
 - 提供单一 Inno Setup 安装器。
+- 同时提供 `CADCheckTool_1_v2.2.0_InnoSetup_Source.zip`，内含完整运行 DLL、Inno Setup 脚本和本地重新打包脚本，可在替换同一次构建的插件文件后自行生成安装 EXE。
 - 支持当前用户免管理员安装和所有用户管理员安装。
 - 使用 Autodesk ApplicationPlugins 自动加载，不要求 `NETLOAD` 或手工注册表配置。
 - 使用 AutoCAD 标准的 `.Net` 命令按需加载声明，确保安装后可以直接识别 `CHECKDRAWING` 等命令。
